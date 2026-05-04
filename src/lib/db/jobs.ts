@@ -2,6 +2,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { demoJobs, explorerTxUrl, isDemoMode, type DemoJob, type JobStatus } from "@/lib/demoData";
 
 let supabase: SupabaseClient | null = null;
+const DEMO_JOBS_STORAGE_KEY = "archve.demo.jobs";
 
 function getSupabase() {
   if (isDemoMode()) return null;
@@ -48,6 +49,36 @@ function normalizeJob(job: Partial<DemoJob> & Record<string, any>): Job {
   };
 }
 
+function canUseLocalStorage() {
+  return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+}
+
+function getStoredDemoJobs(): Job[] {
+  if (!canUseLocalStorage()) return [];
+  try {
+    const raw = window.localStorage.getItem(DEMO_JOBS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.map(normalizeJob) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveStoredDemoJobs(jobs: Job[]) {
+  if (!canUseLocalStorage()) return;
+  window.localStorage.setItem(DEMO_JOBS_STORAGE_KEY, JSON.stringify(jobs));
+}
+
+function getDemoJobs(status?: string) {
+  const jobsById = new Map<string, Job>();
+  for (const job of demoJobs.map(normalizeJob)) jobsById.set(job.id, job);
+  for (const job of getStoredDemoJobs()) jobsById.set(job.id, job);
+  return Array.from(jobsById.values())
+    .filter((job) => !status || job.status === status)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+}
+
 export async function createJobRecord(data: Omit<Job, "id" | "created_at" | "deliverable_hash" | "explorer_url" | "expiry_hours">): Promise<Job> {
   const client = getSupabase();
   const payload = {
@@ -57,12 +88,14 @@ export async function createJobRecord(data: Omit<Job, "id" | "created_at" | "del
   };
 
   if (!client) {
-    return normalizeJob({
+    const job = normalizeJob({
       ...payload,
       id: `job_demo_${Date.now()}`,
       deliverable_hash: null,
       created_at: new Date().toISOString(),
     });
+    saveStoredDemoJobs([job, ...getStoredDemoJobs().filter((item) => item.id !== job.id)]);
+    return job;
   }
 
   const { data: job, error } = await client
@@ -77,9 +110,7 @@ export async function createJobRecord(data: Omit<Job, "id" | "created_at" | "del
 export async function getJobs(status?: string): Promise<Job[]> {
   const client = getSupabase();
   if (!client) {
-    return demoJobs
-      .filter((job) => !status || job.status === status)
-      .map(normalizeJob);
+    return getDemoJobs(status);
   }
 
   let query = client.from("jobs").select("*").order("created_at", { ascending: false });
@@ -92,7 +123,7 @@ export async function getJobs(status?: string): Promise<Job[]> {
 export async function getJobById(id: string): Promise<Job | null> {
   const client = getSupabase();
   if (!client) {
-    const job = demoJobs.find((item) => item.id === id || item.onchain_job_id === id);
+    const job = getDemoJobs().find((item) => item.id === id || item.onchain_job_id === id || item.onchain_id === id);
     return job ? normalizeJob(job) : null;
   }
 
@@ -109,9 +140,8 @@ export async function getJobsByWallet(wallet: string): Promise<Job[]> {
   const lowerWallet = wallet.toLowerCase();
   const client = getSupabase();
   if (!client) {
-    return demoJobs
+    return getDemoJobs()
       .filter((job) => job.client_wallet.toLowerCase() === lowerWallet || job.provider_wallet.toLowerCase() === lowerWallet)
-      .map(normalizeJob);
   }
 
   const { data, error } = await client
@@ -125,7 +155,14 @@ export async function getJobsByWallet(wallet: string): Promise<Job[]> {
 
 export async function updateJobStatus(id: string, status: Job["status"], extras?: Partial<Job>) {
   const client = getSupabase();
-  if (!client) return;
+  if (!client) {
+    const jobs = getStoredDemoJobs();
+    const current = getDemoJobs().find((job) => job.id === id || job.onchain_id === id || job.onchain_job_id === id);
+    if (!current) return;
+    const updated = normalizeJob({ ...current, status, ...extras });
+    saveStoredDemoJobs([updated, ...jobs.filter((job) => job.id !== updated.id)]);
+    return;
+  }
 
   const { error } = await client.from("jobs").update({ status, ...extras }).eq("id", id);
   if (error) throw new Error(error.message);
@@ -133,7 +170,14 @@ export async function updateJobStatus(id: string, status: Job["status"], extras?
 
 export async function updateJobOnchainId(id: string, onchainId: string, txHash: string) {
   const client = getSupabase();
-  if (!client) return;
+  if (!client) {
+    const jobs = getStoredDemoJobs();
+    const current = getDemoJobs().find((job) => job.id === id);
+    if (!current) return;
+    const updated = normalizeJob({ ...current, onchain_job_id: onchainId, onchain_id: onchainId, tx_hash: txHash });
+    saveStoredDemoJobs([updated, ...jobs.filter((job) => job.id !== updated.id)]);
+    return;
+  }
 
   const { error } = await client
     .from("jobs")
