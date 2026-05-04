@@ -127,7 +127,7 @@ function JobDetailContent() {
                       Fund escrow on Arc
                     </button>
                   )}
-                  {isProvider && ["funded", "accepted"].includes(job.status) && (
+                  {isProvider && job.status === "funded" && (
                     <div className="space-y-3">
                       <input className="input-field" value={deliverableHash} onChange={(event) => setDeliverableHash(event.target.value)} placeholder="ipfs:// or sha256 deliverable hash" />
                       <button className="btn-primary w-full" disabled={actionState === "processing" || !deliverableHash.trim()} onClick={() => runAction(() => submitDeliverable({ walletClient, jobId: job.onchain_id ?? job.id, deliverableHash }), "submitted", { deliverable_hash: deliverableHash })}>

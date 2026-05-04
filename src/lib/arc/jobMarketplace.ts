@@ -27,6 +27,12 @@ async function getLiveClients(walletClient: WalletClient) {
   return { account, arcTestnet, publicClient };
 }
 
+function assertSuccessfulReceipt(receipt: { status: "success" | "reverted"; transactionHash: `0x${string}` }, action: string) {
+  if (receipt.status === "reverted") {
+    throw new Error(`${action} transaction reverted on Arc Testnet: ${receipt.transactionHash}`);
+  }
+}
+
 function toBytes32(value: string) {
   if (/^0x[a-fA-F0-9]{64}$/.test(value)) return value as Hex;
   return null;
@@ -78,6 +84,7 @@ export async function createJob({
     chain: arcTestnet,
   });
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+  assertSuccessfulReceipt(receipt, "Create job");
   const created = receipt.logs.flatMap((log) => {
     try {
       const decoded = decodeEventLog({ abi: agenticCommerceAbi, data: log.data, topics: log.topics });
@@ -119,7 +126,8 @@ export async function fundEscrow({
     account,
     chain: arcTestnet,
   });
-  await publicClient.waitForTransactionReceipt({ hash: approveHash });
+  const approveReceipt = await publicClient.waitForTransactionReceipt({ hash: approveHash });
+  assertSuccessfulReceipt(approveReceipt, "Approve USDC");
 
   const fundHash = await walletClient.writeContract({
     address: marketplaceAddress,
@@ -129,7 +137,8 @@ export async function fundEscrow({
     account,
     chain: arcTestnet,
   });
-  await publicClient.waitForTransactionReceipt({ hash: fundHash });
+  const fundReceipt = await publicClient.waitForTransactionReceipt({ hash: fundHash });
+  assertSuccessfulReceipt(fundReceipt, "Fund escrow");
 
   return { txHash: fundHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${fundHash}`, jobId, mode: "live" };
 }
@@ -155,7 +164,8 @@ export async function acceptJob({
     account,
     chain: arcTestnet,
   });
-  await publicClient.waitForTransactionReceipt({ hash: txHash });
+  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+  assertSuccessfulReceipt(receipt, "Set budget");
   return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "live" };
 }
 
@@ -189,7 +199,8 @@ export async function submitDeliverable({
     account,
     chain: arcTestnet,
   });
-  await publicClient.waitForTransactionReceipt({ hash: txHash });
+  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+  assertSuccessfulReceipt(receipt, "Submit deliverable");
   return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, deliverableHash: submittedHash, mode: "live" };
 }
 
@@ -213,7 +224,8 @@ export async function approveAndPay({
     account,
     chain: arcTestnet,
   });
-  await publicClient.waitForTransactionReceipt({ hash: txHash });
+  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+  assertSuccessfulReceipt(receipt, "Complete job");
   return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "live" };
 }
 
