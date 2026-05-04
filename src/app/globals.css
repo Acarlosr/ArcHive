@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── ArcHive Design System ── */
+:root {
+  --arc-bg: #060a10;
+  --arc-surface: #0c1219;
+  --arc-card: #111822;
+  --arc-border: #1a2535;
+  --arc-cyan: #00d4ff;
+  --arc-green: #00e5a0;
+  --arc-purple: #a855f7;
+  --arc-red: #ff4d6a;
+  --arc-text: #e8f0f8;
+  --arc-muted: #8fa8c0;
+  --arc-dim: #4d6a85;
+  --font-display: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", "Roboto Mono", Consolas, "Liberation Mono", monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--arc-bg);
+  color: var(--arc-text);
+  font-family: var(--font-body), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ── Background Grid ── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 212, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#__next,
+main {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--arc-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--arc-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--arc-dim);
+}
+
+/* ── Selection ── */
+::selection {
+  background: rgba(0, 212, 255, 0.2);
+  color: #fff;
+}
+
+/* ── Glass Card ── */
+@layer components {
+  .glass-card {
+    @apply bg-arc-card/80 backdrop-blur-xl border border-arc-border rounded-lg;
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300
+      hover:border-arc-cyan/30 hover:shadow-[0_0_30px_rgba(0,212,255,0.08)];
+  }
+
+  .glow-border {
+    @apply border border-arc-cyan/20 shadow-[0_0_15px_rgba(0,212,255,0.1)];
+  }
+
+  .glow-text {
+    @apply text-arc-cyan drop-shadow-[0_0_8px_rgba(0,212,255,0.5)];
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 bg-arc-cyan text-arc-bg font-display font-bold text-sm
+      tracking-normal rounded-lg
+      hover:bg-white hover:shadow-[0_0_40px_rgba(0,212,255,0.4)]
+      transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 border border-arc-border text-arc-muted font-display font-medium text-sm
+      tracking-normal rounded-lg
+      hover:border-arc-cyan/40 hover:text-arc-cyan
+      transition-all duration-300;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-arc-surface border border-arc-border rounded-lg
+      text-arc-text text-sm font-body
+      focus:outline-none focus:border-arc-cyan focus:ring-2 focus:ring-arc-cyan/10
+      transition-all duration-200
+      placeholder:text-arc-dim;
+  }
+
+  .label-field {
+    @apply text-xs font-mono text-arc-dim uppercase tracking-[0.15em];
+  }
+
+  .status-badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium;
+  }
+}
+
+/* ── Status Badge Colors ── */
+.status-open {
+  @apply bg-arc-cyan/10 text-arc-cyan border border-arc-cyan/20;
+}
+.status-funded {
+  @apply bg-arc-green/10 text-arc-green border border-arc-green/20;
+}
+.status-submitted {
+  @apply bg-arc-purple/10 text-arc-purple border border-arc-purple/20;
+}
+.status-completed {
+  @apply bg-arc-green/10 text-arc-green border border-arc-green/20;
+}
+.status-rejected {
+  @apply bg-arc-red/10 text-arc-red border border-arc-red/20;
+}
+.status-expired {
+  @apply bg-arc-dim/10 text-arc-dim border border-arc-dim/20;
+}
+
+/* ── Animations ── */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 212, 255, 0.05),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
