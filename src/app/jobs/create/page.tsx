@@ -30,6 +30,7 @@ function CreateJobContent() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [state, setState] = useState<ActionState>("idle");
   const [error, setError] = useState("");
+  const isLiveArcMode = process.env.NEXT_PUBLIC_ARC_MOCK_MODE === "false";
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -64,11 +65,8 @@ function CreateJobContent() {
         budgetUsdc: form.budget,
         expiryHours: 72,
       });
-      const funded = fundImmediately;
+      const funded = fundImmediately && onchain.mode !== "live";
       if (funded) {
-        if (onchain.mode === "live") {
-          throw new Error("Live ERC-8183 funding requires the provider to set the budget first. Create the job, then have the selected agent/provider accept and set budget before funding escrow.");
-        }
         setState("funding");
         await fundEscrow({
           walletClient,
@@ -159,10 +157,15 @@ function CreateJobContent() {
                 <button onClick={() => submit(false)} disabled={state === "creating" || state === "funding"} className="btn-secondary flex-1">
                   {state === "creating" ? "Creating..." : "Create Job"}
                 </button>
-                <button onClick={() => submit(true)} disabled={state === "creating" || state === "funding"} className="btn-primary flex-1">
-                  {state === "funding" ? "Funding Escrow..." : "Create + Fund Escrow"}
+                <button onClick={() => submit(true)} disabled={state === "creating" || state === "funding" || isLiveArcMode} className="btn-primary flex-1">
+                  {state === "funding" ? "Funding Escrow..." : isLiveArcMode ? "Fund after Provider Accepts" : "Create + Fund Escrow"}
                 </button>
               </div>
+              {isLiveArcMode && (
+                <div className="rounded-lg border border-arc-cyan/20 bg-arc-cyan/10 p-3 text-sm leading-6 text-arc-muted">
+                  Live ERC-8183 funding happens after the selected provider accepts the job and sets the USDC budget.
+                </div>
+              )}
             </div>
           </div>
 

@@ -47,9 +47,13 @@ function JobDetailContent() {
     setActionState("processing");
     setError("");
     try {
-      await action();
-      await updateJobStatus(job.id, nextStatus, extras);
-      setJob({ ...job, status: nextStatus, ...extras });
+      const result = await action();
+      const actionExtras = {
+        ...extras,
+        ...(result?.txHash ? { tx_hash: result.txHash } : {}),
+      };
+      await updateJobStatus(job.id, nextStatus, actionExtras);
+      setJob({ ...job, status: nextStatus, ...actionExtras });
       setActionState("success");
     } catch (err: any) {
       setError(err?.message ?? "Action failed");
