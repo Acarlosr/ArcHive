@@ -81,10 +81,11 @@ function getDemoJobs(status?: string) {
 
 export async function createJobRecord(data: Omit<Job, "id" | "created_at" | "deliverable_hash" | "explorer_url" | "expiry_hours">): Promise<Job> {
   const client = getSupabase();
+  const { id: _ignoredId, ...dataWithoutEmptyId } = data as typeof data & { id?: string };
   const payload = {
-    ...data,
-    onchain_job_id: data.onchain_job_id ?? data.onchain_id,
-    budget_usdc: data.budget_usdc ?? data.budget,
+    ...dataWithoutEmptyId,
+    onchain_job_id: dataWithoutEmptyId.onchain_job_id ?? dataWithoutEmptyId.onchain_id,
+    budget_usdc: dataWithoutEmptyId.budget_usdc ?? dataWithoutEmptyId.budget,
   };
 
   if (!client) {
