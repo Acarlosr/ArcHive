@@ -66,6 +66,9 @@ function CreateJobContent() {
       });
       const funded = fundImmediately;
       if (funded) {
+        if (onchain.mode === "live") {
+          throw new Error("Live ERC-8183 funding requires the provider to set the budget first. Create the job, then have the selected agent/provider accept and set budget before funding escrow.");
+        }
         setState("funding");
         await fundEscrow({
           walletClient,

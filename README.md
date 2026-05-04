@@ -35,9 +35,24 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=
 NEXT_PUBLIC_ARC_RPC_URL=
 NEXT_PUBLIC_ARC_AGENT_REGISTRY_ADDRESS=
+NEXT_PUBLIC_ARC_REPUTATION_REGISTRY_ADDRESS=
+NEXT_PUBLIC_ARC_VALIDATION_REGISTRY_ADDRESS=
 NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS=
 NEXT_PUBLIC_ARC_ESCROW_VAULT_ADDRESS=
+NEXT_PUBLIC_ARC_USDC_ADDRESS=
 NEXT_PUBLIC_ARC_MOCK_MODE=false
+```
+
+Arc Testnet reference contracts from the official Arc quickstarts:
+
+```bash
+NEXT_PUBLIC_ARC_RPC_URL=https://rpc.testnet.arc.network
+NEXT_PUBLIC_ARC_AGENT_REGISTRY_ADDRESS=0x8004A818BFB912233c491871b3d84c89A494BD9e
+NEXT_PUBLIC_ARC_REPUTATION_REGISTRY_ADDRESS=0x8004B663056A597Dffe9eCcC1965A193B7388713
+NEXT_PUBLIC_ARC_VALIDATION_REGISTRY_ADDRESS=0x8004Cb1BF31DAf7788923b405b754f57acEB4272
+NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS=0x0747EEf0706327138c69792bF28Cd525089e4583
+NEXT_PUBLIC_ARC_ESCROW_VAULT_ADDRESS=0x0747EEf0706327138c69792bF28Cd525089e4583
+NEXT_PUBLIC_ARC_USDC_ADDRESS=0x3600000000000000000000000000000000000000
 ```
 
 ## Routes
@@ -133,6 +148,7 @@ create table activity_events (
 - Arc Testnet is configured as the default product network in `src/components/Providers.tsx`.
 - USDC is the settlement asset throughout the UI and service wrappers.
 - Explorer links point to `https://testnet.arcscan.app`.
+- ERC-8183 live mode follows the Arc reference flow: client creates the job, provider sets budget, client approves USDC and funds escrow, provider submits a bytes32 deliverable hash, and evaluator completes the job.
 
 ## Integration Points
 

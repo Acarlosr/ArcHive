@@ -1,9 +1,41 @@
-import type { WalletClient } from "viem";
+import type { Hex, WalletClient } from "viem";
 import { getJobById as getJobRecordById } from "@/lib/db/jobs";
 import { spendFromUnifiedBalance } from "@/lib/arc/unifiedBalance";
 import { ARC_TESTNET, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
+import { agenticCommerceAbi, erc20Abi, USDC_CONTRACT } from "@/lib/arc/contracts";
 
 type WalletAction = { walletClient?: WalletClient | null };
+type TxResult = { txHash: `0x${string}`; explorerUrl: string; jobId: string; mode: "mock" | "live" };
+
+const zeroAddress = "0x0000000000000000000000000000000000000000" as const;
+
+function getJobMarketplaceAddress() {
+  const address = process.env.NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS;
+  if (!address) throw new Error("NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS is required for live ERC-8183 actions.");
+  return address as `0x${string}`;
+}
+
+async function getLiveClients(walletClient: WalletClient) {
+  const { createPublicClient, http } = await import("viem");
+  const { arcTestnet } = await import("viem/chains");
+  const [account] = await walletClient.getAddresses();
+  if (!account) throw new Error("No wallet account is connected.");
+  const publicClient = createPublicClient({
+    chain: arcTestnet,
+    transport: http(process.env.NEXT_PUBLIC_ARC_RPC_URL ?? "https://rpc.testnet.arc.network"),
+  });
+  return { account, arcTestnet, publicClient };
+}
+
+function toBytes32(value: string) {
+  if (/^0x[a-fA-F0-9]{64}$/.test(value)) return value as Hex;
+  return null;
+}
+
+async function hashToBytes32(value: string) {
+  const { keccak256, toHex } = await import("viem");
+  return keccak256(toHex(value));
+}
 
 export async function createJob({
   walletClient,
@@ -17,7 +49,7 @@ export async function createJob({
   budgetUsdc: string;
   expiryHours?: number;
 }): Promise<{ txHash: `0x${string}`; jobId: string; explorerUrl: string; mode: "mock" | "live" }> {
-  if (isArcMockMode() || !walletClient) {
+  if (isArcMockMode("job") || !walletClient) {
     const txHash = mockTxHash(`create-job-${description}`);
     return {
       txHash,
@@ -27,26 +59,20 @@ export async function createJob({
     };
   }
 
-  const { createPublicClient, decodeEventLog, http, parseAbi } = await import("viem");
-  const { arcTestnet } = await import("viem/chains");
-  const address = process.env.NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS as `0x${string}`;
-  const abi = parseAbi([
-    "function createJob(address provider,address client,uint256 expiredAt,string description,address hook) returns (uint256)",
-    "event JobCreated(uint256 indexed jobId,address indexed client,address indexed provider)",
-  ]);
-  const [account] = await walletClient.getAddresses();
-  const publicClient = createPublicClient({ chain: arcTestnet, transport: http(process.env.NEXT_PUBLIC_ARC_RPC_URL) });
+  const { decodeEventLog } = await import("viem");
+  const { account, arcTestnet, publicClient } = await getLiveClients(walletClient);
   const block = await publicClient.getBlock();
+  const address = getJobMarketplaceAddress();
   const txHash = await walletClient.writeContract({
     address,
-    abi,
+    abi: agenticCommerceAbi,
     functionName: "createJob",
     args: [
       providerAddress as `0x${string}`,
       account,
       block.timestamp + BigInt(expiryHours * 3600),
       `${description}\nBudget: ${budgetUsdc} USDC`,
-      "0x0000000000000000000000000000000000000000",
+      zeroAddress,
     ],
     account,
     chain: arcTestnet,
@@ -54,7 +80,7 @@ export async function createJob({
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
   const created = receipt.logs.flatMap((log) => {
     try {
-      const decoded = decodeEventLog({ abi, data: log.data, topics: log.topics });
+      const decoded = decodeEventLog({ abi: agenticCommerceAbi, data: log.data, topics: log.topics });
       return decoded.eventName === "JobCreated" ? [(decoded.args as any).jobId.toString()] : [];
     } catch {
       return [];
@@ -73,17 +99,68 @@ export async function fundEscrow({
   jobId: string;
   budgetUsdc: string;
   recipientAddress?: string;
-}) {
-  const recipient = recipientAddress ?? process.env.NEXT_PUBLIC_ARC_ESCROW_VAULT_ADDRESS ?? "0x0000000000000000000000000000000000000000";
-  return spendFromUnifiedBalance({ walletClient, amount: budgetUsdc, recipientAddress: recipient, jobId });
+}): Promise<TxResult> {
+  if (isArcMockMode("job") || !walletClient) {
+    const recipient = recipientAddress ?? process.env.NEXT_PUBLIC_ARC_ESCROW_VAULT_ADDRESS ?? zeroAddress;
+    const result = await spendFromUnifiedBalance({ walletClient, amount: budgetUsdc, recipientAddress: recipient, jobId });
+    return { txHash: result.txHash, explorerUrl: result.explorerUrl, jobId, mode: "mock" };
+  }
+
+  const { parseUnits } = await import("viem");
+  const { account, arcTestnet, publicClient } = await getLiveClients(walletClient);
+  const marketplaceAddress = getJobMarketplaceAddress();
+  const amount = parseUnits(budgetUsdc, 6);
+
+  const approveHash = await walletClient.writeContract({
+    address: USDC_CONTRACT,
+    abi: erc20Abi,
+    functionName: "approve",
+    args: [marketplaceAddress, amount],
+    account,
+    chain: arcTestnet,
+  });
+  await publicClient.waitForTransactionReceipt({ hash: approveHash });
+
+  const fundHash = await walletClient.writeContract({
+    address: marketplaceAddress,
+    abi: agenticCommerceAbi,
+    functionName: "fund",
+    args: [BigInt(jobId), "0x"],
+    account,
+    chain: arcTestnet,
+  });
+  await publicClient.waitForTransactionReceipt({ hash: fundHash });
+
+  return { txHash: fundHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${fundHash}`, jobId, mode: "live" };
 }
 
-export async function acceptJob({ jobId }: WalletAction & { jobId: string }) {
-  const txHash = mockTxHash(`accept-${jobId}`);
-  return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId };
+export async function acceptJob({
+  walletClient,
+  jobId,
+  budgetUsdc,
+}: WalletAction & { jobId: string; budgetUsdc?: string }): Promise<TxResult> {
+  if (isArcMockMode("job") || !walletClient) {
+    const txHash = mockTxHash(`accept-${jobId}`);
+    return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "mock" };
+  }
+
+  if (!budgetUsdc) throw new Error("Provider budget is required before the client can fund escrow.");
+  const { parseUnits } = await import("viem");
+  const { account, arcTestnet, publicClient } = await getLiveClients(walletClient);
+  const txHash = await walletClient.writeContract({
+    address: getJobMarketplaceAddress(),
+    abi: agenticCommerceAbi,
+    functionName: "setBudget",
+    args: [BigInt(jobId), parseUnits(budgetUsdc, 6), "0x"],
+    account,
+    chain: arcTestnet,
+  });
+  await publicClient.waitForTransactionReceipt({ hash: txHash });
+  return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "live" };
 }
 
 export async function submitDeliverable({
+  walletClient,
   jobId,
   deliverableHash,
   deliverableDescription,
@@ -91,17 +168,53 @@ export async function submitDeliverable({
   jobId: string;
   deliverableHash?: string;
   deliverableDescription?: string;
-}) {
+}): Promise<TxResult & { deliverableHash: string }> {
   const source = deliverableDescription ?? jobId;
-  const encoded = Array.from(source).map((char) => char.charCodeAt(0).toString(16)).join("").slice(0, 42);
-  const hash = deliverableHash ?? `ipfs://${encoded.padEnd(42, "0")}`;
-  const txHash = mockTxHash(`submit-${jobId}-${hash}`);
-  return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, deliverableHash: hash };
+  const submittedHash = deliverableHash ?? source;
+
+  if (isArcMockMode("job") || !walletClient) {
+    const encoded = Array.from(source).map((char) => char.charCodeAt(0).toString(16)).join("").slice(0, 42);
+    const hash = deliverableHash ?? `ipfs://${encoded.padEnd(42, "0")}`;
+    const txHash = mockTxHash(`submit-${jobId}-${hash}`);
+    return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, deliverableHash: hash, mode: "mock" };
+  }
+
+  const { account, arcTestnet, publicClient } = await getLiveClients(walletClient);
+  const deliverableBytes32 = toBytes32(submittedHash) ?? await hashToBytes32(submittedHash);
+  const txHash = await walletClient.writeContract({
+    address: getJobMarketplaceAddress(),
+    abi: agenticCommerceAbi,
+    functionName: "submit",
+    args: [BigInt(jobId), deliverableBytes32, "0x"],
+    account,
+    chain: arcTestnet,
+  });
+  await publicClient.waitForTransactionReceipt({ hash: txHash });
+  return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, deliverableHash: submittedHash, mode: "live" };
 }
 
-export async function approveAndPay({ jobId }: WalletAction & { jobId: string }) {
-  const txHash = mockTxHash(`approve-pay-${jobId}`);
-  return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId };
+export async function approveAndPay({
+  walletClient,
+  jobId,
+  reason = "deliverable-approved",
+}: WalletAction & { jobId: string; reason?: string }): Promise<TxResult> {
+  if (isArcMockMode("job") || !walletClient) {
+    const txHash = mockTxHash(`approve-pay-${jobId}`);
+    return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "mock" };
+  }
+
+  const { account, arcTestnet, publicClient } = await getLiveClients(walletClient);
+  const reasonHash = toBytes32(reason) ?? await hashToBytes32(reason);
+  const txHash = await walletClient.writeContract({
+    address: getJobMarketplaceAddress(),
+    abi: agenticCommerceAbi,
+    functionName: "complete",
+    args: [BigInt(jobId), reasonHash, "0x"],
+    account,
+    chain: arcTestnet,
+  });
+  await publicClient.waitForTransactionReceipt({ hash: txHash });
+  return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "live" };
 }
 
 export async function refundEscrow({ jobId }: WalletAction & { jobId: string }) {
@@ -113,9 +226,7 @@ export async function getJobById(jobId: string) {
   return getJobRecordById(jobId);
 }
 
-export const setBudget = async ({ jobId, budgetUsdc }: { walletClient?: WalletClient | null; jobId: string; budgetUsdc: string }) => ({
-  txHash: mockTxHash(`budget-${jobId}-${budgetUsdc}`),
-});
+export const setBudget = acceptJob;
 
 export const approveAndFundEscrow = fundEscrow;
 export const completeJob = approveAndPay;

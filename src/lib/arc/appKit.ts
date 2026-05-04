@@ -2,9 +2,11 @@ import { AppKit } from "@circle-fin/app-kit";
 
 let appKit: AppKit | null = null;
 
-export function isArcMockMode() {
+export function isArcMockMode(integration?: "agent" | "job" | "unifiedBalance") {
+  if (process.env.NEXT_PUBLIC_ARC_MOCK_MODE === "true") return true;
+  if (integration === "agent") return !process.env.NEXT_PUBLIC_ARC_AGENT_REGISTRY_ADDRESS;
+  if (integration === "job") return !process.env.NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS;
   return (
-    process.env.NEXT_PUBLIC_ARC_MOCK_MODE === "true" ||
     !process.env.NEXT_PUBLIC_ARC_AGENT_REGISTRY_ADDRESS ||
     !process.env.NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS
   );
@@ -25,7 +27,7 @@ export function mockTxHash(seed = "archve"): `0x${string}` {
 }
 
 export const ARC_TESTNET = {
-  id: 2810,
+  id: 5042002,
   name: "Arc Testnet",
   explorerUrl: "https://testnet.arcscan.app",
   settlementAsset: "USDC",

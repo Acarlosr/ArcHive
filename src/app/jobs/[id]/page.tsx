@@ -113,9 +113,14 @@ function JobDetailContent() {
                       Fund escrow from Unified Balance
                     </button>
                   )}
-                  {isProvider && job.status === "funded" && (
-                    <button className="btn-primary w-full" disabled={actionState === "processing"} onClick={() => runAction(() => acceptJob({ walletClient, jobId: job.onchain_id ?? job.id }), "accepted")}>
-                      Accept job
+                  {isProvider && job.status === "open" && (
+                    <button className="btn-primary w-full" disabled={actionState === "processing"} onClick={() => runAction(() => acceptJob({ walletClient, jobId: job.onchain_id ?? job.id, budgetUsdc: job.budget }), "accepted")}>
+                      Accept job and set budget
+                    </button>
+                  )}
+                  {isClient && job.status === "accepted" && (
+                    <button className="btn-primary w-full" disabled={actionState === "processing"} onClick={() => runAction(() => fundEscrow({ walletClient, jobId: job.onchain_id ?? job.id, budgetUsdc: job.budget, recipientAddress: job.provider_wallet }), "funded")}>
+                      Fund escrow on Arc
                     </button>
                   )}
                   {isProvider && ["funded", "accepted"].includes(job.status) && (

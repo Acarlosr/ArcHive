@@ -12,7 +12,7 @@ export async function registerAgent({
   metadataURI?: string;
 }): Promise<{ txHash: `0x${string}`; agentId: string; explorerUrl: string; mode: "mock" | "live" }> {
   const uri = metadataUri ?? metadataURI ?? "ipfs://bafybeihive-agent";
-  if (isArcMockMode() || !walletClient) {
+  if (isArcMockMode("agent") || !walletClient) {
     const txHash = mockTxHash(`agent-${uri}`);
     return {
       txHash,
@@ -68,7 +68,7 @@ export async function recordAgentFeedback(agentId: string, score: number, tag: s
     agentId,
     score,
     tag,
-    mode: isArcMockMode() ? "mock" as const : "live" as const,
+    mode: isArcMockMode("agent") ? "mock" as const : "live" as const,
   };
 }
 
