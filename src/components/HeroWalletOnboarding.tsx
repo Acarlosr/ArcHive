@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TestnetFundsCard } from "@/components/TestnetFundsCard";
 
 export function HeroWalletOnboarding() {
   return (
@@ -37,6 +38,9 @@ export function HeroWalletOnboarding() {
         <Link href="/settings" className="text-sm font-medium text-arc-muted transition-colors hover:text-white">
           App settings
         </Link>
+      </div>
+      <div className="mt-4">
+        <TestnetFundsCard compact />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { WalletConnectCTA } from "@/components/WalletConnectCTA";
+import { TestnetFundsCard } from "@/components/TestnetFundsCard";
 
 export function WalletOnboardingModal({ title = "Connect to ArcHive" }: { title?: string }) {
   return (
@@ -14,6 +15,9 @@ export function WalletOnboardingModal({ title = "Connect to ArcHive" }: { title?
       </p>
       <div className="mt-6 flex justify-center">
         <WalletConnectCTA />
+      </div>
+      <div className="mt-6 text-left">
+        <TestnetFundsCard compact />
       </div>
     </div>
   );

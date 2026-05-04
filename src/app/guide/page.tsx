@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TestnetFundsCard } from "@/components/TestnetFundsCard";
 
 const steps = [
   {
@@ -128,6 +129,12 @@ export default function GuidePage() {
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="border-b border-arc-border px-4 py-12">
+        <div className="mx-auto max-w-7xl">
+          <TestnetFundsCard />
         </div>
       </section>
 

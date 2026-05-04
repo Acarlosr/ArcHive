@@ -10,6 +10,7 @@ import { FeeEstimatePanel } from "@/components/FeeEstimatePanel";
 import { UnifiedBalanceCard } from "@/components/UnifiedBalanceCard";
 import { WalletOnboardingModal } from "@/components/WalletOnboardingModal";
 import { WalletProviderIsland } from "@/components/WalletProviderIsland";
+import { TestnetFundsCard } from "@/components/TestnetFundsCard";
 
 type ActionState = "idle" | "creating" | "funding" | "success" | "error";
 
@@ -170,6 +171,7 @@ function CreateJobContent() {
           </div>
 
           <aside className="space-y-4">
+            <TestnetFundsCard compact />
             <UnifiedBalanceCard />
             <FeeEstimatePanel amount={form.budget} />
           </aside>
