@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch server.ts",
+    "build": "tsc --noEmit",
     "start": "tsx server.ts",
     "typecheck": "tsc --noEmit"
   },
