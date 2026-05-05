@@ -74,6 +74,51 @@ app.get("/health", (_req: Request, res: Response) => {
   });
 });
 
+app.get("/", (_req: Request, res: Response) => {
+  res.json({
+    service: "ArcHive Metered Tools seller",
+    status: "ok",
+    docs: "Use POST endpoints from ArcHive agents or x402-capable clients. Browser GET requests show route metadata only.",
+    endpoints: {
+      "GET /health": "Seller service health",
+      "GET /premium-data": "x402 protected demo endpoint",
+      "POST /tools/summarize": "x402 protected PDF/text summarizer",
+      "POST /tools/extract-json": "x402 protected structured JSON extractor",
+      "POST /tools/score-deliverable": "x402 protected deliverable scoring",
+    },
+  });
+});
+
+app.get("/tools/summarize", (_req: Request, res: Response) => {
+  res.status(405).json({
+    error: "Method Not Allowed",
+    message: "Summarize PDF is a paid API route. Use POST with an x402-capable client.",
+    methodRequired: "POST",
+    price: "0.001 USDC",
+    network: ACCEPT_ARC_ONLY ? ARC_TESTNET_NETWORK : "gateway-supported",
+  });
+});
+
+app.get("/tools/extract-json", (_req: Request, res: Response) => {
+  res.status(405).json({
+    error: "Method Not Allowed",
+    message: "Extract JSON is a paid API route. Use POST with an x402-capable client.",
+    methodRequired: "POST",
+    price: "0.0005 USDC",
+    network: ACCEPT_ARC_ONLY ? ARC_TESTNET_NETWORK : "gateway-supported",
+  });
+});
+
+app.get("/tools/score-deliverable", (_req: Request, res: Response) => {
+  res.status(405).json({
+    error: "Method Not Allowed",
+    message: "Score Deliverable is a paid API route. Use POST with an x402-capable client.",
+    methodRequired: "POST",
+    price: "0.002 USDC",
+    network: ACCEPT_ARC_ONLY ? ARC_TESTNET_NETWORK : "gateway-supported",
+  });
+});
+
 app.get("/premium-data", paid("$0.001"), (req: Request, res: Response) => {
   res.json({
     tool: "premium-data",
