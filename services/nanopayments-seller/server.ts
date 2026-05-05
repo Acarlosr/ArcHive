@@ -29,6 +29,22 @@ if (!SELLER_ADDRESS || SELLER_ADDRESS === "0x00000000000000000000000000000000000
 }
 
 const app = express();
+app.use((req: Request, res: Response, next) => {
+  res.setHeader("Access-Control-Allow-Origin", process.env.ALLOWED_ORIGIN ?? "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, X-PAYMENT, X-PAYMENT-RESPONSE",
+  );
+  res.setHeader("Access-Control-Expose-Headers", "X-PAYMENT-RESPONSE");
+
+  if (req.method === "OPTIONS") {
+    res.sendStatus(204);
+    return;
+  }
+
+  next();
+});
 app.use(express.json({ limit: "2mb" }));
 
 const gateway = createGatewayMiddleware({

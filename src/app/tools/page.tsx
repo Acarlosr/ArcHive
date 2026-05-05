@@ -1,3 +1,5 @@
+import { MeteredToolTester } from "@/components/MeteredToolTester";
+
 const sellerBaseUrl =
   process.env.NEXT_PUBLIC_NANOPAYMENTS_SELLER_URL ?? "http://localhost:4021";
 
@@ -7,27 +9,42 @@ const tools = [
     description: "Condense uploaded research, invoices, or client briefs into agent-readable summaries.",
     price: "0.001 USDC",
     status: "x402 protected",
+    method: "POST" as const,
     path: "/tools/summarize",
+    body: {
+      text: "ArcHive agent reviewed a funded escrow job and needs a concise client-ready brief.",
+    },
   },
   {
     name: "Extract JSON",
     description: "Convert unstructured text into strict JSON for downstream agent workflows.",
     price: "0.0005 USDC",
     status: "x402 protected",
+    method: "POST" as const,
     path: "/tools/extract-json",
+    body: {
+      title: "Extract ArcHive job metadata",
+      entities: ["agent", "escrow", "deliverable"],
+    },
   },
   {
     name: "Score Deliverable",
     description: "Evaluate submitted work against job requirements before client approval.",
     price: "0.002 USDC",
     status: "x402 protected",
+    method: "POST" as const,
     path: "/tools/score-deliverable",
+    body: {
+      requirements: "Verify the deliverable hash, summarize the output, and confirm job criteria.",
+      deliverable: "ipfs://bafybeihive-deliverable with completed research and structured findings.",
+    },
   },
   {
     name: "Agent Memory Lookup",
     description: "Retrieve compact memory snippets for agents that need paid context on demand.",
     price: "0.0001 USDC",
     status: "planned",
+    method: "GET" as const,
     path: "/premium-data",
   },
 ];
@@ -66,45 +83,7 @@ export default function ToolsPage() {
           </div>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {tools.map((tool) => (
-            <article
-              key={tool.name}
-              className="flex min-h-[260px] flex-col rounded-lg border border-arc-border bg-arc-card/85 p-5 transition-all hover:border-arc-cyan/35 hover:shadow-[0_0_32px_rgba(0,212,255,0.08)]"
-            >
-              <div className="mb-4 flex items-start justify-between gap-3">
-                <h2 className="font-display text-xl font-semibold text-arc-text">
-                  {tool.name}
-                </h2>
-                <span className="rounded-full border border-arc-cyan/25 bg-arc-cyan/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.14em] text-arc-cyan">
-                  {tool.status}
-                </span>
-              </div>
-
-              <p className="text-sm leading-6 text-arc-muted">{tool.description}</p>
-
-              <div className="mt-auto pt-6">
-                <div className="mb-4 rounded-md border border-arc-border bg-arc-surface/70 p-3">
-                  <div className="text-[10px] font-mono uppercase tracking-[0.16em] text-arc-dim">
-                    Price
-                  </div>
-                  <div className="mt-1 font-display text-2xl font-bold text-arc-green">
-                    {tool.price}
-                  </div>
-                  <div className="mt-1 text-xs text-arc-muted">per call</div>
-                </div>
-                <a
-                  href={`${sellerBaseUrl}${tool.path}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex w-full items-center justify-center rounded-lg border border-arc-green/30 bg-arc-green/10 px-4 py-2.5 text-sm font-semibold text-arc-green transition-colors hover:bg-arc-green hover:text-arc-bg"
-                >
-                  Test Tool
-                </a>
-              </div>
-            </article>
-          ))}
-        </section>
+        <MeteredToolTester sellerBaseUrl={sellerBaseUrl} tools={tools} />
 
         <section className="mt-8 rounded-lg border border-arc-border bg-arc-card/80 p-6">
           <div className="grid gap-6 md:grid-cols-3">
