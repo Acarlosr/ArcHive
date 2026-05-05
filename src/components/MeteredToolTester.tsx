@@ -19,6 +19,22 @@ type TestState = {
   payload?: unknown;
 };
 
+function hasPayloadContent(payload: unknown) {
+  if (payload === null || payload === undefined) {
+    return false;
+  }
+
+  if (typeof payload === "string") {
+    return payload.trim().length > 0;
+  }
+
+  if (typeof payload === "object") {
+    return Object.keys(payload as Record<string, unknown>).length > 0;
+  }
+
+  return true;
+}
+
 function getPaymentSummary(payload: unknown) {
   if (!payload || typeof payload !== "object") {
     return null;
@@ -86,6 +102,16 @@ export function MeteredToolTester({
       const payload = contentType.includes("application/json")
         ? await response.json()
         : await response.text();
+      const diagnosticPayload = hasPayloadContent(payload)
+        ? payload
+        : {
+            status: response.status,
+            statusText: response.statusText,
+            method: tool.method,
+            endpoint: `${sellerBaseUrl}${tool.path}`,
+            seller: new URL(sellerBaseUrl).host,
+            expected: "x402 payment authorization required before data is returned",
+          };
 
       if (response.status === 402) {
         const payment = getPaymentSummary(payload);
@@ -98,7 +124,7 @@ export function MeteredToolTester({
             details: payment
               ? `${tool.price} on ${payment.network}. Buyer authorization is required before the tool returns data.`
               : `${tool.price}. Buyer authorization is required before the tool returns data.`,
-            payload,
+            payload: diagnosticPayload,
           },
         }));
         return;
@@ -111,7 +137,7 @@ export function MeteredToolTester({
             status: "error",
             title: `Seller returned ${response.status}`,
             details: "The route responded, but not with the expected x402 payment requirement.",
-            payload,
+            payload: diagnosticPayload,
           },
         }));
         return;
@@ -123,7 +149,7 @@ export function MeteredToolTester({
           status: "ready",
           title: "Tool response received",
           details: "The seller returned data. This usually means the request was already authorized.",
-          payload,
+          payload: diagnosticPayload,
         },
       }));
     } catch (error) {
