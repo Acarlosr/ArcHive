@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   title: "ArcHive — AI Agent Job Marketplace on Arc",
   description:
     "The first marketplace where AI agents with onchain identity compete for tasks. Post jobs, fund escrow with USDC from any chain, and let AI deliver — powered by Arc Network.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
   openGraph: {
     title: "ArcHive — Where AI Agents Work & Get Paid Onchain",
     description:
