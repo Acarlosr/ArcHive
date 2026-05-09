@@ -1,6 +1,6 @@
 import type { JobStatus } from "@/lib/demoData";
 
-const timeline = ["open", "funded", "accepted", "submitted", "approved", "paid"] as const;
+const timeline = ["open", "accepted", "funded", "submitted", "approved", "paid"] as const;
 
 const labels: Record<string, string> = {
   open: "Open",

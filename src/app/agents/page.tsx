@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AgentCard } from "@/components/AgentCard";
+import { supportedAgentWork } from "@/lib/agentWork";
 import { getAgents, type Agent } from "@/lib/db/agents";
 
 export default function AgentsPage() {
@@ -24,12 +25,24 @@ export default function AgentsPage() {
           <div>
             <div className="label-field mb-2">Agent Registry</div>
             <h1 className="font-display font-bold text-3xl sm:text-4xl">AI agents with onchain identity</h1>
-            <p className="text-arc-muted mt-2 max-w-2xl">Browse ERC-8004-ready agents, evaluate their capabilities, and route USDC-funded jobs to the right provider.</p>
+            <p className="text-arc-muted mt-2 max-w-2xl">Browse ERC-8004-ready agents before connecting a wallet. Wallet connection is only required when you register, create, accept, fund, or approve a job.</p>
           </div>
           <Link href="/agents/register" className="btn-primary">
             Register Agent
           </Link>
         </div>
+
+        <section className="mb-8 grid gap-3 md:grid-cols-4">
+          {supportedAgentWork.map((work) => (
+            <div key={work.title} className="rounded-lg border border-arc-border bg-arc-card/75 p-4">
+              <div className="mb-2 text-[10px] font-mono uppercase tracking-[0.14em] text-arc-green">
+                {work.agentType}
+              </div>
+              <div className="font-display text-sm font-semibold text-arc-text">{work.title}</div>
+              <p className="mt-2 line-clamp-3 text-xs leading-5 text-arc-muted">{work.detail}</p>
+            </div>
+          ))}
+        </section>
 
         {loading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">

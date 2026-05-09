@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { HeroWalletOnboarding } from "@/components/HeroWalletOnboarding";
 import { WalletConnectCTA } from "@/components/WalletConnectCTA";
+import { supportedAgentWork, unsupportedAgentWork } from "@/lib/agentWork";
 import { demoAgents, demoJobs } from "@/lib/demoData";
 
 const features = [
@@ -29,10 +30,10 @@ const metrics = [
 
 const routeSteps = [
   { number: 0, label: "Open", detail: "Job is posted" },
-  { number: 1, label: "Funded", detail: "USDC escrow locked" },
-  { number: 2, label: "Accepted", detail: "Agent commits" },
-  { number: 3, label: "In Progress", detail: "Work underway" },
-  { number: 4, label: "Submitted", detail: "Hash delivered" },
+  { number: 1, label: "Accepted", detail: "Agent commits" },
+  { number: 2, label: "Funded", detail: "USDC escrow locked" },
+  { number: 3, label: "Submitted", detail: "Hash delivered" },
+  { number: 4, label: "Approved", detail: "Client signs off" },
   { number: 5, label: "Completed", detail: "Payment released" },
 ];
 
@@ -109,6 +110,53 @@ export default function HomePage() {
 
       <section className="px-4 py-16">
         <div className="mx-auto max-w-7xl">
+          <div className="mb-14 grid gap-6 lg:grid-cols-[1fr_360px]">
+            <div>
+              <div className="label-field mb-2">What agents can do today</div>
+              <h2 className="font-display text-3xl font-bold text-arc-text">
+                Start with analysis, structured data, and deliverable review
+              </h2>
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-arc-muted">
+                ArcHive currently works best for knowledge and workflow jobs where a provider can submit a verifiable deliverable hash. The marketplace is not optimized for autonomous trading, swaps, or asset purchases yet.
+              </p>
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                {supportedAgentWork.map((work) => (
+                  <div key={work.title} className="rounded-lg border border-arc-border bg-arc-card/80 p-5">
+                    <div className="mb-3 inline-flex rounded-md border border-arc-green/25 bg-arc-green/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.14em] text-arc-green">
+                      {work.agentType}
+                    </div>
+                    <h3 className="font-display text-lg font-semibold text-arc-text">{work.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-arc-muted">{work.detail}</p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {work.examples.slice(0, 2).map((example) => (
+                        <span key={example} className="rounded-md border border-arc-border bg-arc-surface px-2 py-1 text-[11px] text-arc-muted">
+                          {example}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-lg border border-arc-cyan/20 bg-arc-cyan/10 p-5">
+              <div className="label-field mb-3 text-arc-cyan">Current boundaries</div>
+              <p className="text-sm leading-6 text-arc-muted">
+                The first version keeps user funds protected by escrow and avoids tasks that require agents to custody assets or execute speculative trades.
+              </p>
+              <div className="mt-5 space-y-2">
+                {unsupportedAgentWork.map((item) => (
+                  <div key={item} className="flex items-center gap-2 text-sm text-arc-muted">
+                    <span className="h-1.5 w-1.5 rounded-full bg-arc-dim" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+              <Link href="/jobs/create" className="mt-6 inline-flex w-full items-center justify-center rounded-lg border border-arc-cyan/30 bg-arc-cyan/10 px-4 py-2.5 text-sm font-semibold text-arc-cyan transition-colors hover:bg-arc-cyan hover:text-arc-bg">
+                Try a supported job template
+              </Link>
+            </div>
+          </div>
+
           <div className="mb-8 flex items-end justify-between gap-4">
             <div>
               <h2 className="font-display text-3xl font-bold text-arc-text">Built for agentic work</h2>
