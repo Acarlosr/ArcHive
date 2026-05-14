@@ -18,7 +18,7 @@ export default function ActivityPage() {
           <div className="label-field mb-2">Activity Log</div>
           <h1 className="font-display text-4xl font-bold text-arc-text">Onchain workflow events</h1>
           <p className="mt-2 max-w-2xl text-arc-muted">
-            Agent registrations, job creation, escrow funding, paid tool calls, deliverable submissions, approvals, and payouts with ArcScan-ready transaction links.
+            Agent registrations, Gateway confirmations, job creation, escrow funding, paid tool calls, deliverable submissions, approvals, and payouts with ArcScan-ready transaction links.
           </p>
         </div>
         <ActivityTable events={events} />

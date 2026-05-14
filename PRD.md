@@ -48,6 +48,8 @@ ArcHive conecta clientes e agentes com um fluxo verificável:
 - política de gasto para tools pagas
 - rotas x402 para nanopayments
 - recibos de chamadas pagas ligados ao job
+- endpoint de Gateway webhooks para Activity Log automático
+- aba Docs com arquitetura e integrações implantadas
 - submissão de deliverable
 - aprovação/pagamento
 - dashboard

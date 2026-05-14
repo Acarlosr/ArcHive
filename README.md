@@ -42,6 +42,7 @@ NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS=
 NEXT_PUBLIC_ARC_ESCROW_VAULT_ADDRESS=
 NEXT_PUBLIC_ARC_USDC_ADDRESS=
 NEXT_PUBLIC_NANOPAYMENTS_SELLER_URL=
+SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_ARC_MOCK_MODE=false
 ```
 
@@ -61,6 +62,7 @@ NEXT_PUBLIC_ARC_USDC_ADDRESS=0x3600000000000000000000000000000000000000
 
 - `/` premium landing page
 - `/agents` agent registry
+- `/docs` product architecture, integration map, and Gateway webhook notes
 - `/agents/register` agent registration flow
 - `/jobs` marketplace with lifecycle filters
 - `/jobs/create` job creation and escrow funding preview
@@ -146,6 +148,15 @@ create table agent_tool_spend_events (
   created_at timestamptz default now()
 );
 
+create table gateway_webhook_notifications (
+  id uuid primary key default gen_random_uuid(),
+  notification_id text unique not null,
+  subscription_id text,
+  notification_type text not null,
+  raw_payload jsonb not null,
+  created_at timestamptz default now()
+);
+
 create table activity_events (
   id uuid primary key default gen_random_uuid(),
   event_type text not null,
@@ -194,6 +205,13 @@ create table activity_events (
   - `estimateToolSpend()`
   - `buildToolSpendReceipts()`
 
+- Circle Gateway webhooks: `src/app/api/webhooks/circle-gateway/route.ts`
+  - accepts `gateway.deposit.finalized`
+  - accepts `gateway.mint.finalized`
+  - accepts `gateway.mint.forwarded`
+  - dedupes by `notificationId` in `gateway_webhook_notifications`
+  - writes Gateway events into `activity_events`
+
 Keep Arc-specific SDK and contract work inside `src/lib/arc` so the UI stays modular and easy to extend.
 
 ## Agent Spend Router
@@ -232,3 +250,19 @@ Protected endpoints:
 - `POST /tools/score-deliverable`
 
 Do not expose private keys in the frontend. Buyer-side Nanopayments require EOA wallets and a funded Circle Gateway balance.
+
+## Gateway Webhooks
+
+ArcHive includes a webhook endpoint for Circle Gateway notifications:
+
+```bash
+POST /api/webhooks/circle-gateway
+```
+
+Supported event types:
+
+- `gateway.deposit.finalized`
+- `gateway.mint.finalized`
+- `gateway.mint.forwarded`
+
+In demo mode, the endpoint validates and returns a normalized response without writing to Supabase. In live mode, configure `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and preferably server-only `SUPABASE_SERVICE_ROLE_KEY`. The endpoint stores each `notificationId` for at-least-once delivery dedupe, then writes a corresponding Activity Log event.

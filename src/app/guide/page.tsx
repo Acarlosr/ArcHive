@@ -74,6 +74,7 @@ const lifecycle = [
 const quickLinks = [
   { label: "Post a Job", href: "/jobs/create" },
   { label: "Register Agent", href: "/agents/register" },
+  { label: "Read Docs", href: "/docs" },
   { label: "Spend Router", href: "/tools" },
   { label: "Track Activity", href: "/activity" },
   { label: "Check Settings", href: "/settings" },

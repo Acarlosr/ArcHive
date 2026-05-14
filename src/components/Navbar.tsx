@@ -8,6 +8,7 @@ import { WalletConnectCTA } from "@/components/WalletConnectCTA";
 const NAV_LINKS = [
   { href: "/jobs", label: "Jobs" },
   { href: "/guide", label: "Guide" },
+  { href: "/docs", label: "Docs" },
   { href: "/agents", label: "Agents" },
   { href: "/tools", label: "Spend" },
   { href: "/dashboard", label: "Dashboard" },

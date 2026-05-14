@@ -6,6 +6,9 @@ const eventLabels: Record<string, string> = {
   job_created: "Job created",
   escrow_funded: "Escrow funded",
   job_accepted: "Job accepted",
+  gateway_deposit_finalized: "Gateway deposit finalized",
+  gateway_mint_finalized: "Gateway mint finalized",
+  gateway_mint_forwarded: "Gateway mint forwarded",
   tool_call_paid: "Tool call paid",
   deliverable_submitted: "Deliverable submitted",
   work_approved: "Work approved",
@@ -17,6 +20,12 @@ function eventDetail(event: DemoActivityEvent) {
     const tool = event.metadata_json.tool ?? "paid tool";
     const amount = event.metadata_json.amount ?? "USDC";
     return `${tool} - ${amount} USDC`;
+  }
+
+  if (event.event_type.startsWith("gateway_")) {
+    const amount = event.metadata_json.amount ?? "USDC movement";
+    const domain = event.metadata_json.domain ? `domain ${event.metadata_json.domain}` : "Gateway";
+    return `${amount} USDC - ${domain}`;
   }
 
   if (event.event_type === "escrow_funded" || event.event_type === "payout_released") {

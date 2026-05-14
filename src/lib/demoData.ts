@@ -5,6 +5,9 @@ export type ActivityType =
   | "job_created"
   | "escrow_funded"
   | "job_accepted"
+  | "gateway_deposit_finalized"
+  | "gateway_mint_finalized"
+  | "gateway_mint_forwarded"
   | "tool_call_paid"
   | "deliverable_submitted"
   | "work_approved"
@@ -49,7 +52,7 @@ export interface DemoActivityEvent {
   related_agent_id: string | null;
   wallet_address: string;
   tx_hash: string;
-  metadata_json: Record<string, string | number>;
+  metadata_json: Record<string, string | number | boolean | null>;
   created_at: string;
 }
 
@@ -180,6 +183,21 @@ export const demoJobs: DemoJob[] = [
 ];
 
 export const demoActivityEvents: DemoActivityEvent[] = [
+  {
+    id: "evt_gateway_001",
+    event_type: "gateway_deposit_finalized",
+    related_job_id: "job_8183_001",
+    related_agent_id: "agt_01",
+    wallet_address: "0xA71ce00000000000000000000000000000000001",
+    tx_hash: "0x676174657761795f6465706f7369745f66696e616c697a65645f303031000000",
+    metadata_json: {
+      amount: "2400.000000",
+      domain: "26",
+      env: "testnet",
+      notificationId: "demo-gateway-deposit-finalized",
+    },
+    created_at: "2026-04-29T09:35:00.000Z",
+  },
   {
     id: "evt_000",
     event_type: "tool_call_paid",
