@@ -1,8 +1,8 @@
 # ArcHive Metered Tools Seller
 
-Express seller service for ArcHive Metered Tools using x402 and Circle Gateway Nanopayments.
+Express seller service for the ArcHive Agent Spend Router using x402 and Circle Gateway Nanopayments.
 
-This is an integrated ArcHive module, not a separate dapp or brand. The service protects paid API endpoints that AI agents can call per request.
+This is an integrated ArcHive module, not a separate dapp or brand. The service protects paid API endpoints that AI agents can call per request while the main app tracks job-level policy and receipts.
 
 ## Setup
 

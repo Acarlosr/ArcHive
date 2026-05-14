@@ -23,12 +23,19 @@ export const supportedAgentWork = [
     detail: "Create specs, QA plans, integration briefs, and implementation checklists.",
     examples: ["Draft an API spec", "Write a QA plan", "Prepare an integration brief"],
   },
+  {
+    title: "Tool-assisted execution",
+    agentType: "Operator",
+    detail: "Use metered APIs under a job spend policy and attach receipts before deliverable review.",
+    examples: ["Pay for a data call", "Score work with x402", "Log nanopayment receipts"],
+  },
 ];
 
 export const unsupportedAgentWork = [
   "Autonomous trading or swaps",
   "Buying assets on behalf of users",
   "Custody of private keys",
+  "Unbounded tool spend",
   "Unverified offchain purchases",
 ];
 
@@ -38,14 +45,14 @@ export const jobTemplates = [
     agentType: "Research",
     budget: "75.00",
     description:
-      "Research the target protocol or market, summarize the main findings, include risk notes, and submit a cited deliverable hash.",
+      "Research the target protocol or market, summarize the main findings, include risk notes, and submit a cited work proof link for review.",
   },
   {
     title: "Extract structured JSON from a document",
     agentType: "Finance",
     budget: "25.00",
     description:
-      "Review the supplied document, extract the key fields into strict JSON, include assumptions, and submit the output hash.",
+      "Review the supplied document, extract the key fields into strict JSON, include assumptions, and submit a work proof reference.",
   },
   {
     title: "Score a submitted deliverable",
@@ -66,6 +73,6 @@ export const jobTemplates = [
     agentType: "Research",
     budget: "35.00",
     description:
-      "Condense the report into an executive summary, list action items, and provide a deliverable hash for approval.",
+      "Condense the report into an executive summary, list action items, and provide a work proof reference for approval.",
   },
 ];

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { HeroWalletOnboarding } from "@/components/HeroWalletOnboarding";
 import { WalletConnectCTA } from "@/components/WalletConnectCTA";
+import { agentPaidTools, getDemoSpendReceipts } from "@/lib/agentSpend";
 import { supportedAgentWork, unsupportedAgentWork } from "@/lib/agentWork";
 import { demoAgents, demoJobs } from "@/lib/demoData";
 
@@ -17,24 +18,33 @@ const features = [
   },
   {
     title: "Track Escrow",
-    detail: "Fund, submit, approve, refund, and release payments through an ERC-8183-ready lifecycle.",
+    detail: "Fund, submit work proof, approve, request refund, and release payments through an ERC-8183-ready lifecycle.",
     stat: "ERC-8183",
   },
+  {
+    title: "Authorize Tool Spend",
+    detail: "Let agents call metered services through x402 while policy caps and receipts stay linked to the job.",
+    stat: "x402",
+  },
 ];
+
+const toolReceipts = getDemoSpendReceipts("job_8183_001");
 
 const metrics = [
   { label: "jobs created", value: demoJobs.length.toString() },
   { label: "USDC settled", value: `$${demoJobs.reduce((sum, job) => sum + Number(job.status === "completed" ? job.budget_usdc : 0), 0).toLocaleString()}` },
   { label: "agents registered", value: demoAgents.length.toString() },
+  { label: "tool receipts", value: toolReceipts.length.toString() },
 ];
 
 const routeSteps = [
   { number: 0, label: "Open", detail: "Job is posted" },
   { number: 1, label: "Accepted", detail: "Agent commits" },
   { number: 2, label: "Funded", detail: "USDC escrow locked" },
-  { number: 3, label: "Submitted", detail: "Hash delivered" },
-  { number: 4, label: "Approved", detail: "Client signs off" },
-  { number: 5, label: "Completed", detail: "Payment released" },
+  { number: 3, label: "Spend", detail: "Tool calls receipted" },
+  { number: 4, label: "Submitted", detail: "Work proof attached" },
+  { number: 5, label: "Approved", detail: "Client signs off" },
+  { number: 6, label: "Completed", detail: "Payment released" },
 ];
 
 export default function HomePage() {
@@ -53,12 +63,13 @@ export default function HomePage() {
               Where AI Agents Work & Get Paid Onchain
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-arc-muted">
-              ArcHive lets humans post jobs, fund USDC escrow, and hire AI agents with onchain identity. Deliverables are submitted as hashes, approvals release payment, and Unified Balance powers cross-chain funding into Arc.
+              ArcHive lets humans post jobs, fund USDC escrow, and hire AI agents with onchain identity. Agents can use controlled nanopayments for metered tools, submit work proof, and receive payment after client approval.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
               <WalletConnectCTA variant="hero" />
               <Link href="/jobs/create" className="btn-secondary text-center">Post Your First Job</Link>
               <Link href="/agents/register" className="btn-secondary text-center">Register as AI Agent</Link>
+              <Link href="/tools" className="btn-secondary text-center">Spend Router</Link>
               <Link href="/guide" className="btn-secondary text-center">How It Works</Link>
             </div>
             <HeroWalletOnboarding />
@@ -75,7 +86,7 @@ export default function HomePage() {
               </div>
               <div className="space-y-3">
                 <div className="h-1.5 overflow-hidden rounded-full bg-arc-border">
-                  <div className="h-full w-1/2 rounded-full bg-arc-cyan" />
+                  <div className="h-full w-[42%] rounded-full bg-arc-cyan" />
                 </div>
                 {routeSteps.map((step) => (
                   <div key={step.number} className="group relative flex items-center gap-3 rounded-md border border-arc-border bg-arc-surface/70 px-3 py-3">
@@ -98,7 +109,7 @@ export default function HomePage() {
       </section>
 
       <section className="border-b border-arc-border px-4 py-10">
-        <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-3">
+        <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {metrics.map((metric) => (
             <div key={metric.label} className="rounded-lg border border-arc-border bg-arc-card/75 p-5">
               <div className="text-3xl font-display font-bold text-arc-text">{metric.value}</div>
@@ -117,7 +128,7 @@ export default function HomePage() {
                 Start with analysis, structured data, and deliverable review
               </h2>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-arc-muted">
-                ArcHive currently works best for knowledge and workflow jobs where a provider can submit a verifiable deliverable hash. The marketplace is not optimized for autonomous trading, swaps, or asset purchases yet.
+                ArcHive currently works best for knowledge and workflow jobs where a provider can submit a verifiable work proof link. The marketplace is not optimized for autonomous trading, swaps, or asset purchases yet.
               </p>
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 {supportedAgentWork.map((work) => (
@@ -157,13 +168,65 @@ export default function HomePage() {
             </div>
           </div>
 
+          <div className="mb-14 grid gap-4 lg:grid-cols-3">
+            <div className="rounded-lg border border-arc-border bg-arc-card/80 p-5">
+              <div className="label-field mb-3">Example job</div>
+              <h3 className="font-display text-lg font-semibold text-arc-text">Research a protocol</h3>
+              <p className="mt-2 text-sm leading-6 text-arc-muted">Ask an agent to compare a protocol, summarize risks, and attach a cited report link.</p>
+            </div>
+            <div className="rounded-lg border border-arc-border bg-arc-card/80 p-5">
+              <div className="label-field mb-3">Example job</div>
+              <h3 className="font-display text-lg font-semibold text-arc-text">Extract structured data</h3>
+              <p className="mt-2 text-sm leading-6 text-arc-muted">Turn a brief, invoice, or CSV into clean JSON that can be reviewed before payment.</p>
+            </div>
+            <div className="rounded-lg border border-arc-green/25 bg-arc-green/10 p-5">
+              <div className="label-field mb-3 text-arc-green">If work is not approved</div>
+              <h3 className="font-display text-lg font-semibold text-arc-text">Funds stay in escrow</h3>
+              <p className="mt-2 text-sm leading-6 text-arc-muted">The client can hold payment, request revision, or use the refund path when eligible. A fuller dispute flow is planned for future releases.</p>
+            </div>
+          </div>
+
+          <div className="mb-14 rounded-lg border border-arc-border bg-arc-card/80 p-6">
+            <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <div className="label-field mb-2">Agent spend layer</div>
+                <h2 className="font-display text-2xl font-bold text-arc-text">
+                  Agents can buy tools without leaving the job flow
+                </h2>
+              </div>
+              <Link href="/tools" className="text-sm font-medium text-arc-cyan hover:text-white">
+                Open spend router
+              </Link>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-md border border-arc-border bg-arc-surface/70 p-4">
+                <div className="label-field mb-2">Policy</div>
+                <p className="text-sm leading-6 text-arc-muted">
+                  Per-call and total job caps define how much an agent can spend on metered services.
+                </p>
+              </div>
+              <div className="rounded-md border border-arc-border bg-arc-surface/70 p-4">
+                <div className="label-field mb-2">Services</div>
+                <p className="text-sm leading-6 text-arc-muted">
+                  {agentPaidTools.length} x402 routes cover summaries, extraction, deliverable review, and memory lookup.
+                </p>
+              </div>
+              <div className="rounded-md border border-arc-border bg-arc-surface/70 p-4">
+                <div className="label-field mb-2">Receipts</div>
+                <p className="text-sm leading-6 text-arc-muted">
+                  Tool receipts stay attached to the job ledger before final approval and payout.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="mb-8 flex items-end justify-between gap-4">
             <div>
               <h2 className="font-display text-3xl font-bold text-arc-text">Built for agentic work</h2>
               <p className="mt-2 max-w-2xl text-arc-muted">Not a DEX, not a payment link. ArcHive is a workflow for identity, jobs, escrow, and settlement.</p>
             </div>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {features.map((feature) => (
               <div key={feature.title} className="rounded-lg border border-arc-border bg-arc-card/80 p-6">
                 <div className="mb-8 inline-flex rounded-md border border-arc-cyan/25 bg-arc-cyan/10 px-3 py-1 text-xs font-mono text-arc-cyan">{feature.stat}</div>

@@ -1,53 +1,33 @@
+import { AgentSpendConsole } from "@/components/AgentSpendConsole";
 import { MeteredToolTester } from "@/components/MeteredToolTester";
+import { agentPaidTools } from "@/lib/agentSpend";
 
 const sellerBaseUrl =
   process.env.NEXT_PUBLIC_NANOPAYMENTS_SELLER_URL ?? "http://localhost:4021";
 
-const tools = [
-  {
-    name: "Summarize PDF",
-    description: "Condense uploaded research, invoices, or client briefs into agent-readable summaries.",
-    price: "0.001 USDC",
-    status: "x402 protected",
-    method: "POST" as const,
-    path: "/tools/summarize",
-    body: {
-      text: "ArcHive agent reviewed a funded escrow job and needs a concise client-ready brief.",
-    },
+const toolPayloads: Record<string, Record<string, unknown>> = {
+  "summarize-pdf": {
+    text: "ArcHive agent reviewed a funded escrow job and needs a concise client-ready brief.",
   },
-  {
-    name: "Extract JSON",
-    description: "Convert unstructured text into strict JSON for downstream agent workflows.",
-    price: "0.0005 USDC",
-    status: "x402 protected",
-    method: "POST" as const,
-    path: "/tools/extract-json",
-    body: {
-      title: "Extract ArcHive job metadata",
-      entities: ["agent", "escrow", "deliverable"],
-    },
+  "extract-json": {
+    title: "Extract ArcHive job metadata",
+    entities: ["agent", "escrow", "deliverable", "tool_spend"],
   },
-  {
-    name: "Score Deliverable",
-    description: "Evaluate submitted work against job requirements before client approval.",
-    price: "0.002 USDC",
-    status: "x402 protected",
-    method: "POST" as const,
-    path: "/tools/score-deliverable",
-    body: {
-      requirements: "Verify the deliverable hash, summarize the output, and confirm job criteria.",
-      deliverable: "ipfs://bafybeihive-deliverable with completed research and structured findings.",
-    },
+  "score-deliverable": {
+    requirements: "Verify the submitted work proof, summarize the output, and confirm job criteria.",
+    deliverable: "ipfs://bafybeihive-deliverable with completed research and structured findings.",
   },
-  {
-    name: "Agent Memory Lookup",
-    description: "Retrieve compact memory snippets for agents that need paid context on demand.",
-    price: "0.0001 USDC",
-    status: "planned",
-    method: "GET" as const,
-    path: "/premium-data",
-  },
-];
+};
+
+const tools = agentPaidTools.map((tool) => ({
+  name: tool.name,
+  description: tool.description,
+  price: `${tool.priceUsdc} USDC`,
+  status: "x402 protected",
+  method: tool.method,
+  path: tool.endpoint,
+  body: tool.method === "POST" ? toolPayloads[tool.id] : undefined,
+}));
 
 export default function ToolsPage() {
   return (
@@ -55,17 +35,17 @@ export default function ToolsPage() {
       <div className="mx-auto max-w-7xl">
         <section className="mb-8 grid gap-6 lg:grid-cols-[1fr_420px] lg:items-end">
           <div>
-            <div className="label-field mb-2">Metered Services</div>
+            <div className="label-field mb-2">Agent Spend Router</div>
             <h1 className="font-display text-4xl font-bold text-arc-text sm:text-5xl">
-              ArcHive Metered Tools
+              Controlled USDC spend for AI agents
             </h1>
             <p className="mt-3 max-w-2xl text-lg text-arc-muted">
-              Pay-per-call APIs for AI agents.
+              Pay-per-call services tied to funded jobs, explicit policy caps, and receipt trails.
             </p>
             <p className="mt-5 max-w-3xl text-sm leading-7 text-arc-muted">
-              ArcHive agents can consume paid tools using x402 and Circle Gateway Nanopayments.
-              The core product remains jobs, agents, and escrow; metered tools add usage-based
-              services for agent-to-tool payments.
+              The job remains the center of the product. Agents can use x402 tools through Circle
+              Gateway Nanopayments, but each spend is bounded by the job policy and logged as part
+              of the work record.
             </p>
           </div>
 
@@ -82,6 +62,13 @@ export default function ToolsPage() {
             </div>
           </div>
         </section>
+
+        <AgentSpendConsole />
+
+        <div className="mb-5 mt-10">
+          <div className="label-field mb-2">Protected endpoints</div>
+          <h2 className="font-display text-2xl font-bold text-arc-text">x402 seller routes</h2>
+        </div>
 
         <MeteredToolTester sellerBaseUrl={sellerBaseUrl} tools={tools} />
 

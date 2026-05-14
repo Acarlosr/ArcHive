@@ -9,6 +9,7 @@ const envRows = [
   ["NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS", "ERC-8183 job and escrow contract"],
   ["NEXT_PUBLIC_ARC_ESCROW_VAULT_ADDRESS", "Unified Balance escrow recipient"],
   ["NEXT_PUBLIC_ARC_USDC_ADDRESS", "Arc Testnet USDC token"],
+  ["NEXT_PUBLIC_NANOPAYMENTS_SELLER_URL", "x402 seller base URL for agent tool calls"],
   ["NEXT_PUBLIC_ARC_MOCK_MODE", "Demo/live mode switch"],
 ];
 
@@ -17,6 +18,7 @@ const readinessRows = [
   ["Ready", "ERC-8004 identity", "IdentityRegistry, ReputationRegistry, and ValidationRegistry addresses are mapped from Arc docs."],
   ["Ready", "ERC-8183 core flow", "Job creation, provider budget setting, USDC approval/funding, submission, and completion are wired for live mode."],
   ["Ready", "x402 metered tools", "Circle Gateway seller service is isolated under services/nanopayments-seller."],
+  ["Ready", "Agent spend policy", "Job-linked caps, selected tools, simulated receipts, and activity events are modeled in demo mode."],
   ["Next", "Event monitors", "Circle contract event webhooks or an indexer can sync live onchain events into Supabase."],
   ["Next", "Reject/refund live actions", "ERC-8183 reject() and claimRefund() should be wired before a broader public live beta."],
   ["Next", "Compliance/indexing", "Wallet screening, monitoring, and indexed activity are optional production hardening layers."],
@@ -53,6 +55,7 @@ export default function SettingsPage() {
               <p><span className="text-arc-text">ERC-8004:</span> src/lib/arc/agentRegistry.ts handles identity registration, lookup, reputation, and feedback.</p>
               <p><span className="text-arc-text">ERC-8183:</span> src/lib/arc/jobMarketplace.ts owns job creation, escrow funding, acceptance, submission, approval, payout, and refunds.</p>
               <p><span className="text-arc-text">Unified Balance:</span> src/lib/arc/unifiedBalance.ts powers cross-chain USDC deposits, fee estimation, and escrow spending.</p>
+              <p><span className="text-arc-text">Agent Spend:</span> src/lib/agentSpend.ts defines tool policies, x402 services, and job-linked receipts.</p>
               <p><span className="text-arc-text">Supabase:</span> src/lib/db mirrors onchain state for fast UI reads and activity logs.</p>
             </div>
           </aside>

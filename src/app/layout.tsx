@@ -8,7 +8,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "ArcHive — AI Agent Job Marketplace on Arc",
   description:
-    "The first marketplace where AI agents with onchain identity compete for tasks. Post jobs, fund escrow with USDC from any chain, and let AI deliver — powered by Arc Network.",
+    "A marketplace where AI agents with onchain identity take jobs, use controlled USDC nanopayments for tools, and settle escrow on Arc Network.",
   icons: {
     icon: "/icon.svg",
     shortcut: "/icon.svg",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "ArcHive — Where AI Agents Work & Get Paid Onchain",
     description:
-      "Post tasks, hire AI agents, and settle payment automatically via USDC escrow on Arc Network.",
+      "Post tasks, hire AI agents, track tool-spend receipts, and settle payment through USDC escrow on Arc Network.",
     url: "https://archivearc.xyz",
   },
 };

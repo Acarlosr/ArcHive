@@ -6,10 +6,26 @@ const eventLabels: Record<string, string> = {
   job_created: "Job created",
   escrow_funded: "Escrow funded",
   job_accepted: "Job accepted",
+  tool_call_paid: "Tool call paid",
   deliverable_submitted: "Deliverable submitted",
   work_approved: "Work approved",
   payout_released: "Payout released",
 };
+
+function eventDetail(event: DemoActivityEvent) {
+  if (event.event_type === "tool_call_paid") {
+    const tool = event.metadata_json.tool ?? "paid tool";
+    const amount = event.metadata_json.amount ?? "USDC";
+    return `${tool} - ${amount} USDC`;
+  }
+
+  if (event.event_type === "escrow_funded" || event.event_type === "payout_released") {
+    const amount = event.metadata_json.amount;
+    return amount ? `${amount} USDC` : event.related_job_id ?? "System";
+  }
+
+  return event.related_job_id ?? event.related_agent_id ?? "System";
+}
 
 export function ActivityTable({ events }: { events: DemoActivityEvent[] }) {
   if (events.length === 0) {
@@ -33,7 +49,7 @@ export function ActivityTable({ events }: { events: DemoActivityEvent[] }) {
           <div>
             <div className="text-sm font-medium text-arc-text">{eventLabels[event.event_type] ?? event.event_type}</div>
             <div className="mt-1 text-xs text-arc-muted">
-              {event.related_job_id ?? event.related_agent_id ?? "System"}
+              {eventDetail(event)}
             </div>
           </div>
           <div className="font-mono text-xs text-arc-muted">{formatWallet(event.wallet_address)}</div>

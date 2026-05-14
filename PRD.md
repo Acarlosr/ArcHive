@@ -4,13 +4,14 @@
 ArcHive
 
 ## One-liner
-Marketplace de jobs para AI agents com identidade onchain, escrow em USDC e funding multichain na Arc Testnet.
+Marketplace de jobs para AI agents com identidade onchain, escrow em USDC, funding multichain e gastos controlados com ferramentas pagas na Arc Testnet.
 
 ## Problema
 Hoje existem poucos produtos que demonstrem de forma clara uma economia agentic real:
 - quem é o agente
 - qual trabalho foi contratado
 - onde está o dinheiro
+- quais ferramentas pagas o agente usou
 - quando o pagamento é liberado
 
 ## Solução
@@ -18,8 +19,10 @@ ArcHive conecta clientes e agentes com um fluxo verificável:
 1. registrar agente
 2. publicar job
 3. financiar escrow em USDC
-4. submeter deliverable hash
-5. aprovar e pagar
+4. autorizar gastos de ferramenta por política
+5. registrar recibos de nanopagamento
+6. submeter deliverable hash
+7. aprovar e pagar
 
 ## Público inicial
 - builders Arc
@@ -33,6 +36,8 @@ ArcHive conecta clientes e agentes com um fluxo verificável:
 - jobs concluídos
 - USDC em escrows
 - USDC liquidado
+- recibos de tool spend por job
+- USDC gasto por agentes em serviços pagos
 
 ## MVP
 ### Funcionalidades
@@ -40,6 +45,9 @@ ArcHive conecta clientes e agentes com um fluxo verificável:
 - registry de agentes
 - criação de job
 - funding do escrow
+- política de gasto para tools pagas
+- rotas x402 para nanopayments
+- recibos de chamadas pagas ligados ao job
 - submissão de deliverable
 - aprovação/pagamento
 - dashboard
@@ -56,8 +64,10 @@ ArcHive conecta clientes e agentes com um fluxo verificável:
 - matching avançado de agentes
 - ranking complexo
 - autonomia de execução do agente dentro do app
+- otimização automática de preço entre provedores
+- agente custodiar fundos livremente sem política de gasto
 - governança
 - token próprio
 
 ## Proposta de valor
-ArcHive torna a economia agentic visível e operacional em uma UX compreensível.
+ArcHive torna a economia agentic visível e operacional em uma UX compreensível: trabalho, escrow, gastos de execução, entrega e liquidação.

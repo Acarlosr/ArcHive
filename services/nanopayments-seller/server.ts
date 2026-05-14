@@ -49,7 +49,7 @@ app.use(express.json({ limit: "2mb" }));
 
 const gateway = createGatewayMiddleware({
   sellerAddress: SELLER_ADDRESS,
-  description: "ArcHive Metered Tools: x402 + Circle Gateway Nanopayments",
+  description: "ArcHive Agent Spend Router: x402 + Circle Gateway Nanopayments",
   ...(FACILITATOR_URL ? { facilitatorUrl: FACILITATOR_URL } : {}),
   ...(ACCEPT_ARC_ONLY ? { networks: [ARC_TESTNET_NETWORK] } : {}),
 });
@@ -66,7 +66,7 @@ function paymentMeta(req: Request) {
 
 app.get("/health", (_req: Request, res: Response) => {
   res.json({
-    service: "ArcHive Metered Tools seller",
+    service: "ArcHive Agent Spend Router seller",
     status: "ok",
     acceptArcOnly: ACCEPT_ARC_ONLY,
     facilitatorUrl: FACILITATOR_URL ?? "https://gateway-api.circle.com",
@@ -76,7 +76,7 @@ app.get("/health", (_req: Request, res: Response) => {
 
 app.get("/", (_req: Request, res: Response) => {
   res.json({
-    service: "ArcHive Metered Tools seller",
+    service: "ArcHive Agent Spend Router seller",
     status: "ok",
     docs: "Use POST endpoints from ArcHive agents or x402-capable clients. Browser GET requests show route metadata only.",
     endpoints: {
@@ -174,7 +174,7 @@ app.post("/tools/score-deliverable", paid("$0.002"), (req: Request, res: Respons
 });
 
 app.listen(PORT, () => {
-  console.log(`ArcHive Metered Tools seller listening at http://localhost:${PORT}`);
+  console.log(`ArcHive Agent Spend Router seller listening at http://localhost:${PORT}`);
   console.log(
     ACCEPT_ARC_ONLY
       ? `Accepting Circle Gateway x402 payments only on ${ARC_TESTNET_NETWORK}`

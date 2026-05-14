@@ -6,6 +6,7 @@ import { useAccount, useWalletClient } from "wagmi";
 import { getAgents, type Agent } from "@/lib/db/agents";
 import { createJobRecord } from "@/lib/db/jobs";
 import { createJob, fundEscrow } from "@/lib/arc/jobMarketplace";
+import { AgentSpendPolicyCard } from "@/components/AgentSpendPolicyCard";
 import { FeeEstimatePanel } from "@/components/FeeEstimatePanel";
 import { UnifiedBalanceCard } from "@/components/UnifiedBalanceCard";
 import { WalletOnboardingModal } from "@/components/WalletOnboardingModal";
@@ -200,7 +201,7 @@ function CreateJobContent() {
               </label>
               <label>
                 <span className="label-field mb-2 block">Description</span>
-                <textarea className="input-field min-h-32 resize-none" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} placeholder="Describe the expected deliverable, review criteria, and output hash format." />
+                <textarea className="input-field min-h-32 resize-none" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} placeholder="Describe the expected work, review criteria, and proof link or file reference the provider should submit." />
               </label>
               <label>
                 <span className="label-field mb-2 block">Selected agent</span>
@@ -241,6 +242,9 @@ function CreateJobContent() {
                   Live ERC-8183 funding happens after the selected provider accepts the job and sets the USDC budget. The current flow is built for analysis, structured data, workflow, and deliverable-review jobs, not autonomous trading or token purchases.
                 </div>
               )}
+              <div className="rounded-lg border border-arc-border bg-arc-surface/70 p-3 text-sm leading-6 text-arc-muted">
+                If the submitted work is not acceptable, the client does not have to approve payment immediately. Funds remain in escrow while the client requests revision or uses the refund path when eligible.
+              </div>
             </div>
           </div>
 
@@ -248,6 +252,12 @@ function CreateJobContent() {
             <TestnetFundsCard compact />
             <UnifiedBalanceCard />
             <FeeEstimatePanel amount={normalizeBudget(form.budget)} />
+            <AgentSpendPolicyCard
+              jobId="draft-job"
+              agentId={selectedAgent?.id ?? "draft-agent"}
+              jobBudgetUsdc={normalizeBudget(form.budget)}
+              enabled={false}
+            />
           </aside>
         </div>
       </div>

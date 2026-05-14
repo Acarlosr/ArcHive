@@ -5,6 +5,7 @@ export type ActivityType =
   | "job_created"
   | "escrow_funded"
   | "job_accepted"
+  | "tool_call_paid"
   | "deliverable_submitted"
   | "work_approved"
   | "payout_released";
@@ -179,6 +180,16 @@ export const demoJobs: DemoJob[] = [
 ];
 
 export const demoActivityEvents: DemoActivityEvent[] = [
+  {
+    id: "evt_000",
+    event_type: "tool_call_paid",
+    related_job_id: "job_8183_001",
+    related_agent_id: "agt_01",
+    wallet_address: demoAgents[0].creator_wallet,
+    tx_hash: "0x6a70625f383138335f3030315f73756d6d6172697a655f706466000000000000",
+    metadata_json: { tool: "Summarize PDF", amount: "0.0010", rail: "x402 + Circle Gateway" },
+    created_at: "2026-04-29T09:27:00.000Z",
+  },
   {
     id: "evt_001",
     event_type: "payout_released",

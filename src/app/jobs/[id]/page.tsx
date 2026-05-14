@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAccount, useWalletClient } from "wagmi";
+import { AgentSpendPolicyCard } from "@/components/AgentSpendPolicyCard";
 import { EscrowBadge } from "@/components/EscrowBadge";
 import { ExplorerLink } from "@/components/ExplorerLink";
 import { JobTimeline } from "@/components/JobTimeline";
@@ -32,7 +33,7 @@ function JobDetailContent() {
   const [loading, setLoading] = useState(true);
   const [actionState, setActionState] = useState<ActionState>("idle");
   const [error, setError] = useState("");
-  const [deliverableHash, setDeliverableHash] = useState("ipfs://bafybeihive-deliverable");
+  const [deliverableProof, setDeliverableProof] = useState("ipfs://bafybeihive-deliverable");
 
   useEffect(() => {
     getJobById(params.id as string).then(setJob).finally(() => setLoading(false));
@@ -108,6 +109,9 @@ function JobDetailContent() {
 
             <div className="rounded-lg border border-arc-border bg-arc-card/85 p-6">
               <h2 className="mb-5 font-display text-xl font-semibold text-arc-text">Role actions</h2>
+              <div className="mb-5 rounded-lg border border-arc-border bg-arc-surface/70 p-4 text-sm leading-6 text-arc-muted">
+                Escrow protects both sides: providers are paid only after approval, and clients can keep funds locked while requesting revision or use the refund path when eligible. Dispute resolution is planned as a future ArcHive module.
+              </div>
               {!address ? (
                 <WalletOnboardingModal title="Connect to act on this job" />
               ) : (
@@ -129,9 +133,15 @@ function JobDetailContent() {
                   )}
                   {isProvider && job.status === "funded" && (
                     <div className="space-y-3">
-                      <input className="input-field" value={deliverableHash} onChange={(event) => setDeliverableHash(event.target.value)} placeholder="ipfs:// or sha256 deliverable hash" />
-                      <button className="btn-primary w-full" disabled={actionState === "processing" || !deliverableHash.trim()} onClick={() => runAction(() => submitDeliverable({ walletClient, jobId: job.onchain_id ?? job.id, deliverableHash }), "submitted", { deliverable_hash: deliverableHash })}>
-                        Submit deliverable hash
+                      <label>
+                        <span className="label-field mb-2 block">Work proof</span>
+                        <input className="input-field" value={deliverableProof} onChange={(event) => setDeliverableProof(event.target.value)} placeholder="ipfs://, file link, or sha256 reference" />
+                      </label>
+                      <p className="text-xs leading-5 text-arc-muted">
+                        Add a link or technical reference that proves what was delivered. ArcHive stores it as a hash/reference for the job record.
+                      </p>
+                      <button className="btn-primary w-full" disabled={actionState === "processing" || !deliverableProof.trim()} onClick={() => runAction(() => submitDeliverable({ walletClient, jobId: job.onchain_id ?? job.id, deliverableHash: deliverableProof }), "submitted", { deliverable_hash: deliverableProof })}>
+                        Submit work proof
                       </button>
                     </div>
                   )}
@@ -150,6 +160,11 @@ function JobDetailContent() {
                       This connected wallet is viewing as an observer. Client and provider actions are shown to their assigned wallets.
                     </div>
                   )}
+                  {actionState === "success" && (
+                    <div className="rounded-lg border border-arc-green/25 bg-arc-green/10 p-3 text-sm text-arc-green">
+                      Action confirmed and job state updated.
+                    </div>
+                  )}
                   {error && <div className="rounded-lg border border-arc-red/25 bg-arc-red/10 p-3 text-sm text-arc-red">{error}</div>}
                 </div>
               )}
@@ -164,7 +179,7 @@ function JobDetailContent() {
                 </div>
                 {job.deliverable_hash && (
                   <div className="rounded-md border border-arc-border bg-arc-surface/70 p-3">
-                    <div className="text-sm text-arc-muted">Deliverable hash</div>
+                    <div className="text-sm text-arc-muted">Work proof reference</div>
                     <div className="mt-1 break-all font-mono text-xs text-arc-cyan">{job.deliverable_hash}</div>
                   </div>
                 )}
@@ -174,6 +189,12 @@ function JobDetailContent() {
 
           <aside className="space-y-4">
             <EscrowBadge amount={job.budget} status={job.status} />
+            <AgentSpendPolicyCard
+              jobId={job.id}
+              agentId={job.agent_id}
+              jobBudgetUsdc={job.budget}
+              enabled={["funded", "accepted", "submitted", "approved", "paid", "completed"].includes(job.status)}
+            />
             <div className="rounded-lg border border-arc-border bg-arc-card/85 p-5">
               <h2 className="mb-4 font-display text-lg font-semibold text-arc-text">Participants</h2>
               <div className="space-y-3 text-sm">

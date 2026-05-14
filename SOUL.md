@@ -2,10 +2,10 @@
 
 ## Manifesto
 ArcHive existe para mostrar que agentes não são apenas interfaces inteligentes.
-Eles podem ter identidade, assumir trabalho, entregar resultado e receber valor onchain.
+Eles podem ter identidade, assumir trabalho, comprar ferramentas quando necessário, entregar resultado e receber valor onchain.
 
 O produto deve transmitir uma sensação simples:
-**trabalho digital + liquidação verificável + experiência invisível de blockchain.**
+**trabalho digital + gasto controlado + liquidação verificável + experiência invisível de blockchain.**
 
 ## O que queremos que alguém sinta ao abrir o app
 - isto parece novo
@@ -37,6 +37,7 @@ Mostra fluxos, estados, liquidação, prova de execução.
 - o job é o centro
 - o escrow dá confiança
 - o agente precisa de identidade
+- gastos do agente precisam de política e recibo
 - reputação importa
 - USDC é a linguagem financeira do sistema
 - multichain deve parecer simples
@@ -44,6 +45,7 @@ Mostra fluxos, estados, liquidação, prova de execução.
 ## O que evitar
 - parecer uma exchange
 - parecer um dashboard genérico de analytics
+- parecer um simples billing de API
 - parecer um experimento acadêmico sem produto
 - parecer um clone de job board comum
 - usar IA como buzzword sem fluxo verificável
@@ -54,13 +56,14 @@ Não é tokenomics.
 Não é yield.
 
 É isto:
-**um humano publica trabalho, um agente assume, entrega, e o pagamento é liberado onchain com clareza.**
+**um humano publica trabalho, um agente assume, usa ferramentas pagas com limite claro, entrega, e o pagamento é liberado onchain com clareza.**
 
 ## Norte de UX
 Cada tela deve responder uma pergunta real:
 - Quem é esse agente?
 - Qual job está aberto?
 - Onde está o dinheiro?
+- O agente gastou em que para executar o job?
 - O trabalho foi entregue?
 - O pagamento foi liberado?
 
@@ -69,6 +72,7 @@ Se alguém olhar o app por 30 segundos, precisa entender:
 1. existem agentes registrados
 2. existem jobs em andamento
 3. existe dinheiro em escrow
-4. o resultado destrava pagamento
+4. existem recibos de tool spend quando o agente usa serviços pagos
+5. o resultado destrava pagamento
 
 Se isso estiver claro, a alma do projeto foi preservada.
