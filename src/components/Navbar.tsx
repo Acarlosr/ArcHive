@@ -3,21 +3,24 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { WalletConnectCTA } from "@/components/WalletConnectCTA";
+import { useLanguage } from "@/lib/i18n";
 
 const NAV_LINKS = [
-  { href: "/jobs", label: "Jobs" },
-  { href: "/guide", label: "Guide" },
-  { href: "/agents", label: "Agents" },
-  { href: "/tools", label: "Spend" },
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/activity", label: "Activity" },
-  { href: "/settings", label: "Settings" },
-  { href: "/docs", label: "Docs" },
+  { href: "/jobs", labelKey: "nav.jobs" },
+  { href: "/guide", labelKey: "nav.guide" },
+  { href: "/agents", labelKey: "nav.agents" },
+  { href: "/tools", labelKey: "nav.spend" },
+  { href: "/dashboard", labelKey: "nav.dashboard" },
+  { href: "/activity", labelKey: "nav.activity" },
+  { href: "/settings", labelKey: "nav.settings" },
+  { href: "/docs", labelKey: "nav.docs" },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
+  const { t } = useLanguage();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-arc-border/50 bg-arc-bg/80 backdrop-blur-xl">
@@ -51,7 +54,7 @@ export function Navbar() {
                       : "text-arc-muted hover:text-arc-text hover:bg-arc-surface"
                   }`}
                 >
-                  {link.label}
+                  {t(link.labelKey)}
                 </Link>
               );
             })}
@@ -59,11 +62,12 @@ export function Navbar() {
 
           {/* Wallet */}
           <div className="flex items-center gap-3">
+            <LanguageToggle />
             <Link
               href="/jobs/create"
               className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 border border-arc-border text-arc-muted text-sm font-medium rounded-lg hover:border-arc-cyan/40 hover:text-arc-cyan transition-all"
             >
-              <span>+</span> Post Job
+              <span>+</span> {t("nav.postJob")}
             </Link>
             <WalletConnectCTA />
           </div>
@@ -84,7 +88,7 @@ export function Navbar() {
                   : "text-arc-muted"
               }`}
             >
-              {link.label}
+              {t(link.labelKey)}
             </Link>
           );
         })}

@@ -1,4 +1,10 @@
+"use client";
+
+import { useLanguage } from "@/lib/i18n";
+
 export function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="border-t border-arc-border bg-arc-bg/95 px-4 py-8">
       <div className="mx-auto max-w-7xl">
@@ -8,14 +14,14 @@ export function Footer() {
               Arc<span className="text-arc-cyan">Hive</span>
             </div>
             <p className="mt-2 max-w-sm text-sm text-arc-muted">
-              Where AI Agents Work & Get Paid Onchain.
+              {t("footer.tagline")}
             </p>
           </div>
         </div>
 
         <div className="mt-8 border-t border-arc-border pt-5">
           <p className="text-xs text-arc-dim">
-            © 2026 ArcHive. Built on Arc Network Testnet.
+            {t("footer.copyright")}
           </p>
         </div>
       </div>
