@@ -13,6 +13,7 @@ import { getAgents, type Agent } from "@/lib/db/agents";
 import { getActivityEvents, type ActivityEvent } from "@/lib/db/activity";
 import { getJobs, type Job } from "@/lib/db/jobs";
 import { WalletProviderIsland } from "@/components/WalletProviderIsland";
+import { useLanguage } from "@/lib/i18n";
 
 type Tab = "jobs" | "agent" | "earnings";
 
@@ -25,6 +26,7 @@ export default function DashboardPage() {
 }
 
 function DashboardContent() {
+  const { t } = useLanguage();
   const { isConnected } = useAccount();
   const [tab, setTab] = useState<Tab>("jobs");
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -48,7 +50,7 @@ function DashboardContent() {
     return (
       <div className="px-4 pb-16 pt-24">
         <div className="mx-auto max-w-xl">
-          <WalletOnboardingModal title="Connect to view your dashboard" />
+          <WalletOnboardingModal title={t("dashboard.connect")} />
         </div>
       </div>
     );
@@ -59,24 +61,24 @@ function DashboardContent() {
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div>
-            <div className="label-field mb-2">Personal Dashboard</div>
-            <h1 className="font-display text-4xl font-bold text-arc-text">Jobs, agents, and earnings</h1>
-            <p className="mt-2 text-arc-muted">A dense view of escrow activity and USDC settlement on ArcHive.</p>
+            <div className="label-field mb-2">{t("dashboard.label")}</div>
+            <h1 className="font-display text-4xl font-bold text-arc-text">{t("dashboard.title")}</h1>
+            <p className="mt-2 text-arc-muted">{t("dashboard.subtitle")}</p>
           </div>
-          <Link href="/jobs/create" className="btn-primary">Post new job</Link>
+          <Link href="/jobs/create" className="btn-primary">{t("dashboard.post")}</Link>
         </div>
 
         <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <EarningsCard label="total USDC earned" value={`$${earned.toFixed(2)}`} detail="Released from approved work." tone="text-arc-green" />
-          <EarningsCard label="total USDC spent" value={`$${spent.toFixed(2)}`} detail="Committed to posted jobs." tone="text-arc-orange" />
-          <EarningsCard label="active escrows" value={activeEscrows.toString()} detail="Funded work not yet paid." tone="text-arc-cyan" />
-          <EarningsCard label="completed jobs" value={completed.length.toString()} detail="Approved deliverables." />
+          <EarningsCard label={t("dashboard.earned")} value={`$${earned.toFixed(2)}`} detail={t("dashboard.earnedDetail")} tone="text-arc-green" />
+          <EarningsCard label={t("dashboard.spent")} value={`$${spent.toFixed(2)}`} detail={t("dashboard.spentDetail")} tone="text-arc-orange" />
+          <EarningsCard label={t("dashboard.escrows")} value={activeEscrows.toString()} detail={t("dashboard.escrowsDetail")} tone="text-arc-cyan" />
+          <EarningsCard label={t("dashboard.completed")} value={completed.length.toString()} detail={t("dashboard.completedDetail")} />
         </div>
 
         <div className="mb-6 flex gap-2 overflow-x-auto">
           {(["jobs", "agent", "earnings"] as Tab[]).map((item) => (
-            <button key={item} onClick={() => setTab(item)} className={`rounded-lg border px-4 py-2 text-sm font-medium capitalize transition-colors ${tab === item ? "border-arc-cyan bg-arc-cyan/10 text-arc-cyan" : "border-arc-border bg-arc-surface text-arc-muted hover:text-arc-text"}`}>
-              My {item}
+            <button key={item} onClick={() => setTab(item)} className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${tab === item ? "border-arc-cyan bg-arc-cyan/10 text-arc-cyan" : "border-arc-border bg-arc-surface text-arc-muted hover:text-arc-text"}`}>
+              {item === "jobs" ? t("dashboard.myJobs") : item === "agent" ? t("dashboard.myAgent") : t("dashboard.myEarnings")}
             </button>
           ))}
         </div>

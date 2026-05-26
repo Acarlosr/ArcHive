@@ -13,6 +13,7 @@ import { WalletOnboardingModal } from "@/components/WalletOnboardingModal";
 import { WalletProviderIsland } from "@/components/WalletProviderIsland";
 import { TestnetFundsCard } from "@/components/TestnetFundsCard";
 import { jobTemplates } from "@/lib/agentWork";
+import { useLanguage } from "@/lib/i18n";
 
 type ActionState = "idle" | "creating" | "funding" | "success" | "error";
 
@@ -35,6 +36,8 @@ export default function CreateJobPage() {
 }
 
 function CreateJobContent() {
+  const { locale } = useLanguage();
+  const isPt = locale === "pt-BR";
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestedAgent = searchParams.get("agent");
@@ -125,7 +128,7 @@ function CreateJobContent() {
       setState("success");
       router.push(`/jobs/${job.id}`);
     } catch (err: any) {
-      setError(err?.message ?? "Could not create job");
+      setError(err?.message ?? (isPt ? "Não foi possível criar o job" : "Could not create job"));
       setState("error");
     }
   }
@@ -134,12 +137,14 @@ function CreateJobContent() {
     return (
       <div className="px-4 pb-16 pt-24">
         <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[420px_1fr]">
-          <WalletOnboardingModal title="Connect to post a job" />
+          <WalletOnboardingModal title={isPt ? "Conecte para criar um job" : "Connect to post a job"} />
           <div className="rounded-lg border border-arc-border bg-arc-card/85 p-6">
-            <div className="label-field mb-2">Before you connect</div>
-            <h1 className="font-display text-2xl font-bold text-arc-text">Choose a supported job type</h1>
+            <div className="label-field mb-2">{isPt ? "Antes de conectar" : "Before you connect"}</div>
+            <h1 className="font-display text-2xl font-bold text-arc-text">{isPt ? "Escolha um tipo de job suportado" : "Choose a supported job type"}</h1>
             <p className="mt-2 text-sm leading-6 text-arc-muted">
-              ArcHive currently works best for research, structured data, deliverable scoring, and workflow support. You can browse these templates first, then connect a wallet when you are ready to create the onchain job.
+              {isPt
+                ? "ArcHive funciona melhor para pesquisa, dados estruturados, avaliação de entregas e suporte de workflow. Veja os templates primeiro e conecte a carteira quando estiver pronto para criar o job onchain."
+                : "ArcHive currently works best for research, structured data, deliverable scoring, and workflow support. You can browse these templates first, then connect a wallet when you are ready to create the onchain job."}
             </p>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {jobTemplates.map((template) => (
@@ -149,7 +154,7 @@ function CreateJobContent() {
                   </div>
                   <div className="font-display text-sm font-semibold text-arc-text">{template.title}</div>
                   <p className="mt-2 line-clamp-3 text-xs leading-5 text-arc-muted">{template.description}</p>
-                  <div className="mt-3 font-mono text-xs text-arc-cyan">{template.budget} USDC example budget</div>
+                  <div className="mt-3 font-mono text-xs text-arc-cyan">{template.budget} USDC {isPt ? "orçamento exemplo" : "example budget"}</div>
                 </div>
               ))}
             </div>
@@ -163,9 +168,13 @@ function CreateJobContent() {
     <div className="px-4 pb-16 pt-24">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8">
-          <div className="label-field mb-2">Create job</div>
-          <h1 className="font-display text-4xl font-bold text-arc-text">Post USDC-funded work</h1>
-          <p className="mt-2 max-w-2xl text-arc-muted">Define a supported agent task, choose a provider, preview fees, then create the escrow record with optional Unified Balance funding.</p>
+          <div className="label-field mb-2">{isPt ? "Criar job" : "Create job"}</div>
+          <h1 className="font-display text-4xl font-bold text-arc-text">{isPt ? "Publique trabalho financiado em USDC" : "Post USDC-funded work"}</h1>
+          <p className="mt-2 max-w-2xl text-arc-muted">
+            {isPt
+              ? "Defina uma tarefa suportada para agente, escolha um prestador, pré-visualize taxas e crie o registro de escrow com funding opcional via Unified Balance."
+              : "Define a supported agent task, choose a provider, preview fees, then create the escrow record with optional Unified Balance funding."}
+          </p>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
@@ -173,8 +182,8 @@ function CreateJobContent() {
             <div className="grid gap-5">
               <div>
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <span className="label-field">Job templates</span>
-                  <span className="text-xs text-arc-dim">Optimized for the current agent registry</span>
+                  <span className="label-field">{isPt ? "Templates de job" : "Job templates"}</span>
+                  <span className="text-xs text-arc-dim">{isPt ? "Otimizados para o registro atual de agentes" : "Optimized for the current agent registry"}</span>
                 </div>
                 <div className="grid gap-3 md:grid-cols-2">
                   {jobTemplates.map((template) => (
@@ -196,15 +205,15 @@ function CreateJobContent() {
               </div>
 
               <label>
-                <span className="label-field mb-2 block">Title</span>
+                <span className="label-field mb-2 block">{isPt ? "Título" : "Title"}</span>
                 <input className="input-field" value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} placeholder="Draft ERC-8183 integration spec" />
               </label>
               <label>
-                <span className="label-field mb-2 block">Description</span>
-                <textarea className="input-field min-h-32 resize-none" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} placeholder="Describe the expected work, review criteria, and proof link or file reference the provider should submit." />
+                <span className="label-field mb-2 block">{isPt ? "Descrição" : "Description"}</span>
+                <textarea className="input-field min-h-32 resize-none" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} placeholder={isPt ? "Descreva o trabalho esperado, critérios de revisão e link/prova de entrega que o prestador deve enviar." : "Describe the expected work, review criteria, and proof link or file reference the provider should submit."} />
               </label>
               <label>
-                <span className="label-field mb-2 block">Selected agent</span>
+                <span className="label-field mb-2 block">{isPt ? "Agente selecionado" : "Selected agent"}</span>
                 <select className="input-field" value={form.selectedAgentId} onChange={(event) => setForm({ ...form, selectedAgentId: event.target.value })}>
                   {agents.map((agent) => (
                     <option key={agent.id} value={agent.id}>{agent.name} - {agent.agent_type}</option>
@@ -212,17 +221,17 @@ function CreateJobContent() {
                 </select>
                 {selectedAgent && (
                   <p className="mt-2 text-xs leading-5 text-arc-muted">
-                    Best fit for {selectedAgent.capabilities.slice(0, 3).join(", ")}.
+                    {isPt ? "Melhor opção para" : "Best fit for"} {selectedAgent.capabilities.slice(0, 3).join(", ")}.
                   </p>
                 )}
               </label>
               <div className="grid gap-5 sm:grid-cols-2">
                 <label>
-                  <span className="label-field mb-2 block">Budget in USDC</span>
+                  <span className="label-field mb-2 block">{isPt ? "Orçamento em USDC" : "Budget in USDC"}</span>
                   <input className="input-field" inputMode="decimal" value={form.budget} onChange={(event) => setForm({ ...form, budget: event.target.value })} placeholder="75.00" />
                 </label>
                 <label>
-                  <span className="label-field mb-2 block">Deadline</span>
+                  <span className="label-field mb-2 block">{isPt ? "Prazo" : "Deadline"}</span>
                   <input className="input-field" type="date" value={form.deadline} onChange={(event) => setForm({ ...form, deadline: event.target.value })} />
                 </label>
               </div>
@@ -231,19 +240,23 @@ function CreateJobContent() {
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 <button onClick={() => submit(false)} disabled={state === "creating" || state === "funding"} className="btn-secondary flex-1">
-                  {state === "creating" ? "Creating..." : "Create Job"}
+                  {state === "creating" ? (isPt ? "Criando..." : "Creating...") : (isPt ? "Criar Job" : "Create Job")}
                 </button>
                 <button onClick={() => submit(true)} disabled={state === "creating" || state === "funding" || isLiveArcMode} className="btn-primary flex-1">
-                  {state === "funding" ? "Funding Escrow..." : isLiveArcMode ? "Fund after Provider Accepts" : "Create + Fund Escrow"}
+                  {state === "funding" ? (isPt ? "Financiando Escrow..." : "Funding Escrow...") : isLiveArcMode ? (isPt ? "Financiar após prestador aceitar" : "Fund after Provider Accepts") : (isPt ? "Criar + Financiar Escrow" : "Create + Fund Escrow")}
                 </button>
               </div>
               {isLiveArcMode && (
                 <div className="rounded-lg border border-arc-cyan/20 bg-arc-cyan/10 p-3 text-sm leading-6 text-arc-muted">
-                  Live ERC-8183 funding happens after the selected provider accepts the job and sets the USDC budget. The current flow is built for analysis, structured data, workflow, and deliverable-review jobs, not autonomous trading or token purchases.
+                  {isPt
+                    ? "No modo live ERC-8183, o funding acontece após o prestador selecionado aceitar o job e definir o orçamento em USDC. O fluxo atual é para análise, dados estruturados, workflow e revisão de entregas, não trading autônomo ou compra de tokens."
+                    : "Live ERC-8183 funding happens after the selected provider accepts the job and sets the USDC budget. The current flow is built for analysis, structured data, workflow, and deliverable-review jobs, not autonomous trading or token purchases."}
                 </div>
               )}
               <div className="rounded-lg border border-arc-border bg-arc-surface/70 p-3 text-sm leading-6 text-arc-muted">
-                If the submitted work is not acceptable, the client does not have to approve payment immediately. Funds remain in escrow while the client requests revision or uses the refund path when eligible.
+                {isPt
+                  ? "Se a entrega não estiver adequada, o cliente não precisa aprovar o pagamento imediatamente. Os fundos permanecem em escrow enquanto o cliente solicita revisão ou usa o caminho de reembolso quando elegível."
+                  : "If the submitted work is not acceptable, the client does not have to approve payment immediately. Funds remain in escrow while the client requests revision or uses the refund path when eligible."}
               </div>
             </div>
           </div>

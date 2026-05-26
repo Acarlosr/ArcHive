@@ -134,14 +134,14 @@ function JobDetailContent() {
                   {isProvider && job.status === "funded" && (
                     <div className="space-y-3">
                       <label>
-                        <span className="label-field mb-2 block">Work proof</span>
+                        <span className="label-field mb-2 block">Proof of delivery</span>
                         <input className="input-field" value={deliverableProof} onChange={(event) => setDeliverableProof(event.target.value)} placeholder="ipfs://, file link, or sha256 reference" />
                       </label>
                       <p className="text-xs leading-5 text-arc-muted">
-                        Add a link or technical reference that proves what was delivered. ArcHive stores it as a hash/reference for the job record.
+                        Add a delivery receipt, file link, IPFS URI, or technical reference that proves what was delivered. ArcHive stores it as the job proof record.
                       </p>
                       <button className="btn-primary w-full" disabled={actionState === "processing" || !deliverableProof.trim()} onClick={() => runAction(() => submitDeliverable({ walletClient, jobId: job.onchain_id ?? job.id, deliverableHash: deliverableProof }), "submitted", { deliverable_hash: deliverableProof })}>
-                        Submit work proof
+                        Submit proof of delivery
                       </button>
                     </div>
                   )}
@@ -179,7 +179,7 @@ function JobDetailContent() {
                 </div>
                 {job.deliverable_hash && (
                   <div className="rounded-md border border-arc-border bg-arc-surface/70 p-3">
-                    <div className="text-sm text-arc-muted">Work proof reference</div>
+                    <div className="text-sm text-arc-muted">Proof of delivery receipt</div>
                     <div className="mt-1 break-all font-mono text-xs text-arc-cyan">{job.deliverable_hash}</div>
                   </div>
                 )}

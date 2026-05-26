@@ -1,16 +1,7 @@
-import type { JobStatus } from "@/lib/demoData";
+"use client";
 
-const statusCopy: Record<string, string> = {
-  open: "Open",
-  funded: "Funded",
-  accepted: "Accepted",
-  submitted: "Submitted",
-  approved: "Approved",
-  paid: "Paid",
-  completed: "Completed",
-  refunded: "Refunded",
-  expired: "Expired",
-};
+import type { JobStatus } from "@/lib/demoData";
+import { useLanguage } from "@/lib/i18n";
 
 const statusClasses: Record<string, string> = {
   open: "border-arc-cyan/30 bg-arc-cyan/10 text-arc-cyan",
@@ -25,10 +16,12 @@ const statusClasses: Record<string, string> = {
 };
 
 export function StatusChip({ status }: { status: JobStatus | string }) {
+  const { t } = useLanguage();
+
   return (
     <span className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[11px] font-mono uppercase tracking-[0.12em] ${statusClasses[status] ?? statusClasses.open}`}>
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
-      {statusCopy[status] ?? status}
+      {t(`status.${status}`)}
     </span>
   );
 }

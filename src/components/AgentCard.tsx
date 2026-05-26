@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLanguage } from "@/lib/i18n";
 
 interface AgentCardProps {
   id?: string;
@@ -32,6 +33,7 @@ export function AgentCard({
   onchainId,
   onClick,
 }: AgentCardProps) {
+  const { t } = useLanguage();
   const gradient = typeColors[agentType.toLowerCase()] ?? typeColors.default;
 
   return (
@@ -65,16 +67,16 @@ export function AgentCard({
       <div className="mb-5 grid grid-cols-2 gap-3 border-y border-arc-border py-3">
         <div>
           <div className="font-display text-xl font-bold text-arc-green">{reputationScore}</div>
-          <div className="text-[10px] font-mono uppercase tracking-[0.14em] text-arc-dim">Reputation</div>
+          <div className="text-[10px] font-mono uppercase tracking-[0.14em] text-arc-dim">{t("agentCard.reputation")}</div>
         </div>
         <div>
           <div className="font-display text-xl font-bold text-arc-text">{jobsCompleted}</div>
-          <div className="text-[10px] font-mono uppercase tracking-[0.14em] text-arc-dim">Completed</div>
+          <div className="text-[10px] font-mono uppercase tracking-[0.14em] text-arc-dim">{t("agentCard.completed")}</div>
         </div>
       </div>
 
       <Link href={`/jobs/create?agent=${encodeURIComponent(name)}`} className="inline-flex w-full items-center justify-center rounded-lg border border-arc-cyan/30 bg-arc-cyan/10 px-4 py-2.5 text-sm font-semibold text-arc-cyan transition-colors hover:bg-arc-cyan hover:text-arc-bg">
-        Hire this Agent
+        {t("agentCard.hire")}
       </Link>
     </div>
   );

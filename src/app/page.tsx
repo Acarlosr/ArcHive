@@ -91,11 +91,11 @@ export default function HomePage() {
   return (
     <div className="pt-16">
       <section className="relative overflow-hidden border-b border-arc-border px-4 py-20 sm:py-24">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,212,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,212,255,0.05)_1px,transparent_1px)] bg-[size:72px_72px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,212,255,0.18),transparent_42%),linear-gradient(180deg,rgba(6,10,16,0)_0%,#060a10_85%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(189,216,207,0.026)_1px,transparent_1px),linear-gradient(90deg,rgba(189,216,207,0.026)_1px,transparent_1px)] bg-[size:72px_72px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_54%_10%,rgba(45,243,208,0.10),transparent_38%),radial-gradient(circle_at_80%_22%,rgba(216,185,106,0.09),transparent_30%),radial-gradient(circle_at_36%_38%,rgba(168,85,247,0.045),transparent_26%),linear-gradient(180deg,rgba(5,9,8,0.18)_0%,#050908_88%)]" />
         <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-arc-cyan/25 bg-arc-cyan/10 px-3 py-1.5 text-xs font-mono uppercase tracking-[0.14em] text-arc-cyan">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-arc-cyan/25 bg-arc-cyan/10 px-3 py-1.5 text-xs font-mono uppercase tracking-[0.14em] text-arc-cyan shadow-[0_0_28px_rgba(24,242,194,0.10)]">
               <span className="h-1.5 w-1.5 rounded-full bg-arc-cyan" />
               {t("home.eyebrow")}
             </div>
@@ -108,36 +108,90 @@ export default function HomePage() {
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
               <WalletConnectCTA variant="hero" />
               <Link href="/jobs/create" className="btn-secondary text-center">{t("home.cta.post")}</Link>
-              <Link href="/agents/register" className="btn-secondary text-center">{t("home.cta.agent")}</Link>
-              <Link href="/tools" className="btn-secondary text-center">{t("home.cta.spend")}</Link>
               <Link href="/guide" className="btn-secondary text-center">{t("home.cta.guide")}</Link>
             </div>
-            <HeroWalletOnboarding />
+            <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-arc-muted">
+              <span>Need testnet setup?</span>
+              <Link href="/guide" className="font-medium text-arc-cyan transition-colors hover:text-white">
+                Add Arc Testnet
+              </Link>
+              <Link href="/tools" className="font-medium text-arc-gold transition-colors hover:text-white">
+                Explore metered tools
+              </Link>
+            </div>
           </div>
 
-          <div className="rounded-lg border border-arc-border bg-arc-card/80 p-4 shadow-[0_0_80px_rgba(0,212,255,0.08)] backdrop-blur">
-            <div className="rounded-md border border-arc-border bg-arc-bg/80 p-5">
-              <div className="mb-5 flex items-center justify-between">
-                <div>
-                  <div className="label-field">{t("home.liveRoute")}</div>
-                  <div className="mt-1 font-display text-xl font-semibold text-arc-text">{t("home.escrowFunded")}</div>
-                </div>
-                <div className="rounded-full border border-arc-green/25 bg-arc-green/10 px-3 py-1 text-xs font-mono text-arc-green">2,400 USDC</div>
+          <div className="agent-orbit-card min-h-[620px] border-arc-border/90 bg-[#0d1412]/80 p-5">
+            <div className="relative z-10 flex items-center justify-between">
+              <div>
+                <div className="label-field">{t("home.liveRoute")}</div>
+                <div className="mt-1 font-display text-xl font-semibold text-arc-text">{t("home.escrowFunded")}</div>
               </div>
-              <div className="space-y-3">
-                <div className="h-1.5 overflow-hidden rounded-full bg-arc-border">
-                  <div className="h-full w-[42%] rounded-full bg-arc-cyan" />
+              <div className="rounded-full border border-arc-gold/30 bg-arc-gold/10 px-3 py-1 text-xs font-mono text-arc-gold">2,400 USDC</div>
+            </div>
+
+            <div className="relative z-10 mt-6 h-[360px] overflow-hidden rounded-lg border border-arc-border/80 bg-[#060b0a]/70">
+              <div className="escrow-core absolute left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full border border-arc-gold/45 bg-[radial-gradient(circle,rgba(216,185,106,0.42),rgba(216,185,106,0.12)_45%,rgba(16,28,26,0.86)_72%)] shadow-[0_0_60px_rgba(216,185,106,0.26)]" />
+              <div className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-arc-cyan/25 bg-arc-bg/80 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-arc-cyan">
+                Escrow
+              </div>
+
+              <div className="agent-link left-[49%] top-[50%] w-[31%] rotate-[-28deg]" />
+              <div className="agent-link left-[49%] top-[50%] w-[28%] rotate-[22deg]" />
+              <div className="agent-link left-[49%] top-[50%] w-[27%] rotate-[88deg]" />
+              <div className="agent-link left-[22%] top-[34%] w-[29%] rotate-[25deg]" />
+              <div className="agent-link left-[18%] top-[66%] w-[34%] rotate-[-22deg]" />
+              <div className="agent-link left-[49%] top-[50%] w-[32%] rotate-[156deg]" />
+
+              <div className="agent-node agent-node-pulse left-[8%] top-[18%] h-12 w-12 border-arc-purple/40 bg-arc-purple/18 text-arc-purple [--node-delay:0.6s]">AI</div>
+              <div className="agent-node agent-node-pulse left-[20%] top-[56%] h-14 w-14 border-arc-rose/45 bg-arc-rose/16 text-arc-rose [--node-delay:0s]">Job</div>
+              <div className="agent-node agent-node-pulse right-[12%] top-[19%] h-16 w-16 border-arc-gold/45 bg-arc-gold/14 text-arc-gold [--node-delay:1.2s]">USDC</div>
+              <div className="agent-node agent-node-pulse right-[9%] top-[58%] h-14 w-14 border-arc-cyan/45 bg-arc-cyan/14 text-arc-cyan [--node-delay:5.8s]">Pay</div>
+              <div className="agent-node agent-node-pulse bottom-[8%] left-[44%] h-14 w-14 border-arc-green/45 bg-arc-green/14 text-arc-green [--node-delay:4.7s]">OK</div>
+              <div className="agent-node agent-node-pulse left-[34%] top-[16%] h-9 w-9 border-arc-cyan/35 bg-arc-cyan/12 text-arc-cyan [--node-delay:3.7s]">CID</div>
+              <div className="agent-node agent-node-pulse right-[31%] top-[33%] h-9 w-9 border-arc-purple/35 bg-arc-purple/14 text-arc-purple [--node-delay:2.7s]">x402</div>
+
+              <span className="flow-particle flow-particle-lg [--flow-left:29%] [--flow-top:64%] [--flow-x:188px] [--flow-y:-64px] [--flow-color:#e36f9f]" />
+              <span className="flow-particle [--flow-left:14%] [--flow-top:24%] [--flow-x:230px] [--flow-y:100px] [--flow-color:#a855f7] [--flow-delay:0.7s]" />
+              <span className="flow-particle flow-particle-lg [--flow-left:82%] [--flow-top:29%] [--flow-x:-200px] [--flow-y:70px] [--flow-color:#d8b96a] [--flow-delay:1.4s]" />
+              <span className="flow-particle [--flow-left:67%] [--flow-top:42%] [--flow-x:-108px] [--flow-y:40px] [--flow-color:#a855f7] [--flow-delay:2.4s]" />
+              <span className="flow-particle [--flow-left:38%] [--flow-top:22%] [--flow-x:96px] [--flow-y:102px] [--flow-color:#2df3d0] [--flow-delay:3.5s]" />
+              <span className="flow-particle flow-particle-lg [--flow-left:50%] [--flow-top:78%] [--flow-x:0px] [--flow-y:-102px] [--flow-color:#5dffc0] [--flow-delay:4.6s]" />
+              <span className="flow-particle flow-particle-lg [--flow-left:53%] [--flow-top:50%] [--flow-x:310px] [--flow-y:64px] [--flow-color:#2df3d0] [--flow-delay:5.6s]" />
+
+              <span className="route-spark left-[24%] top-[42%] [--spark-delay:0.4s]" />
+              <span className="route-spark right-[25%] top-[28%] [--spark-delay:1.2s]" />
+              <span className="route-spark bottom-[27%] left-[62%] [--spark-delay:2.2s]" />
+
+              <div className="absolute left-[13%] top-[38%] h-1.5 w-1.5 rounded-full bg-arc-rose shadow-[0_0_14px_rgba(227,111,159,0.75)]" />
+              <div className="absolute left-[28%] top-[72%] h-2 w-2 rounded-full bg-arc-cyan shadow-[0_0_16px_rgba(45,243,208,0.72)]" />
+              <div className="absolute right-[24%] top-[13%] h-1.5 w-1.5 rounded-full bg-arc-gold shadow-[0_0_14px_rgba(216,185,106,0.8)]" />
+              <div className="absolute right-[39%] bottom-[22%] h-2 w-2 rounded-full bg-white/80 shadow-[0_0_16px_rgba(255,255,255,0.8)]" />
+            </div>
+
+            <div className="relative z-10 mt-5 grid gap-3 sm:grid-cols-3">
+              {metrics.slice(0, 3).map((metric) => (
+                <div key={metric.label} className="rounded-md border border-arc-border bg-arc-bg/55 p-3">
+                  <div className="font-display text-xl font-bold text-arc-text">{metric.value}</div>
+                  <div className="mt-1 text-[9px] font-mono uppercase tracking-[0.14em] text-arc-dim">{metric.label}</div>
                 </div>
+              ))}
+            </div>
+
+            <div className="relative z-10 mt-4 rounded-lg border border-arc-border bg-arc-bg/60 p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <span className="label-field">Lifecycle</span>
+                <span className="text-xs text-arc-muted">0 - 6</span>
+              </div>
+              <div className="grid grid-cols-7 gap-2">
                 {routeSteps.map((step) => (
-                  <div key={step.number} className="group relative flex items-center gap-3 rounded-md border border-arc-border bg-arc-surface/70 px-3 py-3">
-                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border font-mono text-xs ${step.number <= 2 ? "border-arc-cyan bg-arc-cyan/15 text-arc-cyan" : "border-arc-border bg-arc-bg text-arc-dim"}`}>
+                  <div key={step.number} className="group relative">
+                    <div className={`h-1.5 rounded-full ${step.number <= 2 ? "bg-arc-cyan" : "bg-arc-border"}`} />
+                    <div className={`mt-2 flex h-7 w-7 items-center justify-center rounded-full border font-mono text-[10px] ${step.number <= 2 ? "border-arc-cyan bg-arc-cyan/15 text-arc-cyan" : "border-arc-border bg-arc-bg text-arc-dim"}`}>
                       {step.number}
                     </div>
-                    <div>
-                      <div className="text-sm font-medium text-arc-text">{step.number} - {step.label}</div>
-                      <div className="text-xs text-arc-muted">{step.detail}</div>
-                    </div>
-                    <div className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-arc-border bg-arc-bg px-2 py-1 text-[11px] text-arc-muted opacity-0 shadow-xl transition-opacity group-hover:opacity-100 sm:block">
+                    <div className="mt-2 truncate text-[10px] font-mono uppercase tracking-[0.1em] text-arc-muted">{step.label}</div>
+                    <div className="pointer-events-none absolute bottom-full left-0 z-20 mb-2 hidden w-44 rounded-md border border-arc-border bg-arc-bg px-2 py-1 text-[11px] text-arc-muted opacity-0 shadow-xl transition-opacity group-hover:opacity-100 sm:block">
                       {step.detail}
                     </div>
                   </div>
@@ -151,11 +205,17 @@ export default function HomePage() {
       <section className="border-b border-arc-border px-4 py-10">
         <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {metrics.map((metric) => (
-            <div key={metric.label} className="rounded-lg border border-arc-border bg-arc-card/75 p-5">
+            <div key={metric.label} className="glass-card p-5">
               <div className="text-3xl font-display font-bold text-arc-text">{metric.value}</div>
               <div className="mt-1 text-[10px] font-mono uppercase tracking-[0.16em] text-arc-dim">{metric.label}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="border-b border-arc-border px-4 py-10">
+        <div className="mx-auto max-w-7xl">
+          <HeroWalletOnboarding />
         </div>
       </section>
 

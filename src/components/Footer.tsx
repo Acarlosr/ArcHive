@@ -6,12 +6,12 @@ export function Footer() {
   const { t } = useLanguage();
 
   return (
-    <footer className="border-t border-arc-border bg-arc-bg/95 px-4 py-8">
+    <footer className="border-t border-arc-border bg-[linear-gradient(180deg,rgba(6,17,15,0.82),rgba(3,9,7,0.96))] px-4 py-8">
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
           <div>
             <div className="font-display text-xl font-bold text-arc-text">
-              Arc<span className="text-arc-cyan">Hive</span>
+              Arc<span className="bg-gradient-to-r from-arc-cyan to-arc-gold bg-clip-text text-transparent">Hive</span>
             </div>
             <p className="mt-2 max-w-sm text-sm text-arc-muted">
               {t("footer.tagline")}

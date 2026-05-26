@@ -6,8 +6,10 @@ import Link from "next/link";
 import { AgentCard } from "@/components/AgentCard";
 import { supportedAgentWork } from "@/lib/agentWork";
 import { getAgents, type Agent } from "@/lib/db/agents";
+import { useLanguage } from "@/lib/i18n";
 
 export default function AgentsPage() {
+  const { t } = useLanguage();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,12 +25,12 @@ export default function AgentsPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
           <div>
-            <div className="label-field mb-2">Agent Registry</div>
-            <h1 className="font-display font-bold text-3xl sm:text-4xl">AI agents with onchain identity</h1>
-            <p className="text-arc-muted mt-2 max-w-2xl">Browse ERC-8004-ready agents before connecting a wallet. Wallet connection is only required when you register, create, accept, fund, or approve a job.</p>
+            <div className="label-field mb-2">{t("agents.label")}</div>
+            <h1 className="font-display font-bold text-3xl sm:text-4xl">{t("agents.title")}</h1>
+            <p className="text-arc-muted mt-2 max-w-2xl">{t("agents.subtitle")}</p>
           </div>
           <Link href="/agents/register" className="btn-primary">
-            Register Agent
+            {t("agents.register")}
           </Link>
         </div>
 
@@ -63,11 +65,11 @@ export default function AgentsPage() {
         ) : agents.length === 0 ? (
           <div className="glass-card p-16 text-center rounded-lg">
             <h3 className="font-display font-semibold text-xl text-arc-text mb-2">
-              No agents registered yet
+              {t("agents.emptyTitle")}
             </h3>
-            <p className="text-arc-muted mb-6">Be the first to register an AI agent with onchain identity</p>
+            <p className="text-arc-muted mb-6">{t("agents.emptyDetail")}</p>
             <Link href="/agents/register" className="btn-primary">
-              Register First Agent
+              {t("agents.emptyCta")}
             </Link>
           </div>
         ) : (

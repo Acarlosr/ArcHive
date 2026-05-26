@@ -1,19 +1,6 @@
 import { ExplorerLink } from "@/components/ExplorerLink";
 import { formatWallet, type DemoActivityEvent } from "@/lib/demoData";
-
-const eventLabels: Record<string, string> = {
-  agent_registered: "Agent registered",
-  job_created: "Job created",
-  escrow_funded: "Escrow funded",
-  job_accepted: "Job accepted",
-  gateway_deposit_finalized: "Gateway deposit finalized",
-  gateway_mint_finalized: "Gateway mint finalized",
-  gateway_mint_forwarded: "Gateway mint forwarded",
-  tool_call_paid: "Tool call paid",
-  deliverable_submitted: "Deliverable submitted",
-  work_approved: "Work approved",
-  payout_released: "Payout released",
-};
+import { useLanguage } from "@/lib/i18n";
 
 function eventDetail(event: DemoActivityEvent) {
   if (event.event_type === "tool_call_paid") {
@@ -37,10 +24,12 @@ function eventDetail(event: DemoActivityEvent) {
 }
 
 export function ActivityTable({ events }: { events: DemoActivityEvent[] }) {
+  const { t } = useLanguage();
+
   if (events.length === 0) {
     return (
       <div className="rounded-lg border border-arc-border bg-arc-card/80 p-10 text-center">
-        <p className="text-sm text-arc-muted">No activity yet. Job and agent events will appear here.</p>
+        <p className="text-sm text-arc-muted">{t("activity.empty")}</p>
       </div>
     );
   }
@@ -48,15 +37,15 @@ export function ActivityTable({ events }: { events: DemoActivityEvent[] }) {
   return (
     <div className="overflow-hidden rounded-lg border border-arc-border bg-arc-card/80">
       <div className="grid grid-cols-[1.3fr_1fr_1fr] gap-4 border-b border-arc-border px-4 py-3 text-[10px] font-mono uppercase tracking-[0.16em] text-arc-dim md:grid-cols-[1.2fr_1fr_1fr_1.2fr]">
-        <span>Event</span>
-        <span>Wallet</span>
-        <span>Time</span>
-        <span className="hidden md:block">Transaction</span>
+        <span>{t("activity.event")}</span>
+        <span>{t("common.wallet")}</span>
+        <span>{t("common.time")}</span>
+        <span className="hidden md:block">{t("common.transaction")}</span>
       </div>
       {events.map((event) => (
         <div key={event.id} className="grid grid-cols-[1.3fr_1fr_1fr] gap-4 border-b border-arc-border/70 px-4 py-4 last:border-b-0 md:grid-cols-[1.2fr_1fr_1fr_1.2fr]">
           <div>
-            <div className="text-sm font-medium text-arc-text">{eventLabels[event.event_type] ?? event.event_type}</div>
+            <div className="text-sm font-medium text-arc-text">{t(`activity.${event.event_type}`)}</div>
             <div className="mt-1 text-xs text-arc-muted">
               {eventDetail(event)}
             </div>

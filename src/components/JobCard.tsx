@@ -4,6 +4,7 @@ import Link from "next/link";
 import { EscrowBadge } from "@/components/EscrowBadge";
 import { StatusChip } from "@/components/StatusChip";
 import { formatWallet, type JobStatus } from "@/lib/demoData";
+import { useLanguage } from "@/lib/i18n";
 
 interface JobCardProps {
   id: string;
@@ -32,6 +33,8 @@ export function JobCard({
   expiresAt,
   onchainId,
 }: JobCardProps) {
+  const { t } = useLanguage();
+
   return (
     <Link href={`/jobs/${id}`} className="block">
       <article className="group h-full rounded-lg border border-arc-border bg-arc-card/85 p-5 transition-all hover:border-arc-cyan/40 hover:shadow-[0_0_32px_rgba(0,212,255,0.08)]">
@@ -55,16 +58,16 @@ export function JobCard({
 
         <div className="mb-4 rounded-lg border border-arc-border bg-arc-surface/65 p-3">
           <div className="flex items-center justify-between gap-3 text-xs">
-            <span className="text-arc-dim">Assigned agent</span>
-            <span className="font-medium text-arc-text">{agentName || "Open assignment"}</span>
+            <span className="text-arc-dim">{t("jobCard.assignedAgent")}</span>
+            <span className="font-medium text-arc-text">{agentName || t("jobCard.openAssignment")}</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-3 text-xs">
-            <span className="text-arc-dim">Provider</span>
+            <span className="text-arc-dim">{t("jobCard.provider")}</span>
             <span className="font-mono text-arc-muted">{formatWallet(providerWallet)}</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-3 text-xs">
-            <span className="text-arc-dim">Expiration</span>
-            <span className="font-mono text-arc-muted">{expiresAt ? new Date(expiresAt).toLocaleDateString() : "Rolling"}</span>
+            <span className="text-arc-dim">{t("jobCard.expiration")}</span>
+            <span className="font-mono text-arc-muted">{expiresAt ? new Date(expiresAt).toLocaleDateString() : t("jobCard.rolling")}</span>
           </div>
         </div>
 
