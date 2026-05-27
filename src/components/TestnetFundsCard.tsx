@@ -1,19 +1,27 @@
-const arcNetwork = [
-  ["Network", "Arc Testnet"],
-  ["Chain ID", "5042002"],
-  ["Currency", "USDC"],
-  ["RPC", "https://rpc.testnet.arc.network"],
-  ["Explorer", "https://testnet.arcscan.app"],
-];
+"use client";
+
+import { useLanguage } from "@/lib/i18n";
 
 export function TestnetFundsCard({ compact = false }: { compact?: boolean }) {
+  const { locale } = useLanguage();
+  const isPt = locale === "pt-BR";
+  const arcNetwork = [
+    [isPt ? "Rede" : "Network", "Arc Testnet"],
+    ["Chain ID", "5042002"],
+    [isPt ? "Moeda" : "Currency", "USDC"],
+    ["RPC", "https://rpc.testnet.arc.network"],
+    [isPt ? "Explorador" : "Explorer", "https://testnet.arcscan.app"],
+  ];
+
   return (
     <div className="rounded-lg border border-arc-cyan/20 bg-arc-cyan/5 p-5">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
-          <div className="font-display text-lg font-semibold text-arc-text">Get Testnet Funds</div>
+          <div className="font-display text-lg font-semibold text-arc-text">{isPt ? "Obter fundos de teste" : "Get Testnet Funds"}</div>
           <p className="mt-1 text-sm leading-6 text-arc-muted">
-            Arc uses USDC for gas and escrow. USDC is live for job payments; EURC is available for testnet transfers and future flows.
+            {isPt
+              ? "Arc usa USDC para gas e escrow. USDC está ativo para pagamentos de jobs; EURC fica disponível para transferências de teste e fluxos futuros."
+              : "Arc uses USDC for gas and escrow. USDC is live for job payments; EURC is available for testnet transfers and future flows."}
           </p>
         </div>
         <span className="rounded-full border border-arc-cyan/30 bg-arc-cyan/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.14em] text-arc-cyan">
@@ -39,7 +47,7 @@ export function TestnetFundsCard({ compact = false }: { compact?: boolean }) {
           rel="noreferrer"
           className="btn-primary flex-1 text-center"
         >
-          Get USDC / EURC
+          {isPt ? "Pegar USDC / EURC" : "Get USDC / EURC"}
         </a>
         <a
           href="https://docs.arc.network/arc/references/connect-to-arc"
@@ -47,7 +55,7 @@ export function TestnetFundsCard({ compact = false }: { compact?: boolean }) {
           rel="noreferrer"
           className="btn-secondary flex-1 text-center"
         >
-          Add Arc Testnet
+          {isPt ? "Adicionar Arc Testnet" : "Add Arc Testnet"}
         </a>
       </div>
     </div>

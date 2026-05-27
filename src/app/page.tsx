@@ -10,7 +10,8 @@ import { useLanguage } from "@/lib/i18n";
 const toolReceipts = getDemoSpendReceipts("job_8183_001");
 
 export default function HomePage() {
-  const { t } = useLanguage();
+  const { locale, t } = useLanguage();
+  const isPt = locale === "pt-BR";
   const features = [
     {
       title: t("home.feature.agent"),
@@ -111,12 +112,12 @@ export default function HomePage() {
               <Link href="/guide" className="btn-secondary text-center">{t("home.cta.guide")}</Link>
             </div>
             <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-arc-muted">
-              <span>Need testnet setup?</span>
+              <span>{isPt ? "Precisa configurar a testnet?" : "Need testnet setup?"}</span>
               <Link href="/guide" className="font-medium text-arc-cyan transition-colors hover:text-white">
-                Add Arc Testnet
+                {isPt ? "Adicionar Arc Testnet" : "Add Arc Testnet"}
               </Link>
               <Link href="/tools" className="font-medium text-arc-gold transition-colors hover:text-white">
-                Explore metered tools
+                {isPt ? "Explorar tools medidas" : "Explore metered tools"}
               </Link>
             </div>
           </div>
@@ -133,7 +134,7 @@ export default function HomePage() {
             <div className="relative z-10 mt-6 h-[360px] overflow-hidden rounded-lg border border-arc-border/80 bg-[#060b0a]/70">
               <div className="escrow-core absolute left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full border border-arc-gold/45 bg-[radial-gradient(circle,rgba(216,185,106,0.42),rgba(216,185,106,0.12)_45%,rgba(16,28,26,0.86)_72%)] shadow-[0_0_60px_rgba(216,185,106,0.26)]" />
               <div className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-arc-cyan/25 bg-arc-bg/80 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-arc-cyan">
-                Escrow
+                {isPt ? "Escrow" : "Escrow"}
               </div>
 
               <div className="agent-link left-[49%] top-[50%] w-[31%] rotate-[-28deg]" />
@@ -144,9 +145,9 @@ export default function HomePage() {
               <div className="agent-link left-[49%] top-[50%] w-[32%] rotate-[156deg]" />
 
               <div className="agent-node agent-node-pulse left-[8%] top-[18%] h-12 w-12 border-arc-purple/40 bg-arc-purple/18 text-arc-purple [--node-delay:0.6s]">AI</div>
-              <div className="agent-node agent-node-pulse left-[20%] top-[56%] h-14 w-14 border-arc-rose/45 bg-arc-rose/16 text-arc-rose [--node-delay:0s]">Job</div>
+              <div className="agent-node agent-node-pulse left-[20%] top-[56%] h-14 w-14 border-arc-rose/45 bg-arc-rose/16 text-arc-rose [--node-delay:0s]">{isPt ? "Job" : "Job"}</div>
               <div className="agent-node agent-node-pulse right-[12%] top-[19%] h-16 w-16 border-arc-gold/45 bg-arc-gold/14 text-arc-gold [--node-delay:1.2s]">USDC</div>
-              <div className="agent-node agent-node-pulse right-[9%] top-[58%] h-14 w-14 border-arc-cyan/45 bg-arc-cyan/14 text-arc-cyan [--node-delay:5.8s]">Pay</div>
+              <div className="agent-node agent-node-pulse right-[9%] top-[58%] h-14 w-14 border-arc-cyan/45 bg-arc-cyan/14 text-arc-cyan [--node-delay:5.8s]">{isPt ? "Pagar" : "Pay"}</div>
               <div className="agent-node agent-node-pulse bottom-[8%] left-[44%] h-14 w-14 border-arc-green/45 bg-arc-green/14 text-arc-green [--node-delay:4.7s]">OK</div>
               <div className="agent-node agent-node-pulse left-[34%] top-[16%] h-9 w-9 border-arc-cyan/35 bg-arc-cyan/12 text-arc-cyan [--node-delay:3.7s]">CID</div>
               <div className="agent-node agent-node-pulse right-[31%] top-[33%] h-9 w-9 border-arc-purple/35 bg-arc-purple/14 text-arc-purple [--node-delay:2.7s]">x402</div>
@@ -180,7 +181,7 @@ export default function HomePage() {
 
             <div className="relative z-10 mt-4 rounded-lg border border-arc-border bg-arc-bg/60 p-4">
               <div className="mb-3 flex items-center justify-between">
-                <span className="label-field">Lifecycle</span>
+                <span className="label-field">{isPt ? "Ciclo" : "Lifecycle"}</span>
                 <span className="text-xs text-arc-muted">0 - 6</span>
               </div>
               <div className="grid grid-cols-7 gap-2">

@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { TestnetFundsCard } from "@/components/TestnetFundsCard";
+import { useLanguage } from "@/lib/i18n";
 
 const steps = [
   {
@@ -81,6 +84,62 @@ const quickLinks = [
 ];
 
 export default function GuidePage() {
+  const { locale } = useLanguage();
+  const isPt = locale === "pt-BR";
+  const copy = isPt
+    ? {
+        eyebrow: "Guia do usuário ArcHive",
+        title: "Como usar o ArcHive",
+        subtitle:
+          "ArcHive é um marketplace de jobs para agentes de IA na Arc Testnet. Use para registrar agentes, criar jobs financiados em USDC, travar escrow, autorizar chamadas pagas de tools, enviar entregas e liberar pagamento após aprovação.",
+        post: "Criar Primeiro Job",
+        register: "Registrar Agente de IA",
+        before: "Antes de começar",
+        needTitle: "O que usuários precisam",
+        need: [
+          "Uma carteira conectada é necessária para ações de job, registro de agente, funding de escrow e payout.",
+          "ArcHive continua utilizável em modo demo quando Supabase ou contratos live não estão configurados.",
+          "A liquidação em produção foi desenhada em USDC na Arc Testnet, com Unified Balance preparado para depósitos e gastos cross-chain.",
+        ],
+        goTo: "Ir para",
+        main: "Fluxo principal",
+        from: "Da carteira ao payout",
+        lifecycle: "Ciclo do job",
+        meaning: "O que cada status significa",
+        activity: "Ver Atividade",
+        quickLinks: [
+          { label: "Criar Job", href: "/jobs/create" },
+          { label: "Registrar Agente", href: "/agents/register" },
+          { label: "Ler Docs", href: "/docs" },
+          { label: "Roteador de Gastos", href: "/tools" },
+          { label: "Acompanhar Atividade", href: "/activity" },
+          { label: "Ver Configurações", href: "/settings" },
+        ],
+        steps: [
+          ["01", "Conecte uma carteira", "Comece com uma carteira EVM como Rabby, MetaMask, WalletConnect, Coinbase Wallet, Rainbow, Trust Wallet, OKX, Ledger ou Safe. ArcHive usa Arc Testnet por padrão.", "Conectar Carteira", "/"],
+          ["02", "Escolha seu papel", "Clientes criam jobs e financiam escrow. Operadores de agentes registram agentes, aceitam trabalho, enviam prova de entrega e constroem reputação.", "Ver Agentes", "/agents"],
+          ["03", "Registre um agente de IA", "Crie um perfil com nome, tipo, capacidades e URI de metadata. O fluxo está preparado para identidade onchain ERC-8004.", "Registrar Agente", "/agents/register"],
+          ["04", "Crie um job em USDC", "Crie um job com escopo, agente selecionado, orçamento em USDC e prazo. ArcHive mostra uma prévia de funding antes do escrow.", "Criar Job", "/jobs/create"],
+          ["05", "Financie o escrow", "Trave o orçamento do job em escrow. A camada de funding está preparada para Unified Balance, permitindo depósito e gasto de USDC entre chains suportadas.", "Ver Jobs", "/jobs"],
+          ["06", "Autorize gastos de tools", "Defina limites para chamadas pagas. Agentes podem usar serviços x402 via Circle Gateway enquanto recibos ficam vinculados ao job.", "Abrir Tools", "/tools"],
+          ["07", "Envie, aprove e pague", "O prestador envia prova de trabalho, como link IPFS ou referência de arquivo. O cliente revisa, aprova e libera USDC do escrow.", "Abrir Painel", "/dashboard"],
+        ],
+        states: [
+          ["Aberto", "Job está visível e pronto para funding ou atribuição de agente."],
+          ["Financiado", "Escrow em USDC está travado para o orçamento do job."],
+          ["Aceito", "O agente/prestador selecionado assumiu o trabalho."],
+          ["Gasto em tools", "Chamadas pagas de API são autorizadas por política e anexadas como recibos do job."],
+          ["Enviado", "Uma referência de prova de trabalho foi anexada ao registro do job."],
+          ["Aprovado", "O cliente confirma que a entrega é aceitável."],
+          ["Pago", "O escrow libera USDC para o prestador."],
+          ["Reembolsado", "Se o trabalho não for aprovado e regras permitirem, o escrow pode devolver fundos ao cliente."],
+        ],
+      }
+    : null;
+  const visibleQuickLinks = copy?.quickLinks ?? quickLinks;
+  const visibleSteps = copy?.steps?.map(([number, title, detail, action, href]) => ({ number, title, detail, action, href })) ?? steps;
+  const visibleLifecycle = copy?.states?.map(([state, description]) => ({ state, description })) ?? lifecycle;
+
   return (
     <div className="pt-16">
       <section className="relative overflow-hidden border-b border-arc-border px-4 py-16 sm:py-20">
@@ -89,20 +148,20 @@ export default function GuidePage() {
         <div className="relative mx-auto max-w-7xl">
           <div className="max-w-3xl">
             <div className="mb-5 inline-flex items-center rounded-full border border-arc-cyan/25 bg-arc-cyan/10 px-3 py-1.5 text-xs font-mono uppercase tracking-[0.14em] text-arc-cyan">
-              ArcHive user guide
+              {copy?.eyebrow ?? "ArcHive user guide"}
             </div>
             <h1 className="font-display text-4xl font-extrabold leading-tight text-arc-text sm:text-5xl">
-              How to use ArcHive
+              {copy?.title ?? "How to use ArcHive"}
             </h1>
             <p className="mt-5 text-lg leading-8 text-arc-muted">
-              ArcHive is an AI agent job marketplace on Arc Testnet. Use it to register agents, post USDC-funded jobs, lock escrow, authorize paid tool calls, submit deliverables, and release payment after approval.
+              {copy?.subtitle ?? "ArcHive is an AI agent job marketplace on Arc Testnet. Use it to register agents, post USDC-funded jobs, lock escrow, authorize paid tool calls, submit deliverables, and release payment after approval."}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/jobs/create" className="btn-primary text-center">
-                Post Your First Job
+                {copy?.post ?? "Post Your First Job"}
               </Link>
               <Link href="/agents/register" className="btn-secondary text-center">
-                Register as AI Agent
+                {copy?.register ?? "Register as AI Agent"}
               </Link>
             </div>
           </div>
@@ -112,32 +171,28 @@ export default function GuidePage() {
       <section className="border-b border-arc-border px-4 py-12">
         <div className="mx-auto grid max-w-7xl gap-4 lg:grid-cols-[0.8fr_1.2fr]">
           <div className="rounded-lg border border-arc-border bg-arc-card/75 p-6">
-            <div className="label-field">Before you start</div>
+            <div className="label-field">{copy?.before ?? "Before you start"}</div>
             <h2 className="mt-3 font-display text-2xl font-semibold text-arc-text">
-              What users need
+              {copy?.needTitle ?? "What users need"}
             </h2>
             <div className="mt-5 space-y-4 text-sm leading-6 text-arc-muted">
-              <p>
-                A connected wallet is required for job actions, agent registration, escrow funding, and payout flows.
-              </p>
-              <p>
-                ArcHive currently remains usable in demo mode when Supabase or live contract addresses are not configured.
-              </p>
-              <p>
-                Production settlement is designed around USDC on Arc Testnet, with Unified Balance prepared for cross-chain deposits and spending.
-              </p>
+              {(copy?.need ?? [
+                "A connected wallet is required for job actions, agent registration, escrow funding, and payout flows.",
+                "ArcHive currently remains usable in demo mode when Supabase or live contract addresses are not configured.",
+                "Production settlement is designed around USDC on Arc Testnet, with Unified Balance prepared for cross-chain deposits and spending.",
+              ]).map((item) => <p key={item}>{item}</p>)}
             </div>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            {quickLinks.map((link) => (
+            {visibleQuickLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className="rounded-lg border border-arc-border bg-arc-card/75 p-5 transition-all hover:border-arc-cyan/35 hover:bg-arc-surface"
               >
                 <div className="font-display text-lg font-semibold text-arc-text">{link.label}</div>
-                <div className="mt-2 text-sm text-arc-muted">Go to {link.href}</div>
+                <div className="mt-2 text-sm text-arc-muted">{copy?.goTo ?? "Go to"} {link.href}</div>
               </Link>
             ))}
           </div>
@@ -153,13 +208,13 @@ export default function GuidePage() {
       <section className="px-4 py-14">
         <div className="mx-auto max-w-7xl">
           <div className="mb-8">
-            <div className="label-field">Main workflow</div>
+            <div className="label-field">{copy?.main ?? "Main workflow"}</div>
             <h2 className="mt-3 font-display text-3xl font-bold text-arc-text">
-              From wallet to payout
+              {copy?.from ?? "From wallet to payout"}
             </h2>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {steps.map((step) => (
+            {visibleSteps.map((step) => (
               <div key={step.number} className="rounded-lg border border-arc-border bg-arc-card/80 p-6">
                 <div className="mb-6 flex items-center justify-between gap-4">
                   <span className="font-mono text-sm text-arc-cyan">{step.number}</span>
@@ -179,17 +234,17 @@ export default function GuidePage() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="label-field">Job lifecycle</div>
+              <div className="label-field">{copy?.lifecycle ?? "Job lifecycle"}</div>
               <h2 className="mt-3 font-display text-3xl font-bold text-arc-text">
-                What each job status means
+                {copy?.meaning ?? "What each job status means"}
               </h2>
             </div>
             <Link href="/activity" className="btn-secondary text-center">
-              View Activity
+              {copy?.activity ?? "View Activity"}
             </Link>
           </div>
           <div className="overflow-hidden rounded-lg border border-arc-border bg-arc-card/75">
-            {lifecycle.map((item, index) => (
+            {visibleLifecycle.map((item, index) => (
               <div
                 key={item.state}
                 className="grid gap-3 border-b border-arc-border px-5 py-4 last:border-b-0 sm:grid-cols-[120px_1fr]"

@@ -1,3 +1,5 @@
+"use client";
+
 import { ExplorerLink } from "@/components/ExplorerLink";
 import { formatWallet, type DemoActivityEvent } from "@/lib/demoData";
 import { useLanguage } from "@/lib/i18n";

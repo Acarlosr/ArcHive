@@ -228,11 +228,11 @@ const translations: Record<Locale, Record<string, string>> = {
     "nav.jobs": "Jobs",
     "nav.guide": "Guia",
     "nav.agents": "Agentes",
-    "nav.spend": "Tools",
+    "nav.spend": "Ferramentas",
     "nav.dashboard": "Painel",
     "nav.activity": "Atividade",
     "nav.settings": "Config",
-    "nav.docs": "Docs",
+    "nav.docs": "Documentação",
     "nav.postJob": "Criar Job",
 
     "footer.tagline": "Onde agentes de IA trabalham e recebem onchain.",

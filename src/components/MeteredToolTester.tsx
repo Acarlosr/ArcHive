@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useLanguage } from "@/lib/i18n";
 
 type MeteredTool = {
   name: string;
@@ -71,6 +72,8 @@ export function MeteredToolTester({
   sellerBaseUrl: string;
   tools: MeteredTool[];
 }) {
+  const { locale } = useLanguage();
+  const isPt = locale === "pt-BR";
   const [results, setResults] = useState<Record<string, TestState>>({});
 
   const sellerHost = useMemo(() => {
@@ -86,8 +89,8 @@ export function MeteredToolTester({
       ...current,
       [tool.name]: {
         status: "loading",
-        title: "Checking x402 route",
-        details: "Calling the seller service and reading its payment requirement.",
+        title: isPt ? "Verificando rota x402" : "Checking x402 route",
+        details: isPt ? "Chamando o serviço seller e lendo o requisito de pagamento." : "Calling the seller service and reading its payment requirement.",
       },
     }));
 
@@ -110,7 +113,7 @@ export function MeteredToolTester({
             method: tool.method,
             endpoint: `${sellerBaseUrl}${tool.path}`,
             seller: new URL(sellerBaseUrl).host,
-            expected: "x402 payment authorization required before data is returned",
+            expected: isPt ? "autorização de pagamento x402 exigida antes do retorno dos dados" : "x402 payment authorization required before data is returned",
           };
 
       if (response.status === 402) {
@@ -120,10 +123,14 @@ export function MeteredToolTester({
           ...current,
           [tool.name]: {
             status: "ready",
-            title: "x402 payment required",
+            title: isPt ? "pagamento x402 exigido" : "x402 payment required",
             details: payment
-              ? `${tool.price} on ${payment.network}. Buyer authorization is required before the tool returns data.`
-              : `${tool.price}. Buyer authorization is required before the tool returns data.`,
+              ? isPt
+                ? `${tool.price} em ${payment.network}. A autorização do comprador é necessária antes da tool retornar dados.`
+                : `${tool.price} on ${payment.network}. Buyer authorization is required before the tool returns data.`
+              : isPt
+                ? `${tool.price}. A autorização do comprador é necessária antes da tool retornar dados.`
+                : `${tool.price}. Buyer authorization is required before the tool returns data.`,
             payload: diagnosticPayload,
           },
         }));
@@ -135,8 +142,8 @@ export function MeteredToolTester({
           ...current,
           [tool.name]: {
             status: "error",
-            title: `Seller returned ${response.status}`,
-            details: "The route responded, but not with the expected x402 payment requirement.",
+            title: isPt ? `Seller retornou ${response.status}` : `Seller returned ${response.status}`,
+            details: isPt ? "A rota respondeu, mas não com o requisito de pagamento x402 esperado." : "The route responded, but not with the expected x402 payment requirement.",
             payload: diagnosticPayload,
           },
         }));
@@ -147,8 +154,8 @@ export function MeteredToolTester({
         ...current,
         [tool.name]: {
           status: "ready",
-          title: "Tool response received",
-          details: "The seller returned data. This usually means the request was already authorized.",
+          title: isPt ? "Resposta da tool recebida" : "Tool response received",
+          details: isPt ? "O seller retornou dados. Isso geralmente significa que a requisição já estava autorizada." : "The seller returned data. This usually means the request was already authorized.",
           payload: diagnosticPayload,
         },
       }));
@@ -157,11 +164,13 @@ export function MeteredToolTester({
         ...current,
         [tool.name]: {
           status: "error",
-          title: "Unable to reach seller",
+          title: isPt ? "Não foi possível acessar o seller" : "Unable to reach seller",
           details:
             error instanceof Error
               ? error.message
-              : "The seller may still be waking up on Render Free. Try again in a minute.",
+              : isPt
+                ? "O seller pode ainda estar acordando no Render Free. Tente novamente em um minuto."
+                : "The seller may still be waking up on Render Free. Try again in a minute.",
         },
       }));
     }
@@ -190,12 +199,12 @@ export function MeteredToolTester({
             <div className="mt-auto pt-6">
               <div className="mb-4 rounded-md border border-arc-border bg-arc-surface/70 p-3">
                 <div className="text-[10px] font-mono uppercase tracking-[0.16em] text-arc-dim">
-                  Price
+                  {isPt ? "Preço" : "Price"}
                 </div>
                 <div className="mt-1 font-display text-2xl font-bold text-arc-green">
                   {tool.price}
                 </div>
-                <div className="mt-1 text-xs text-arc-muted">per call via {sellerHost}</div>
+                <div className="mt-1 text-xs text-arc-muted">{isPt ? "por chamada via" : "per call via"} {sellerHost}</div>
               </div>
 
               <button
@@ -204,7 +213,7 @@ export function MeteredToolTester({
                 disabled={isLoading}
                 className="inline-flex w-full items-center justify-center rounded-lg border border-arc-green/30 bg-arc-green/10 px-4 py-2.5 text-sm font-semibold text-arc-green transition-colors hover:bg-arc-green hover:text-arc-bg disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isLoading ? "Testing Route..." : "Test Tool"}
+                {isLoading ? (isPt ? "Testando rota..." : "Testing Route...") : (isPt ? "Testar Tool" : "Test Tool")}
               </button>
 
               {result ? (
@@ -226,7 +235,7 @@ export function MeteredToolTester({
                   {result.payload ? (
                     <details className="mt-2">
                       <summary className="cursor-pointer text-[11px] font-mono uppercase tracking-[0.12em] text-arc-dim">
-                        View response
+                        {isPt ? "Ver resposta" : "View response"}
                       </summary>
                       <pre className="mt-2 max-h-40 overflow-auto rounded border border-arc-border bg-arc-bg/80 p-2 text-[11px] leading-5 text-arc-muted">
                         {formatPayload(result.payload)}

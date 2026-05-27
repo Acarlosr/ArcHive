@@ -6,6 +6,7 @@ import {
   getDemoSpendReceipts,
   type AgentSpendPolicy,
 } from "@/lib/agentSpend";
+import { useLanguage } from "@/lib/i18n";
 
 export function AgentSpendPolicyCard({
   jobId,
@@ -18,6 +19,8 @@ export function AgentSpendPolicyCard({
   jobBudgetUsdc: string;
   enabled: boolean;
 }) {
+  const { locale } = useLanguage();
+  const isPt = locale === "pt-BR";
   const policy = createDemoSpendPolicy({
     jobId,
     agentId,
@@ -31,21 +34,21 @@ export function AgentSpendPolicyCard({
     <div className="rounded-lg border border-arc-border bg-arc-card/85 p-5">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <div className="label-field mb-2">Agent spend</div>
-          <h2 className="font-display text-lg font-semibold text-arc-text">Tool budget policy</h2>
+          <div className="label-field mb-2">{isPt ? "Gasto do agente" : "Agent spend"}</div>
+          <h2 className="font-display text-lg font-semibold text-arc-text">{isPt ? "Política de orçamento das tools" : "Tool budget policy"}</h2>
         </div>
         <PolicyStatus policy={policy} />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-        <PolicyMetric label="max call" value={policy.maxPerCallUsdc} />
-        <PolicyMetric label="spent" value={policy.spentUsdc} />
-        <PolicyMetric label="remaining" value={policy.remainingUsdc} />
+        <PolicyMetric label={isPt ? "máx. chamada" : "max call"} value={policy.maxPerCallUsdc} />
+        <PolicyMetric label={isPt ? "gasto" : "spent"} value={policy.spentUsdc} />
+        <PolicyMetric label={isPt ? "restante" : "remaining"} value={policy.remainingUsdc} />
       </div>
 
       <div className="mt-4 rounded-md border border-arc-border bg-arc-surface/70 p-3">
         <div className="mb-2 text-[10px] font-mono uppercase tracking-[0.16em] text-arc-dim">
-          Recent receipts
+          {isPt ? "Recibos recentes" : "Recent receipts"}
         </div>
         {receipts.length > 0 ? (
           <div className="space-y-2">
@@ -58,7 +61,7 @@ export function AgentSpendPolicyCard({
           </div>
         ) : (
           <p className="text-xs leading-5 text-arc-muted">
-            Receipts appear after this agent uses a paid tool for the job.
+            {isPt ? "Recibos aparecem depois que este agente usa uma tool paga para o job." : "Receipts appear after this agent uses a paid tool for the job."}
           </p>
         )}
       </div>
@@ -67,7 +70,7 @@ export function AgentSpendPolicyCard({
         href="/tools"
         className="mt-4 inline-flex w-full items-center justify-center rounded-lg border border-arc-cyan/30 bg-arc-cyan/10 px-4 py-2.5 text-sm font-semibold text-arc-cyan transition-colors hover:bg-arc-cyan hover:text-arc-bg"
       >
-        Open spend router
+        {isPt ? "Abrir roteador de gastos" : "Open spend router"}
       </Link>
     </div>
   );

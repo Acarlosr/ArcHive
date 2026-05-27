@@ -8,6 +8,7 @@ import {
   estimateToolSpend,
   type ToolSpendReceipt,
 } from "@/lib/agentSpend";
+import { useLanguage } from "@/lib/i18n";
 
 type SpendRunState = "idle" | "loading" | "success" | "error";
 
@@ -18,9 +19,11 @@ const demoJob = {
 };
 
 export function AgentSpendConsole() {
+  const { locale } = useLanguage();
+  const isPt = locale === "pt-BR";
   const [selectedToolIds, setSelectedToolIds] = useState(["summarize-pdf", "extract-json", "score-deliverable"]);
   const [state, setState] = useState<SpendRunState>("idle");
-  const [message, setMessage] = useState("Ready to authorize job-linked tool calls.");
+  const [message, setMessage] = useState(isPt ? "Pronto para autorizar chamadas de tools vinculadas ao job." : "Ready to authorize job-linked tool calls.");
   const [receipts, setReceipts] = useState<ToolSpendReceipt[]>([]);
 
   const policy = useMemo(
@@ -48,12 +51,12 @@ export function AgentSpendConsole() {
 
   async function runSpendSimulation() {
     setState("loading");
-    setMessage("Authorizing x402 calls against the job spend policy.");
+    setMessage(isPt ? "Autorizando chamadas x402 contra a política de gastos do job." : "Authorizing x402 calls against the job spend policy.");
     await new Promise((resolve) => window.setTimeout(resolve, 450));
 
     if (!estimate.withinPolicy) {
       setState("error");
-      setMessage(estimate.blockedReasons[0] ?? "Spend request blocked by policy.");
+      setMessage(estimate.blockedReasons[0] ?? (isPt ? "Solicitação de gasto bloqueada pela política." : "Spend request blocked by policy."));
       return;
     }
 
@@ -65,27 +68,28 @@ export function AgentSpendConsole() {
       }),
     );
     setState("success");
-    setMessage("Tool calls settled and receipts attached to the job ledger.");
+    setMessage(isPt ? "Chamadas de tools liquidadas e recibos anexados ao ledger do job." : "Tool calls settled and receipts attached to the job ledger.");
   }
 
   return (
     <section className="rounded-lg border border-arc-border bg-arc-card/85 p-6">
       <div className="mb-6 grid gap-6 lg:grid-cols-[1fr_360px] lg:items-start">
         <div>
-          <div className="label-field mb-2">Spend router</div>
+          <div className="label-field mb-2">{isPt ? "Roteador de gastos" : "Spend router"}</div>
           <h2 className="font-display text-2xl font-bold text-arc-text">
-            Job-linked nanopayments
+            {isPt ? "Nanopagamentos vinculados ao job" : "Job-linked nanopayments"}
           </h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-arc-muted">
-            Demo job {demoJob.id} lets an agent buy metered tools while every call remains capped,
-            receipted, and tied back to escrow-funded work.
+            {isPt
+              ? `O job demo ${demoJob.id} permite que um agente compre tools medidas enquanto cada chamada continua limitada, com recibo e vinculada ao trabalho financiado por escrow.`
+              : `Demo job ${demoJob.id} lets an agent buy metered tools while every call remains capped, receipted, and tied back to escrow-funded work.`}
           </p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-          <PolicyStat label="max per call" value={policy.maxPerCallUsdc} />
-          <PolicyStat label="remaining" value={policy.remainingUsdc} />
-          <PolicyStat label="selected" value={estimate.totalUsdc} />
+          <PolicyStat label={isPt ? "máx. por chamada" : "max per call"} value={policy.maxPerCallUsdc} />
+          <PolicyStat label={isPt ? "restante" : "remaining"} value={policy.remainingUsdc} />
+          <PolicyStat label={isPt ? "selecionado" : "selected"} value={estimate.totalUsdc} />
         </div>
       </div>
 
@@ -129,8 +133,8 @@ export function AgentSpendConsole() {
         <aside className="rounded-lg border border-arc-border bg-arc-bg/55 p-5">
           <div className="mb-4 flex items-start justify-between gap-3">
             <div>
-              <div className="label-field mb-2">Authorization</div>
-              <h3 className="font-display text-lg font-semibold text-arc-text">Spend state</h3>
+              <div className="label-field mb-2">{isPt ? "Autorização" : "Authorization"}</div>
+              <h3 className="font-display text-lg font-semibold text-arc-text">{isPt ? "Estado do gasto" : "Spend state"}</h3>
             </div>
             <span className={statusClassName(state)}>{state}</span>
           </div>
@@ -149,12 +153,12 @@ export function AgentSpendConsole() {
             disabled={state === "loading" || selectedToolIds.length === 0}
             className="mt-5 inline-flex w-full items-center justify-center rounded-lg border border-arc-green/30 bg-arc-green/10 px-4 py-2.5 text-sm font-semibold text-arc-green transition-colors hover:bg-arc-green hover:text-arc-bg disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {state === "loading" ? "Authorizing..." : "Run agent spend"}
+            {state === "loading" ? (isPt ? "Autorizando..." : "Authorizing...") : (isPt ? "Executar gasto do agente" : "Run agent spend")}
           </button>
 
           <div className="mt-5 rounded-md border border-arc-border bg-arc-surface/70 p-3">
             <div className="mb-2 text-[10px] font-mono uppercase tracking-[0.16em] text-arc-dim">
-              Receipts
+              {isPt ? "Recibos" : "Receipts"}
             </div>
             {receipts.length > 0 ? (
               <div className="space-y-2">
@@ -170,7 +174,7 @@ export function AgentSpendConsole() {
               </div>
             ) : (
               <p className="text-xs leading-5 text-arc-muted">
-                No receipts in this session yet.
+                {isPt ? "Nenhum recibo nesta sessão ainda." : "No receipts in this session yet."}
               </p>
             )}
           </div>

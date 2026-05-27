@@ -2,6 +2,7 @@
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { WalletProviderIsland } from "@/components/WalletProviderIsland";
+import { useLanguage } from "@/lib/i18n";
 
 export function WalletConnectCTAClient({ variant = "nav" }: { variant?: "nav" | "hero" }) {
   return (
@@ -12,6 +13,8 @@ export function WalletConnectCTAClient({ variant = "nav" }: { variant?: "nav" | 
 }
 
 function WalletConnectCTAInner({ variant = "nav" }: { variant?: "nav" | "hero" }) {
+  const { locale } = useLanguage();
+  const isPt = locale === "pt-BR";
   const isHero = variant === "hero";
 
   return (
@@ -31,7 +34,7 @@ function WalletConnectCTAInner({ variant = "nav" }: { variant?: "nav" | "hero" }
                   : "rounded-lg bg-arc-green px-5 py-2.5 text-sm font-display font-bold text-arc-bg shadow-[0_0_28px_rgba(0,229,160,0.25)] transition-all hover:bg-white"
               }
             >
-              Connect Wallet
+              {isPt ? "Conectar Carteira" : "Connect Wallet"}
             </button>
           );
         }
@@ -43,7 +46,7 @@ function WalletConnectCTAInner({ variant = "nav" }: { variant?: "nav" | "hero" }
               onClick={openChainModal}
               className={isHero ? "btn-primary px-7 py-4 text-base" : "btn-primary px-5 py-2.5"}
             >
-              Switch to Arc Testnet
+              {isPt ? "Trocar para Arc Testnet" : "Switch to Arc Testnet"}
             </button>
           );
         }

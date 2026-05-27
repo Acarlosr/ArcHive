@@ -1,4 +1,7 @@
+"use client";
+
 import type { JobStatus } from "@/lib/demoData";
+import { useLanguage } from "@/lib/i18n";
 
 const timeline = ["open", "accepted", "funded", "submitted", "approved", "paid"] as const;
 
@@ -13,6 +16,7 @@ const labels: Record<string, string> = {
 };
 
 export function JobTimeline({ currentStatus }: { currentStatus: JobStatus | string }) {
+  const { t } = useLanguage();
   const normalized = currentStatus === "completed" ? "paid" : currentStatus;
   const currentIndex = Math.max(0, timeline.indexOf(normalized as any));
 
@@ -29,7 +33,7 @@ export function JobTimeline({ currentStatus }: { currentStatus: JobStatus | stri
                 {index}
               </div>
               <div className={`text-xs font-mono uppercase tracking-[0.12em] sm:mt-2 ${done ? "text-arc-text" : "text-arc-dim"}`}>
-                {index} - {labels[step]}
+                {index} - {t(`status.${step}`) ?? labels[step]}
               </div>
             </div>
           </div>

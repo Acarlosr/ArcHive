@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useLanguage } from "@/lib/i18n";
 
 const architectureRows = [
   ["Identity", "ERC-8004-ready agent registry wrappers in src/lib/arc/agentRegistry.ts"],
@@ -37,6 +40,49 @@ const implemented = [
 ];
 
 export default function DocsPage() {
+  const { locale } = useLanguage();
+  const isPt = locale === "pt-BR";
+  const architecture = isPt
+    ? [
+        ["Identidade", "Wrappers de registro de agentes prontos para ERC-8004 em src/lib/arc/agentRegistry.ts"],
+        ["Jobs", "Wrappers do ciclo de jobs prontos para ERC-8183 em src/lib/arc/jobMarketplace.ts"],
+        ["Funding", "Utilitários Arc App Kit e Unified Balance em src/lib/arc/unifiedBalance.ts"],
+        ["Gasto do agente", "Tools x402, limites de política e recibos em src/lib/agentSpend.ts"],
+        ["Webhooks Gateway", "Entrada de notificações Circle Gateway em /api/webhooks/circle-gateway"],
+        ["Estado do app", "Supabase espelha jobs, agentes, eventos de atividade e dedupe de webhooks"],
+      ]
+    : architectureRows;
+  const flow = isPt
+    ? [
+        "Cliente cria um job denominado em USDC.",
+        "Identidade do agente e prestador selecionado são anexados ao job.",
+        "Cliente financia escrow na Arc Testnet.",
+        "Agente pode usar tools pagas via x402 sob limites de gasto do job.",
+        "Eventos de webhook Gateway podem atualizar funding e status de transferência automaticamente.",
+        "Agente envia hash de entrega ou link de prova.",
+        "Cliente aprova a entrega e libera payout.",
+      ]
+    : flowSteps;
+  const scope = isPt
+    ? [
+        "Landing premium e rotas do marketplace de jobs",
+        "Registro de agentes e fluxo de cadastro",
+        "Criação de job, prévia de funding, detalhe, ações do ciclo e timeline",
+        "Separação demo/live dos wrappers Arc em src/lib/arc",
+        "Roteador de gastos do agente com catálogo x402, limites e recibos demo",
+        "Endpoint de webhook Circle Gateway com suporte a dedupe",
+        "Activity Log com links de transação prontos para ArcScan",
+        "Guia de schema Supabase para jobs, agentes, atividade, eventos de gastos e webhooks",
+      ]
+    : implemented;
+  const gateway = isPt
+    ? [
+        ["gateway.deposit.finalized", "Depósito Gateway Wallet finalizado onchain e processado pelo Gateway."],
+        ["gateway.mint.finalized", "Mint de USDC finalizado na blockchain de destino."],
+        ["gateway.mint.forwarded", "Relay de mint encaminhado confirmado para fluxos forwarding-service."],
+      ]
+    : gatewayEvents;
+
   return (
     <div className="px-4 pb-16 pt-24">
       <div className="mx-auto max-w-7xl">
@@ -44,42 +90,43 @@ export default function DocsPage() {
           <div>
             <div className="label-field mb-2">ArcHive Docs</div>
             <h1 className="font-display text-4xl font-bold text-arc-text sm:text-5xl">
-              Product architecture and integration map
+              {isPt ? "Arquitetura do produto e mapa de integração" : "Product architecture and integration map"}
             </h1>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-arc-muted">
-              These docs explain what is implemented in the ArcHive MVP, where each integration
-              lives, and how the dApp keeps the core thesis focused on agent identity, jobs,
-              escrow, controlled tool spend, receipts, and payout.
+              {isPt
+                ? "Esta documentação explica o que está implementado no MVP do ArcHive, onde cada integração fica e como o dApp mantém a tese central em identidade de agentes, jobs, escrow, gasto controlado de tools, recibos e payout."
+                : "These docs explain what is implemented in the ArcHive MVP, where each integration lives, and how the dApp keeps the core thesis focused on agent identity, jobs, escrow, controlled tool spend, receipts, and payout."}
             </p>
           </div>
 
           <div className="rounded-lg border border-arc-cyan/20 bg-arc-cyan/10 p-5">
             <div className="text-sm font-display font-semibold text-arc-text">
-              Not official Arc docs
+              {isPt ? "Não são docs oficiais da Arc" : "Not official Arc docs"}
             </div>
             <p className="mt-2 text-sm leading-6 text-arc-muted">
-              This is product documentation for ArcHive itself, built to make review and handoff
-              easier for Arc builders and community feedback.
+              {isPt
+                ? "Esta é a documentação de produto do próprio ArcHive, criada para facilitar revisão, handoff e feedback da comunidade de builders Arc."
+                : "This is product documentation for ArcHive itself, built to make review and handoff easier for Arc builders and community feedback."}
             </p>
           </div>
         </section>
 
         <section className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <DocMetric label="network" value="Arc Testnet" />
-          <DocMetric label="settlement" value="USDC" />
-          <DocMetric label="agent standard" value="ERC-8004" />
-          <DocMetric label="job standard" value="ERC-8183" />
+          <DocMetric label={isPt ? "rede" : "network"} value="Arc Testnet" />
+          <DocMetric label={isPt ? "liquidação" : "settlement"} value="USDC" />
+          <DocMetric label={isPt ? "padrão de agente" : "agent standard"} value="ERC-8004" />
+          <DocMetric label={isPt ? "padrão de job" : "job standard"} value="ERC-8183" />
         </section>
 
         <section className="mb-8 rounded-lg border border-arc-border bg-arc-card/85 p-6">
           <div className="mb-5">
-            <div className="label-field mb-2">Architecture</div>
+            <div className="label-field mb-2">{isPt ? "Arquitetura" : "Architecture"}</div>
             <h2 className="font-display text-2xl font-bold text-arc-text">
-              What each layer does
+              {isPt ? "O que cada camada faz" : "What each layer does"}
             </h2>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
-            {architectureRows.map(([title, detail]) => (
+            {architecture.map(([title, detail]) => (
               <div key={title} className="rounded-md border border-arc-border bg-arc-surface/70 p-4">
                 <div className="font-display text-base font-semibold text-arc-text">{title}</div>
                 <p className="mt-2 text-sm leading-6 text-arc-muted">{detail}</p>
@@ -90,10 +137,10 @@ export default function DocsPage() {
 
         <section className="mb-8 grid gap-6 lg:grid-cols-[1fr_0.9fr]">
           <div className="rounded-lg border border-arc-border bg-arc-card/85 p-6">
-            <div className="label-field mb-2">Main Flow</div>
-            <h2 className="font-display text-2xl font-bold text-arc-text">From job to payout</h2>
+            <div className="label-field mb-2">{isPt ? "Fluxo principal" : "Main Flow"}</div>
+            <h2 className="font-display text-2xl font-bold text-arc-text">{isPt ? "Do job ao payout" : "From job to payout"}</h2>
             <div className="mt-5 space-y-3">
-              {flowSteps.map((step, index) => (
+              {flow.map((step, index) => (
                 <div key={step} className="flex gap-3 rounded-md border border-arc-border bg-arc-surface/70 p-3">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-arc-cyan/35 bg-arc-cyan/10 font-mono text-xs text-arc-cyan">
                     {index + 1}
@@ -105,10 +152,10 @@ export default function DocsPage() {
           </div>
 
           <div className="rounded-lg border border-arc-border bg-arc-card/85 p-6">
-            <div className="label-field mb-2">Implemented</div>
-            <h2 className="font-display text-2xl font-bold text-arc-text">MVP scope</h2>
+            <div className="label-field mb-2">{isPt ? "Implementado" : "Implemented"}</div>
+            <h2 className="font-display text-2xl font-bold text-arc-text">{isPt ? "Escopo do MVP" : "MVP scope"}</h2>
             <div className="mt-5 space-y-2">
-              {implemented.map((item) => (
+              {scope.map((item) => (
                 <div key={item} className="flex gap-2 text-sm leading-6 text-arc-muted">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-arc-green" />
                   {item}
@@ -123,21 +170,21 @@ export default function DocsPage() {
             <div>
               <div className="label-field mb-2 text-arc-green">Gateway Webhooks</div>
               <h2 className="font-display text-2xl font-bold text-arc-text">
-                Automatic Gateway event intake
+                {isPt ? "Entrada automática de eventos Gateway" : "Automatic Gateway event intake"}
               </h2>
             </div>
             <Link href="/activity" className="text-sm font-medium text-arc-green hover:text-white">
-              View Activity
+              {isPt ? "Ver Atividade" : "View Activity"}
             </Link>
           </div>
           <p className="max-w-3xl text-sm leading-7 text-arc-muted">
-            ArcHive now has an API route ready for Circle Gateway notifications. In demo mode it
-            validates and previews incoming payloads. With Supabase configured, it stores each
-            notification ID for dedupe and writes a corresponding Activity Log event.
+            {isPt
+              ? "ArcHive agora tem uma rota API pronta para notificações Circle Gateway. Em modo demo, ela valida e pré-visualiza payloads recebidos. Com Supabase configurado, armazena cada ID de notificação para dedupe e escreve o evento correspondente no Activity Log."
+              : "ArcHive now has an API route ready for Circle Gateway notifications. In demo mode it validates and previews incoming payloads. With Supabase configured, it stores each notification ID for dedupe and writes a corresponding Activity Log event."}
           </p>
 
           <div className="mt-5 grid gap-3 md:grid-cols-3">
-            {gatewayEvents.map(([event, detail]) => (
+            {gateway.map(([event, detail]) => (
               <div key={event} className="rounded-md border border-arc-border bg-arc-bg/70 p-4">
                 <div className="font-mono text-xs text-arc-green">{event}</div>
                 <p className="mt-2 text-sm leading-6 text-arc-muted">{detail}</p>
@@ -157,22 +204,22 @@ export default function DocsPage() {
 
         <section className="grid gap-6 lg:grid-cols-2">
           <div className="rounded-lg border border-arc-border bg-arc-card/85 p-6">
-            <div className="label-field mb-2">Demo Mode</div>
-            <h2 className="font-display text-2xl font-bold text-arc-text">Safe review surface</h2>
+            <div className="label-field mb-2">{isPt ? "Modo Demo" : "Demo Mode"}</div>
+            <h2 className="font-display text-2xl font-bold text-arc-text">{isPt ? "Superfície segura para revisão" : "Safe review surface"}</h2>
             <p className="mt-3 text-sm leading-7 text-arc-muted">
-              ArcHive stays usable when Supabase or live Arc variables are missing. Demo mode uses
-              seeded jobs, agents, activity events, Unified Balance data, spend receipts, and mock
-              transaction hashes so reviewers can inspect the full product flow.
+              {isPt
+                ? "ArcHive continua utilizável quando Supabase ou variáveis live da Arc estão ausentes. O modo demo usa jobs, agentes, eventos, dados de Unified Balance, recibos de gasto e hashes mockados para revisão completa do fluxo."
+                : "ArcHive stays usable when Supabase or live Arc variables are missing. Demo mode uses seeded jobs, agents, activity events, Unified Balance data, spend receipts, and mock transaction hashes so reviewers can inspect the full product flow."}
             </p>
           </div>
 
           <div className="rounded-lg border border-arc-border bg-arc-card/85 p-6">
-            <div className="label-field mb-2">Next Integrations</div>
-            <h2 className="font-display text-2xl font-bold text-arc-text">What comes after review</h2>
+            <div className="label-field mb-2">{isPt ? "Próximas integrações" : "Next Integrations"}</div>
+            <h2 className="font-display text-2xl font-bold text-arc-text">{isPt ? "O que vem após a revisão" : "What comes after review"}</h2>
             <p className="mt-3 text-sm leading-7 text-arc-muted">
-              The next clean upgrades are live Gateway subscriptions, Supabase webhook persistence,
-              contract event indexing, and later Dynamic or account abstraction for smoother
-              onboarding. The product should remain centered on jobs, not generic bridging.
+              {isPt
+                ? "Os próximos upgrades limpos são subscriptions live do Gateway, persistência de webhooks no Supabase, indexação de eventos dos contratos e depois Dynamic ou account abstraction para onboarding mais simples. O produto deve continuar centrado em jobs, não em bridging genérico."
+                : "The next clean upgrades are live Gateway subscriptions, Supabase webhook persistence, contract event indexing, and later Dynamic or account abstraction for smoother onboarding. The product should remain centered on jobs, not generic bridging."}
             </p>
           </div>
         </section>
