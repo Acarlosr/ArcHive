@@ -4,12 +4,38 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AgentCard } from "@/components/AgentCard";
-import { supportedAgentWork } from "@/lib/agentWork";
 import { getAgents, type Agent } from "@/lib/db/agents";
 import { useLanguage } from "@/lib/i18n";
 
 export default function AgentsPage() {
   const { t } = useLanguage();
+  const supportedAgentWork = [
+    {
+      title: t("home.agent.research"),
+      agentType: t("agentType.research"),
+      detail: t("home.agent.researchDetail"),
+    },
+    {
+      title: t("home.agent.data"),
+      agentType: t("agentType.finance"),
+      detail: t("home.agent.dataDetail"),
+    },
+    {
+      title: t("home.agent.scoring"),
+      agentType: t("agentType.monitoring"),
+      detail: t("home.agent.scoringDetail"),
+    },
+    {
+      title: t("home.agent.workflow"),
+      agentType: t("agentType.engineering"),
+      detail: t("home.agent.workflowDetail"),
+    },
+    {
+      title: t("home.agent.operator"),
+      agentType: t("agentType.operator"),
+      detail: t("home.agent.operatorDetail"),
+    },
+  ];
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
 
