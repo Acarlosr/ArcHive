@@ -8,6 +8,7 @@ const architectureRows = [
   ["Jobs", "ERC-8183-ready job lifecycle wrappers in src/lib/arc/jobMarketplace.ts"],
   ["Funding", "Arc App Kit and Unified Balance utilities in src/lib/arc/unifiedBalance.ts"],
   ["Agent Spend", "x402 tools, policy caps, and receipts in src/lib/agentSpend.ts"],
+  ["Proof Packs", "Job-linked proof assembly in src/lib/proofPacks.ts and the /proof review surface"],
   ["Gateway Webhooks", "Circle Gateway notification intake at /api/webhooks/circle-gateway"],
   ["App State", "Supabase mirrors jobs, agents, activity events, and webhook dedupe records"],
 ];
@@ -20,6 +21,7 @@ const flowSteps = [
   "Gateway webhook events can update funding and transfer status automatically.",
   "Agent submits a deliverable hash or proof link.",
   "Client approves the deliverable and releases payout.",
+  "ArcHive assembles a Proof Pack for review, indexing, and future agent reputation.",
 ];
 
 const gatewayEvents = [
@@ -34,6 +36,7 @@ const implemented = [
   "Job creation, funding preview, detail page, lifecycle actions, and timeline",
   "Demo/live Arc wrapper separation under src/lib/arc",
   "Agent Spend Router with x402 tool catalog, policy caps, and demo receipts",
+  "Proof Pack surface for job evidence, hash-only deliverables, receipts, approval, and payout",
   "Circle Gateway webhook endpoint with notification dedupe support",
   "Activity Log with ArcScan-ready transaction links",
   "Supabase schema guidance for jobs, agents, activity, spend events, and webhooks",
@@ -48,6 +51,7 @@ export default function DocsPage() {
         ["Jobs", "Wrappers do ciclo de jobs prontos para ERC-8183 em src/lib/arc/jobMarketplace.ts"],
         ["Funding", "Utilitários Arc App Kit e Unified Balance em src/lib/arc/unifiedBalance.ts"],
         ["Gasto do agente", "Tools x402, limites de política e recibos em src/lib/agentSpend.ts"],
+        ["Proof Packs", "Montagem de provas por job em src/lib/proofPacks.ts e superfície de revisão em /proof"],
         ["Webhooks Gateway", "Entrada de notificações Circle Gateway em /api/webhooks/circle-gateway"],
         ["Estado do app", "Supabase espelha jobs, agentes, eventos de atividade e dedupe de webhooks"],
       ]
@@ -61,6 +65,7 @@ export default function DocsPage() {
         "Eventos de webhook Gateway podem atualizar funding e status de transferência automaticamente.",
         "Agente envia hash de entrega ou link de prova.",
         "Cliente aprova a entrega e libera payout.",
+        "ArcHive monta um Proof Pack para revisão, indexação e reputação futura do agente.",
       ]
     : flowSteps;
   const scope = isPt
@@ -70,6 +75,7 @@ export default function DocsPage() {
         "Criação de job, prévia de funding, detalhe, ações do ciclo e timeline",
         "Separação demo/live dos wrappers Arc em src/lib/arc",
         "Roteador de gastos do agente com catálogo x402, limites e recibos demo",
+        "Superfície de Proof Pack para evidências do job, entregas hash-only, recibos, aprovação e payout",
         "Endpoint de webhook Circle Gateway com suporte a dedupe",
         "Activity Log com links de transação prontos para ArcScan",
         "Guia de schema Supabase para jobs, agentes, atividade, eventos de gastos e webhooks",
@@ -218,8 +224,8 @@ export default function DocsPage() {
             <h2 className="font-display text-2xl font-bold text-arc-text">{isPt ? "O que vem após a revisão" : "What comes after review"}</h2>
             <p className="mt-3 text-sm leading-7 text-arc-muted">
               {isPt
-                ? "Os próximos upgrades limpos são subscriptions live do Gateway, persistência de webhooks no Supabase, indexação de eventos dos contratos e depois Dynamic ou account abstraction para onboarding mais simples. O produto deve continuar centrado em jobs, não em bridging genérico."
-                : "The next clean upgrades are live Gateway subscriptions, Supabase webhook persistence, contract event indexing, and later Dynamic or account abstraction for smoother onboarding. The product should remain centered on jobs, not generic bridging."}
+                ? "Os próximos upgrades limpos são indexação Goldsky para os Proof Packs, subscriptions live do Gateway, persistência de webhooks no Supabase, Dynamic ou account abstraction para onboarding simples e alinhamento futuro com Agent Stack. O produto deve continuar centrado em jobs, não em bridging genérico."
+                : "The next clean upgrades are Goldsky indexing for Proof Packs, live Gateway subscriptions, Supabase webhook persistence, Dynamic or account abstraction for smoother onboarding, and future Agent Stack alignment. The product should remain centered on jobs, not generic bridging."}
             </p>
           </div>
         </section>

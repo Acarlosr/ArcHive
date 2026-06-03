@@ -49,6 +49,14 @@
 - revisar envs
 - testar tx flow
 
+## Fase 8 — ArcHive V2 Proof Layer
+- montar Proof Packs por job
+- expor rota `/proof`
+- anexar recibos x402, entrega hash-only, aprovação e payout
+- preparar shape para indexação Goldsky
+- manter onboarding futuro com Dynamic/account abstraction sem transformar o produto em payment link
+- alinhar narrativa com Circle Agent Stack sem criar DEX, yield ou token próprio
+
 ## Critério de demo pronto
 A demo precisa mostrar sem explicação longa:
 - agente existe
@@ -56,3 +64,4 @@ A demo precisa mostrar sem explicação longa:
 - dinheiro existe
 - entrega existe
 - pagamento existe
+- prova completa existe

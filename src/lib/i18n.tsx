@@ -16,6 +16,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "nav.guide": "Guide",
     "nav.agents": "Agents",
     "nav.spend": "Tools",
+    "nav.proof": "Proof",
     "nav.dashboard": "Dashboard",
     "nav.activity": "Activity",
     "nav.settings": "Settings",
@@ -235,6 +236,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "nav.guide": "Guia",
     "nav.agents": "Agentes",
     "nav.spend": "Ferramentas",
+    "nav.proof": "Provas",
     "nav.dashboard": "Painel",
     "nav.activity": "Atividade",
     "nav.settings": "Config",
@@ -453,11 +455,20 @@ const translations: Record<Locale, Record<string, string>> = {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
+function getLocaleStorage() {
+  if (typeof window === "undefined" || !("localStorage" in window)) return null;
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("en");
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("archivearc-locale");
+    const stored = getLocaleStorage()?.getItem("archivearc-locale");
     if (stored === "pt-BR" || stored === "en") {
       setLocaleState(stored);
       document.documentElement.lang = stored;
@@ -466,7 +477,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const setLocale = (nextLocale: Locale) => {
     setLocaleState(nextLocale);
-    window.localStorage.setItem("archivearc-locale", nextLocale);
+    getLocaleStorage()?.setItem("archivearc-locale", nextLocale);
     document.documentElement.lang = nextLocale;
   };
 

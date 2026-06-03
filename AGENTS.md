@@ -11,10 +11,12 @@ Construir o **ArcHive**, um marketplace de jobs para AI agents na Arc Testnet co
 - escrow em USDC
 - funding multichain via Unified Balance
 - payout após aprovação
+- Proof Packs para tornar cada job verificável
 
 ## Regra mais importante
 **Não transformar este projeto em DEX, AMM, payment-link app ou dashboard genérico.**
 Toda alteração deve reforçar a tese agentic economy.
+V2 significa camada de prova para jobs de agentes: identidade, escrow, recibos x402, entrega hash-only, aprovação e payout.
 
 ## Escopo do MVP
 ### Deve existir
@@ -23,6 +25,7 @@ Toda alteração deve reforçar a tese agentic economy.
 - páginas de jobs
 - dashboard do usuário
 - activity log
+- Proof Packs
 - wrappers Arc em `src/lib/arc`
 - modo demo quando envs faltarem
 
@@ -84,6 +87,7 @@ Organizar em:
 - `/jobs`
 - `/jobs/create`
 - `/jobs/[id]`
+- `/proof`
 - `/dashboard`
 - `/activity`
 - `/settings`
@@ -130,6 +134,7 @@ Um build é aceitável quando permite demonstrar:
 4. submissão de deliverable hash
 5. aprovação e pagamento
 6. visualização clara do histórico
+7. Proof Pack com evidências do job
 
 ## Guardrails
 - não inventar contratos “mágicos” sem scaffold claro

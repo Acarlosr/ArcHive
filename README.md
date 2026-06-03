@@ -4,6 +4,17 @@ ArcHive is a production-style MVP dapp for Arc Testnet: an AI Agent Job Marketpl
 
 This is not a DEX, LP, staking app, orderbook, or generic payment link flow. The product is organized around agent identity, job state, escrow, bounded tool spend, deliverables, reputation, and Unified Balance funding.
 
+## V2 Direction: Agent Proof Layer
+
+ArcHive V2 strengthens the core product instead of pivoting into swaps, yield, BRL/BRLA, tokenomics, or payment links. The new direction is a job-linked proof layer for the agentic economy:
+
+- each job can produce a Proof Pack
+- Proof Packs combine agent identity, USDC escrow, x402 tool receipts, hash-only deliverable proof, client approval, and payout status
+- deliverable content can remain private while the public surface stays verifiable
+- Goldsky indexing can turn contract and Gateway events into real-time Proof Pack data
+- Dynamic/account abstraction can reduce onboarding friction before first escrow or tool-spend action
+- Circle Agent Stack can later map agent wallets, services, CLI actions, and Circle Skills into the same work ledger
+
 ## Stack
 
 - Next.js App Router
@@ -68,6 +79,7 @@ NEXT_PUBLIC_ARC_USDC_ADDRESS=0x3600000000000000000000000000000000000000
 - `/jobs/create` job creation and escrow funding preview
 - `/jobs/[id]` job detail, timeline, role actions, and tx history
 - `/tools` Agent Spend Router powered by x402 + Circle Gateway Nanopayments
+- `/proof` ArcHive V2 Proof Packs for job evidence, receipts, hash-only deliverables, approval, and payout
 - `/dashboard` jobs, agents, earnings, and Unified Balance snapshot
 - `/activity` activity event table with explorer links
 - `/settings` integration map and environment checklist
@@ -204,6 +216,11 @@ create table activity_events (
   - `createDemoSpendPolicy()`
   - `estimateToolSpend()`
   - `buildToolSpendReceipts()`
+
+- Proof Pack assembly: `src/lib/proofPacks.ts`
+  - `buildProofPack(job)`
+  - `getDemoProofPacks()`
+  - surfaces agent identity, escrow, x402 receipts, deliverable proof, approval, and payout completeness
 
 - Circle Gateway webhooks: `src/app/api/webhooks/circle-gateway/route.ts`
   - accepts `gateway.deposit.finalized`

@@ -23,6 +23,7 @@ ArcHive conecta clientes e agentes com um fluxo verificável:
 5. registrar recibos de nanopagamento
 6. submeter deliverable hash
 7. aprovar e pagar
+8. gerar Proof Pack do job
 
 ## Público inicial
 - builders Arc
@@ -38,6 +39,8 @@ ArcHive conecta clientes e agentes com um fluxo verificável:
 - USDC liquidado
 - recibos de tool spend por job
 - USDC gasto por agentes em serviços pagos
+- Proof Packs completos por job
+- eventos indexáveis por job
 
 ## MVP
 ### Funcionalidades
@@ -49,6 +52,7 @@ ArcHive conecta clientes e agentes com um fluxo verificável:
 - rotas x402 para nanopayments
 - recibos de chamadas pagas ligados ao job
 - endpoint de Gateway webhooks para Activity Log automático
+- Proof Packs com identidade, escrow, recibos x402, entrega hash-only, aprovação e payout
 - aba Docs com arquitetura e integrações implantadas
 - submissão de deliverable
 - aprovação/pagamento
@@ -72,4 +76,14 @@ ArcHive conecta clientes e agentes com um fluxo verificável:
 - token próprio
 
 ## Proposta de valor
-ArcHive torna a economia agentic visível e operacional em uma UX compreensível: trabalho, escrow, gastos de execução, entrega e liquidação.
+ArcHive torna a economia agentic visível e operacional em uma UX compreensível: trabalho, escrow, gastos de execução, entrega, liquidação e Proof Pack.
+
+## Direção V2
+ArcHive V2 é uma camada de prova para trabalho agentic na Arc. A V2 deve melhorar o produto existente com:
+- Proof Packs por job
+- indexação futura com Goldsky
+- onboarding futuro com Dynamic ou account abstraction
+- alinhamento futuro com Circle Agent Stack, Agent Wallets, Circle Skills e CLI
+- entregas privadas por conteúdo, mas verificáveis por hash/prova
+
+A V2 não deve virar DEX, swap, lending, yield, mineração, BRL/BRLA, token próprio ou narrativa fiscal.
