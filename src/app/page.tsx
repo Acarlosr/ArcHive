@@ -88,6 +88,26 @@ export default function HomePage() {
     t("home.boundary.spend"),
     t("home.boundary.offchain"),
   ];
+  const arcPrimitives = [
+    { title: t("home.arc.usdc"), detail: t("home.arc.usdcDetail"), stat: "USDC" },
+    { title: t("home.arc.identity"), detail: t("home.arc.identityDetail"), stat: "ERC-8004" },
+    { title: t("home.arc.settlement"), detail: t("home.arc.settlementDetail"), stat: "Arc" },
+    { title: t("home.arc.tools"), detail: t("home.arc.toolsDetail"), stat: "x402" },
+  ];
+  const trustPoints = [
+    t("home.trust.client"),
+    t("home.trust.provider"),
+    t("home.trust.refund"),
+    t("home.trust.trace"),
+  ];
+  const payoutFlow = [
+    t("home.flow.human"),
+    t("home.flow.agent"),
+    t("home.flow.escrow"),
+    t("home.flow.proof"),
+    t("home.flow.approve"),
+    t("home.flow.payout"),
+  ];
 
   return (
     <div className="pt-16">
@@ -211,6 +231,63 @@ export default function HomePage() {
               <div className="mt-1 text-[10px] font-mono uppercase tracking-[0.16em] text-arc-dim">{metric.label}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="border-b border-arc-border px-4 py-14">
+        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="rounded-lg border border-arc-border bg-arc-card/82 p-6">
+            <div className="label-field mb-2">{t("home.arc.label")}</div>
+            <h2 className="font-display text-3xl font-bold text-arc-text">{t("home.arc.title")}</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-arc-muted">{t("home.arc.detail")}</p>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {arcPrimitives.map((item) => (
+                <div key={item.title} className="rounded-lg border border-arc-border bg-arc-surface/70 p-4">
+                  <div className="mb-5 inline-flex rounded-md border border-arc-cyan/25 bg-arc-cyan/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.14em] text-arc-cyan">
+                    {item.stat}
+                  </div>
+                  <h3 className="font-display text-base font-semibold text-arc-text">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-arc-muted">{item.detail}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-4">
+            <div className="rounded-lg border border-arc-cyan/20 bg-arc-cyan/10 p-6">
+              <div className="label-field mb-2 text-arc-cyan">{t("home.flow.label")}</div>
+              <h2 className="font-display text-2xl font-bold text-arc-text">{t("home.flow.title")}</h2>
+              <div className="mt-5 grid gap-2">
+                {payoutFlow.map((step, index) => (
+                  <div key={step} className="flex items-center gap-3 rounded-md border border-arc-border bg-arc-bg/55 p-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-arc-cyan/35 bg-arc-cyan/10 font-mono text-xs text-arc-cyan">
+                      {index + 1}
+                    </span>
+                    <span className="text-sm font-medium text-arc-text">{step}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+              <div className="rounded-lg border border-arc-border bg-arc-card/82 p-5">
+                <h3 className="font-display text-lg font-semibold text-arc-text">{t("home.proof.title")}</h3>
+                <p className="mt-2 text-sm leading-6 text-arc-muted">{t("home.proof.detail")}</p>
+              </div>
+              <div className="rounded-lg border border-arc-green/25 bg-arc-green/10 p-5">
+                <h3 className="font-display text-lg font-semibold text-arc-text">{t("home.trust.title")}</h3>
+                <div className="mt-3 space-y-2">
+                  {trustPoints.map((point) => (
+                    <div key={point} className="flex gap-2 text-sm leading-6 text-arc-muted">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-arc-green" />
+                      <span>{point}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
