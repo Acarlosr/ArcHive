@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AuditorAccessPanel } from "@/components/AuditorAccessPanel";
 import { ExplorerLink } from "@/components/ExplorerLink";
 import { getDemoProofPacks, type ProofCheck, type ProofCheckStatus, type ProofPack } from "@/lib/proofPacks";
 import { formatWallet } from "@/lib/demoData";
@@ -234,6 +235,8 @@ export default function ProofPage() {
           <ProofMetric label={isPt ? "recibos x402" : "x402 receipts"} value={totalReceipts.toString()} />
           <ProofMetric label={isPt ? "USDC em jobs" : "job USDC"} value={`$${totalEscrowLabel}`} />
         </section>
+
+        <AuditorAccessPanel packs={packs} isPt={isPt} />
 
         <section className="mb-8 rounded-lg border border-arc-border bg-arc-card/85 p-6">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

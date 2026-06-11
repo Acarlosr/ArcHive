@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { href: "/agents", labelKey: "nav.agents" },
   { href: "/tools", labelKey: "nav.spend" },
   { href: "/proof", labelKey: "nav.proof" },
+  { href: "/payroll", labelKey: "nav.payroll" },
   { href: "/guide", labelKey: "nav.guide" },
   { href: "/dashboard", labelKey: "nav.dashboard" },
 ];
