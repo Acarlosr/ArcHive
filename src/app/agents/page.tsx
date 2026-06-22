@@ -110,6 +110,7 @@ export default function AgentsPage() {
                 reputationScore={agent.reputation_score}
                 jobsCompleted={agent.jobs_completed}
                 onchainId={agent.onchain_agent_id ?? agent.onchain_id}
+                agentStatus={agent.agent_status as "live" | "dev" | undefined}
               />
             ))}
           </div>

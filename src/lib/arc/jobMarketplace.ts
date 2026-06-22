@@ -3,6 +3,7 @@ import { getJobById as getJobRecordById } from "@/lib/db/jobs";
 import { spendFromUnifiedBalance } from "@/lib/arc/unifiedBalance";
 import { ARC_TESTNET, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
 import { agenticCommerceAbi, erc20Abi, USDC_CONTRACT } from "@/lib/arc/contracts";
+import { callWithMemo, arcScanUrl } from "@/lib/arc/memo";
 
 type WalletAction = { walletClient?: WalletClient | null };
 type TxResult = { txHash: `0x${string}`; explorerUrl: string; jobId: string; mode: "mock" | "live" };
@@ -113,11 +114,12 @@ export async function fundEscrow({
     return { txHash: result.txHash, explorerUrl: result.explorerUrl, jobId, mode: "mock" };
   }
 
-  const { parseUnits } = await import("viem");
+  const { parseUnits, encodeFunctionData } = await import("viem");
   const { account, arcTestnet, publicClient } = await getLiveClients(walletClient);
   const marketplaceAddress = getJobMarketplaceAddress();
   const amount = parseUnits(budgetUsdc, 6);
 
+  // 1. Approve USDC para o marketplace (call direta — sem memo, não é o evento de negócio)
   const approveHash = await walletClient.writeContract({
     address: USDC_CONTRACT,
     abi: erc20Abi,
@@ -129,18 +131,26 @@ export async function fundEscrow({
   const approveReceipt = await publicClient.waitForTransactionReceipt({ hash: approveHash });
   assertSuccessfulReceipt(approveReceipt, "Approve USDC");
 
-  const fundHash = await walletClient.writeContract({
-    address: marketplaceAddress,
+  // 2. Fund escrow via Memo — anexa jobId, clientId e valor para reconciliação offchain
+  const fundCalldata = encodeFunctionData({
     abi: agenticCommerceAbi,
     functionName: "fund",
     args: [BigInt(jobId), "0x"],
-    account,
-    chain: arcTestnet,
   });
-  const fundReceipt = await publicClient.waitForTransactionReceipt({ hash: fundHash });
-  assertSuccessfulReceipt(fundReceipt, "Fund escrow");
+  const fundHash = await callWithMemo({
+    walletClient,
+    target: marketplaceAddress,
+    calldata: fundCalldata,
+    memoPayload: {
+      event: "escrow_funded",
+      jobId,
+      clientId: account,
+      usdcAmount: budgetUsdc,
+      currency: "USDC",
+    },
+  });
 
-  return { txHash: fundHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${fundHash}`, jobId, mode: "live" };
+  return { txHash: fundHash, explorerUrl: arcScanUrl(fundHash), jobId, mode: "live" };
 }
 
 export async function acceptJob({
@@ -189,19 +199,30 @@ export async function submitDeliverable({
     return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, deliverableHash: hash, mode: "mock" };
   }
 
-  const { account, arcTestnet, publicClient } = await getLiveClients(walletClient);
+  const { encodeFunctionData } = await import("viem");
+  const { account } = await getLiveClients(walletClient);
+  const marketplaceAddress = getJobMarketplaceAddress();
   const deliverableBytes32 = toBytes32(submittedHash) ?? await hashToBytes32(submittedHash);
-  const txHash = await walletClient.writeContract({
-    address: getJobMarketplaceAddress(),
+
+  // Submit via Memo — anexa jobId, agentId e CID do deliverable para auditoria
+  const submitCalldata = encodeFunctionData({
     abi: agenticCommerceAbi,
     functionName: "submit",
     args: [BigInt(jobId), deliverableBytes32, "0x"],
-    account,
-    chain: arcTestnet,
   });
-  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
-  assertSuccessfulReceipt(receipt, "Submit deliverable");
-  return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, deliverableHash: submittedHash, mode: "live" };
+  const txHash = await callWithMemo({
+    walletClient,
+    target: marketplaceAddress,
+    calldata: submitCalldata,
+    memoPayload: {
+      event: "deliverable_submitted",
+      jobId,
+      agentId: account,
+      deliverableCID: submittedHash,
+    },
+  });
+
+  return { txHash, explorerUrl: arcScanUrl(txHash), jobId, deliverableHash: submittedHash, mode: "live" };
 }
 
 export async function approveAndPay({
@@ -214,19 +235,30 @@ export async function approveAndPay({
     return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "mock" };
   }
 
-  const { account, arcTestnet, publicClient } = await getLiveClients(walletClient);
+  const { encodeFunctionData } = await import("viem");
+  const { account } = await getLiveClients(walletClient);
+  const marketplaceAddress = getJobMarketplaceAddress();
   const reasonHash = toBytes32(reason) ?? await hashToBytes32(reason);
-  const txHash = await walletClient.writeContract({
-    address: getJobMarketplaceAddress(),
+
+  // Complete via Memo — anexa jobId, recipient e invoiceRef para reconciliação de pagamento
+  const completeCalldata = encodeFunctionData({
     abi: agenticCommerceAbi,
     functionName: "complete",
     args: [BigInt(jobId), reasonHash, "0x"],
-    account,
-    chain: arcTestnet,
   });
-  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
-  assertSuccessfulReceipt(receipt, "Complete job");
-  return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "live" };
+  const txHash = await callWithMemo({
+    walletClient,
+    target: marketplaceAddress,
+    calldata: completeCalldata,
+    memoPayload: {
+      event: "job_completed",
+      jobId,
+      payoutRecipient: account,
+      invoiceRef: `archv-${jobId}`,
+    },
+  });
+
+  return { txHash, explorerUrl: arcScanUrl(txHash), jobId, mode: "live" };
 }
 
 export async function refundEscrow({ jobId }: WalletAction & { jobId: string }) {

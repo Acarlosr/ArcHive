@@ -9,6 +9,8 @@ export const REPUTATION_REGISTRY: Address = "0x8004B663056A597Dffe9eCcC1965A193B
 export const VALIDATION_REGISTRY: Address = "0x8004Cb1BF31DAf7788923b405b754f57acEB4272";
 export const AGENTIC_COMMERCE: Address = "0x0747EEf0706327138c69792bF28Cd525089e4583";
 export const USDC_CONTRACT: Address = "0x3600000000000000000000000000000000000000";
+// Arc Transaction Memos — https://docs.arc.io/arc/concepts/transaction-memos
+export const MEMO_CONTRACT: Address = "0x5294E9927c3306DcBaDb03fe70b92e01cCede505";
 
 // ── ERC-8004 Identity Registry ABI ──
 export const identityRegistryAbi = [
@@ -180,6 +182,41 @@ export const transferEventAbi = [
       { indexed: true, name: "from", type: "address" },
       { indexed: true, name: "to", type: "address" },
       { indexed: true, name: "tokenId", type: "uint256" },
+    ],
+  },
+] as const;
+
+// ── Arc Memo Contract ABI ──
+export const memoAbi = [
+  {
+    name: "memo",
+    type: "function",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "target", type: "address" },
+      { name: "data", type: "bytes" },
+      { name: "memoId", type: "bytes32" },
+      { name: "memoData", type: "bytes" },
+    ],
+    outputs: [],
+  },
+  {
+    type: "event",
+    name: "BeforeMemo",
+    anonymous: false,
+    inputs: [{ indexed: true, name: "memoIndex", type: "uint256" }],
+  },
+  {
+    type: "event",
+    name: "Memo",
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: "sender", type: "address" },
+      { indexed: true, name: "target", type: "address" },
+      { name: "callDataHash", type: "bytes32" },
+      { indexed: true, name: "memoId", type: "bytes32" },
+      { name: "memo", type: "bytes" },
+      { name: "memoIndex", type: "uint256" },
     ],
   },
 ] as const;

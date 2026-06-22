@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n";
 
+export type AgentStatus = "live" | "dev";
+
 interface AgentCardProps {
   id?: string;
   name: string;
@@ -12,6 +14,7 @@ interface AgentCardProps {
   reputationScore: number;
   jobsCompleted: number;
   onchainId: string;
+  agentStatus?: AgentStatus;
   onClick?: () => void;
 }
 
@@ -31,10 +34,13 @@ export function AgentCard({
   reputationScore,
   jobsCompleted,
   onchainId,
+  agentStatus,
   onClick,
 }: AgentCardProps) {
   const { t } = useLanguage();
   const gradient = typeColors[agentType.toLowerCase()] ?? typeColors.default;
+  const isLive = agentStatus === "live";
+  const isDev = agentStatus === "dev";
 
   return (
     <div onClick={onClick} className="group relative overflow-hidden rounded-lg border border-arc-border bg-arc-card/85 p-5 transition-all hover:border-arc-cyan/40 hover:shadow-[0_0_32px_rgba(0,212,255,0.08)]">
@@ -43,8 +49,22 @@ export function AgentCard({
         <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${gradient} font-display text-lg font-bold text-arc-bg`}>
           {name.slice(0, 2).toUpperCase()}
         </div>
-        <div className="min-w-0">
-          <h3 className="truncate font-display text-lg font-semibold text-arc-text">{name}</h3>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <h3 className="truncate font-display text-lg font-semibold text-arc-text">{name}</h3>
+            {isLive && (
+              <span className="shrink-0 inline-flex items-center gap-1 rounded-full border border-arc-green/30 bg-arc-green/10 px-2 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-[0.12em] text-arc-green">
+                <span className="h-1.5 w-1.5 rounded-full bg-arc-green animate-pulse" />
+                Live
+              </span>
+            )}
+            {isDev && (
+              <span className="shrink-0 inline-flex items-center gap-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-2 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-[0.12em] text-yellow-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-yellow-400" />
+                In Dev
+              </span>
+            )}
+          </div>
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <span className="font-mono text-[11px] text-arc-dim">ERC-8004 #{onchainId}</span>
             <span className="rounded-full border border-arc-border bg-arc-surface px-2 py-0.5 text-[10px] font-mono uppercase tracking-[0.12em] text-arc-muted">
@@ -75,9 +95,15 @@ export function AgentCard({
         </div>
       </div>
 
-      <Link href={`/jobs/create?agent=${encodeURIComponent(name)}`} className="inline-flex w-full items-center justify-center rounded-lg border border-arc-cyan/30 bg-arc-cyan/10 px-4 py-2.5 text-sm font-semibold text-arc-cyan transition-colors hover:bg-arc-cyan hover:text-arc-bg">
-        {t("agentCard.hire")}
-      </Link>
+      {isDev ? (
+        <div className="inline-flex w-full items-center justify-center rounded-lg border border-yellow-500/20 bg-yellow-500/5 px-4 py-2.5 text-sm font-semibold text-yellow-500/60 cursor-not-allowed select-none">
+          Coming Soon
+        </div>
+      ) : (
+        <Link href={`/jobs/create?agent=${encodeURIComponent(name)}`} className="inline-flex w-full items-center justify-center rounded-lg border border-arc-cyan/30 bg-arc-cyan/10 px-4 py-2.5 text-sm font-semibold text-arc-cyan transition-colors hover:bg-arc-cyan hover:text-arc-bg">
+          {t("agentCard.hire")}
+        </Link>
+      )}
     </div>
   );
 }

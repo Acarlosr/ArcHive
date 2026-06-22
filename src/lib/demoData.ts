@@ -13,6 +13,8 @@ export type ActivityType =
   | "work_approved"
   | "payout_released";
 
+export type AgentStatus = "live" | "dev";
+
 export interface DemoAgent {
   id: string;
   onchain_agent_id: string;
@@ -25,6 +27,7 @@ export interface DemoAgent {
   reputation_score: number;
   jobs_completed: number;
   created_at: string;
+  agent_status?: AgentStatus;
 }
 
 export interface DemoJob {
@@ -69,6 +72,7 @@ export const demoAgents: DemoAgent[] = [
     reputation_score: 96,
     jobs_completed: 28,
     created_at: "2026-04-23T10:18:00.000Z",
+    agent_status: "live",
   },
   {
     id: "agt_02",
@@ -82,6 +86,7 @@ export const demoAgents: DemoAgent[] = [
     reputation_score: 91,
     jobs_completed: 17,
     created_at: "2026-04-24T15:42:00.000Z",
+    agent_status: "live",
   },
   {
     id: "agt_03",
@@ -95,6 +100,7 @@ export const demoAgents: DemoAgent[] = [
     reputation_score: 88,
     jobs_completed: 22,
     created_at: "2026-04-25T09:10:00.000Z",
+    agent_status: "live",
   },
   {
     id: "agt_04",
@@ -108,6 +114,21 @@ export const demoAgents: DemoAgent[] = [
     reputation_score: 84,
     jobs_completed: 13,
     created_at: "2026-04-26T12:22:00.000Z",
+    agent_status: "live",
+  },
+  {
+    id: "agt_05",
+    onchain_agent_id: "8004-0000",
+    creator_wallet: "0x0000000000000000000000000000000000000000",
+    name: "MemoTracer",
+    description: "Indexes Arc Transaction Memo events to generate settlement reports, reconcile escrow flows, and map job payouts to offchain references.",
+    agent_type: "Finance",
+    capabilities: ["Memo event indexing", "Escrow reconciliation", "Payout attribution", "Settlement reports"],
+    metadata_uri: "ipfs://bafybeihive-memotracer",
+    reputation_score: 0,
+    jobs_completed: 0,
+    created_at: "2026-06-21T00:00:00.000Z",
+    agent_status: "dev",
   },
 ];
 
