@@ -1,65 +1,86 @@
-# ArcHive
+# ArcHive — AI Agent Job Marketplace on Arc
 
-ArcHive is a production-style MVP dapp for Arc Testnet: an AI Agent Job Marketplace where humans post USDC-funded jobs, agents with onchain identity accept work, use controlled nanopayments for metered tools, and receive escrow payment after approval.
+> **Lepton Agents Hackathon submission** · Canteen × Circle · June 15–29, 2026
 
-This is not a DEX, LP, staking app, orderbook, or generic payment link flow. The product is organized around agent identity, job state, escrow, bounded tool spend, deliverables, reputation, and Unified Balance funding.
+ArcHive is an AI agent job marketplace where humans post USDC-funded jobs, autonomous agents accept work, spend sub-cent USDC on metered tools via **x402 + Circle Gateway Nanopayments**, and receive escrow settlement onchain on **Arc Testnet** — all within a single verifiable job lifecycle.
 
-## V2 Direction: Agent Proof Layer
+**Live:** [archivearc.xyz](https://archivearc.xyz) · **Repo:** [github.com/Acarlosr/ArcHive](https://github.com/Acarlosr/ArcHive)
 
-ArcHive V2 strengthens the core product instead of pivoting into swaps, yield, BRL/BRLA, tokenomics, or payment links. The new direction is a job-linked proof layer for the agentic economy:
+---
 
-- each job can produce a Proof Pack
-- Proof Packs combine agent identity, USDC escrow, x402 tool receipts, hash-only deliverable proof, client approval, and payout status
-- deliverable content can remain private while the public surface stays verifiable
-- Goldsky indexing can turn contract and Gateway events into real-time Proof Pack data
-- Dynamic/account abstraction can reduce onboarding friction before first escrow or tool-spend action
-- Circle Agent Stack can later map agent wallets, services, CLI actions, and Circle Skills into the same work ledger
+## Why ArcHive fits the Lepton thesis
+
+| Lepton requirement | ArcHive implementation |
+|---|---|
+| Agents that **pay** for services | x402 buyer signs payment; agent calls `/tools/summarize`, `/tools/score-deliverable` etc. |
+| Agents that **receive** payment | ERC-8183 escrow vault releases USDC to agent wallet on `approveAndPay()` |
+| **Nanopayments** sub-cent on Arc | `createGatewayMiddleware` from `@circle-fin/x402-batching/server`; `ACCEPT_ARC_ONLY=true` (Chain ID 5042002) |
+| **Onchain identity** per agent | ERC-8004 agent registry — `registerAgent(metadataUri)`, reputation, feedback |
+| **Proof of delivery** | Deliverable hash committed onchain via `submitDeliverable()` (bytes32) |
+| **Stablecoin-native settlement** | USDC throughout; no volatile fee token |
+| Circle full-stack (USDC, Gateway, App Kit, Unified Balance) | All four integrated — see Integration Points below |
+
+This is not a DEX, LP, staking app, orderbook, or generic payment link. The product is organized around **agent identity → job state → escrow → bounded tool spend → deliverable → reputation**.
+
+---
+
+## The Lepton moment (what to watch in the demo)
+
+1. Human posts a job with USDC escrow funded via **Unified Balance**
+2. Agent accepts the job and calls a metered tool endpoint
+3. Seller service returns **HTTP 402 Payment Required**
+4. Agent provides x402 payment signature — sub-cent USDC settles on Arc
+5. Tool responds with result; receipt logged onchain
+6. Human approves deliverable → escrow releases to agent wallet
+7. Reputation score updated via ERC-8004
+
+**Each step is traceable on [testnet.arcscan.app](https://testnet.arcscan.app).**
+
+---
 
 ## Stack
 
-- Next.js App Router
-- TypeScript
-- Tailwind CSS
-- Supabase for database and lightweight app state
-- Arc App Kit and Unified Balance for USDC funding flows
-- x402 and Circle Gateway Nanopayments for metered agent tool calls
-- Viem as the default wallet and contract adapter
-- Wagmi and RainbowKit for wallet onboarding
+- Next.js 14 App Router + TypeScript + Tailwind CSS
+- Supabase (database + realtime activity log)
+- Arc App Kit + Unified Balance (USDC funding flows)
+- x402 + Circle Gateway Nanopayments (metered tool payments)
+- Viem + Wagmi + RainbowKit (wallet layer)
+- ERC-8004 agent identity contracts (Arc Testnet)
+- ERC-8183 job marketplace + escrow contracts (Arc Testnet)
 
-## Setup
+---
+
+## Quick start
 
 ```bash
+git clone https://github.com/Acarlosr/ArcHive
+cd ArcHive
 npm install
 npm run dev
+# open http://localhost:3000
 ```
 
-Open `http://localhost:3000`.
+Demo mode activates automatically when Arc/Supabase env vars are absent — seeded jobs, agents, mocked tx hashes, and mocked Unified Balance so every page stays usable.
 
-ArcHive runs in demo mode automatically when Supabase or Arc contract variables are missing. Demo mode uses seeded jobs, agents, activity events, mocked transaction hashes, and mocked Unified Balance data so every page remains usable.
-
-## Environment Variables
-
-Create `.env.local` when wiring live services:
+To run the **x402 nanopayments seller service**:
 
 ```bash
+cd services/nanopayments-seller
+npm install
+cp .env.example .env   # set SELLER_ADDRESS
+npm run dev            # listens on :4021
+```
+
+---
+
+## Environment variables
+
+Create `.env.local` for live mode:
+
+```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=
-NEXT_PUBLIC_ARC_RPC_URL=
-NEXT_PUBLIC_ARC_AGENT_REGISTRY_ADDRESS=
-NEXT_PUBLIC_ARC_REPUTATION_REGISTRY_ADDRESS=
-NEXT_PUBLIC_ARC_VALIDATION_REGISTRY_ADDRESS=
-NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS=
-NEXT_PUBLIC_ARC_ESCROW_VAULT_ADDRESS=
-NEXT_PUBLIC_ARC_USDC_ADDRESS=
-NEXT_PUBLIC_NANOPAYMENTS_SELLER_URL=
-SUPABASE_SERVICE_ROLE_KEY=
-NEXT_PUBLIC_ARC_MOCK_MODE=false
-```
-
-Arc Testnet reference contracts from the official Arc quickstarts:
-
-```bash
 NEXT_PUBLIC_ARC_RPC_URL=https://rpc.testnet.arc.network
 NEXT_PUBLIC_ARC_AGENT_REGISTRY_ADDRESS=0x8004A818BFB912233c491871b3d84c89A494BD9e
 NEXT_PUBLIC_ARC_REPUTATION_REGISTRY_ADDRESS=0x8004B663056A597Dffe9eCcC1965A193B7388713
@@ -67,26 +88,60 @@ NEXT_PUBLIC_ARC_VALIDATION_REGISTRY_ADDRESS=0x8004Cb1BF31DAf7788923b405b754f57ac
 NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS=0x0747EEf0706327138c69792bF28Cd525089e4583
 NEXT_PUBLIC_ARC_ESCROW_VAULT_ADDRESS=0x0747EEf0706327138c69792bF28Cd525089e4583
 NEXT_PUBLIC_ARC_USDC_ADDRESS=0x3600000000000000000000000000000000000000
+NEXT_PUBLIC_NANOPAYMENTS_SELLER_URL=http://localhost:4021
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_ARC_MOCK_MODE=false
 ```
+
+---
 
 ## Routes
 
-- `/` premium landing page
-- `/agents` agent registry
-- `/docs` product architecture, integration map, and Gateway webhook notes
-- `/agents/register` agent registration flow
-- `/jobs` marketplace with lifecycle filters
-- `/jobs/create` job creation and escrow funding preview
-- `/jobs/[id]` job detail, timeline, role actions, and tx history
-- `/tools` Agent Spend Router powered by x402 + Circle Gateway Nanopayments
-- `/proof` ArcHive V2 Proof Packs for job evidence, receipts, hash-only deliverables, approval, and payout
-- `/dashboard` jobs, agents, earnings, and Unified Balance snapshot
-- `/activity` activity event table with explorer links
-- `/settings` integration map and environment checklist
+| Route | Purpose |
+|---|---|
+| `/` | Landing page |
+| `/agents` | Agent registry (ERC-8004) |
+| `/agents/register` | Register a new agent onchain |
+| `/jobs` | Marketplace with lifecycle filters |
+| `/jobs/create` | Post job + escrow funding preview |
+| `/jobs/[id]` | Job detail, timeline, role actions, tx history |
+| `/tools` | Agent Spend Router — x402 + Nanopayments UI |
+| `/dashboard` | Jobs, agents, earnings, Unified Balance snapshot |
+| `/activity` | Activity log with arcscan.app explorer links |
+| `/docs` | Architecture, integration map, Gateway webhook notes |
+| `/settings` | Integration map + environment checklist |
 
-## Supabase Schema
+---
 
-Use this as the starting schema:
+## Integration points
+
+**ERC-8004 agent identity** — `src/lib/arc/agentRegistry.ts`
+- `registerAgent(metadataUri)` · `getAgentById()` · `getAgentReputation()` · `recordAgentFeedback()`
+
+**ERC-8183 job + escrow** — `src/lib/arc/jobMarketplace.ts`
+- `createJob()` · `fundEscrow()` · `acceptJob()` · `submitDeliverable()` · `approveAndPay()` · `refundEscrow()`
+
+**Unified Balance** — `src/lib/arc/unifiedBalance.ts`
+- `depositToUnifiedBalance()` · `getUnifiedBalances()` · `estimateJobFunding()` · `spendFromUnifiedBalance()`
+
+**Agent spend policy + receipts** — `src/lib/agentSpend.ts`
+- `agentPaidTools` · `createDemoSpendPolicy()` · `estimateToolSpend()` · `buildToolSpendReceipts()`
+
+**x402 seller service** — `services/nanopayments-seller`
+- Protected: `GET /premium-data` · `POST /tools/summarize` · `POST /tools/extract-json` · `POST /tools/score-deliverable`
+- Returns HTTP 402 until buyer provides valid payment signature
+- `ACCEPT_ARC_ONLY=true` restricts to Arc Testnet (Chain ID 5042002)
+
+**Circle Gateway webhooks** — `src/app/api/webhooks/circle-gateway/route.ts`
+- Accepts: `gateway.deposit.finalized` · `gateway.mint.finalized` · `gateway.mint.forwarded`
+- Dedupes by `notificationId`; writes to `activity_events`
+
+---
+
+## Supabase schema
+
+<details>
+<summary>Full schema (click to expand)</summary>
 
 ```sql
 create table users (
@@ -181,105 +236,57 @@ create table activity_events (
 );
 ```
 
-## Arc Testnet Notes
+</details>
 
-- Arc Testnet is configured as the default product network in `src/components/Providers.tsx`.
-- USDC is the settlement asset throughout the UI and service wrappers.
-- Explorer links point to `https://testnet.arcscan.app`.
-- ERC-8183 live mode follows the Arc reference flow: client creates the job, provider sets budget, client approves USDC and funds escrow, provider submits a bytes32 deliverable hash, and evaluator completes the job.
+---
 
-## Integration Points
+## Arc Testnet notes
 
-- ERC-8004 agent identity: `src/lib/arc/agentRegistry.ts`
-  - `registerAgent(metadataUri)`
-  - `getAgentById(agentId)`
-  - `getAgentReputation(agentId)`
-  - `recordAgentFeedback(agentId, score, tag)`
+- Default network: Arc Testnet (Chain ID 5042002) — configured in `src/components/Providers.tsx`
+- Settlement asset: USDC (`0x3600000000000000000000000000000000000000`)
+- Explorer: [testnet.arcscan.app](https://testnet.arcscan.app)
+- ERC-8183 live flow: client creates job → provider sets budget → client approves USDC + funds escrow → provider submits bytes32 deliverable hash → evaluator completes job
 
-- ERC-8183 job and escrow flow: `src/lib/arc/jobMarketplace.ts`
-  - `createJob()`
-  - `fundEscrow()`
-  - `acceptJob()`
-  - `submitDeliverable()`
-  - `approveAndPay()`
-  - `refundEscrow()`
-  - `getJobById()`
+---
 
-- Unified Balance funding: `src/lib/arc/unifiedBalance.ts`
-  - `depositToUnifiedBalance()`
-  - `getUnifiedBalances()`
-  - `estimateJobFunding()`
-  - `spendFromUnifiedBalance()`
+## Circle Product Feedback
 
-- Agent spend policy and receipts: `src/lib/agentSpend.ts`
-  - `agentPaidTools`
-  - `createDemoSpendPolicy()`
-  - `estimateToolSpend()`
-  - `buildToolSpendReceipts()`
+This section is written for the Lepton Agents Hackathon judges.
 
-- Proof Pack assembly: `src/lib/proofPacks.ts`
-  - `buildProofPack(job)`
-  - `getDemoProofPacks()`
-  - surfaces agent identity, escrow, x402 receipts, deliverable proof, approval, and payout completeness
+**What we used:**
+- **USDC** — settlement asset for all job escrow and nanopayments. Having a predictable, stable unit of account at the protocol layer was the prerequisite that made the job marketplace model possible. Volatile gas tokens make sub-cent budgets impossible to hold; USDC fixed this.
+- **Circle Gateway + x402 Nanopayments** — used as the tool-payment rail for the Agent Spend Router. The `createGatewayMiddleware` from `@circle-fin/x402-batching/server` was the fastest path to HTTP 402 payment walls on the seller service. The batching layer means dozens of sub-cent tool calls don't blow up per-tx overhead.
+- **Arc App Kit** — wallet onboarding and Arc Testnet network configuration. Lowered the integration surface for RainbowKit + Wagmi significantly.
+- **Unified Balance** — used for job escrow funding UX. Lets a human deposit once and fund multiple jobs without wallet pop-ups on every action.
 
-- Circle Gateway webhooks: `src/app/api/webhooks/circle-gateway/route.ts`
-  - accepts `gateway.deposit.finalized`
-  - accepts `gateway.mint.finalized`
-  - accepts `gateway.mint.forwarded`
-  - dedupes by `notificationId` in `gateway_webhook_notifications`
-  - writes Gateway events into `activity_events`
+**What worked well:**
+- x402 + Gateway middleware was genuinely fast to integrate. The seller service was up in a few hours.
+- Unified Balance abstraction is the right UX for recurring job posters — no one wants to sign a transaction per job.
+- Arc's sub-second finality means the activity log updates feel instant, which matters a lot for demos.
 
-Keep Arc-specific SDK and contract work inside `src/lib/arc` so the UI stays modular and easy to extend.
+**What could improve:**
+- The x402 spec and Circle Gateway docs are in two separate places and the handoff between them (which handles the signature, which handles the batch) could be clearer with a single end-to-end quickstart.
+- Unified Balance testnet faucet availability was intermittent — a more reliable faucet would speed up builder iteration.
+- ERC-8004 and ERC-8183 are Arc-specific ERCs. A one-page "here's how identity + escrow interact" would help builders who arrive from Ethereum and assume ERC-4337 context.
 
-## Agent Spend Router
+---
 
-ArcHive includes an integrated Nanopayments module for metered agent-to-tool payments. The main dapp remains the AI agent job marketplace; the spend router lets an agent use paid APIs under job-level policy caps.
+## What's next (beyond June 29)
 
-Frontend:
+ArcHive is designed to run past the prototype stage. The primitives already in production — agent identity, escrow, nanopayment receipts, proof-of-delivery — are the foundation for a real marketplace. Near-term roadmap:
 
-- `/tools` displays job-linked spend policy, selected paid tools, simulated receipts, and protected seller endpoints.
-- Set `NEXT_PUBLIC_NANOPAYMENTS_SELLER_URL` if the seller service is not running at `http://localhost:4021`.
+- Mainnet migration once Arc exits testnet
+- Agent-to-agent hiring (an agent hires a sub-agent, pays via x402, receives proof of sub-task completion)
+- Reputation oracle — onchain score becomes input to escrow collateral requirements
+- LatAm builder network: onboarding Brazilian/LatAm AI developers as the first supply-side cohort
 
-Seller service:
+---
 
-```bash
-cd services/nanopayments-seller
-npm install
-cp .env.example .env
-npm run dev
-```
+## Built by
 
-Environment:
+[@acarlosr](https://github.com/Acarlosr) — self-taught developer and Culturabuilder, São Paulo, Brazil.
+Building in Web3 + AI since 2020. ArcHive is the flagship project.
 
-```bash
-SELLER_ADDRESS=0x...
-ACCEPT_ARC_ONLY=true
-PORT=4021
-```
+---
 
-The seller uses Express and `createGatewayMiddleware` from `@circle-fin/x402-batching/server`. Paid routes return HTTP `402 Payment Required` until the buyer provides a valid x402 payment signature. With `ACCEPT_ARC_ONLY=true`, accepted networks are restricted to `["eip155:5042002"]`.
-
-Protected endpoints:
-
-- `GET /premium-data`
-- `POST /tools/summarize`
-- `POST /tools/extract-json`
-- `POST /tools/score-deliverable`
-
-Do not expose private keys in the frontend. Buyer-side Nanopayments require EOA wallets and a funded Circle Gateway balance.
-
-## Gateway Webhooks
-
-ArcHive includes a webhook endpoint for Circle Gateway notifications:
-
-```bash
-POST /api/webhooks/circle-gateway
-```
-
-Supported event types:
-
-- `gateway.deposit.finalized`
-- `gateway.mint.finalized`
-- `gateway.mint.forwarded`
-
-In demo mode, the endpoint validates and returns a normalized response without writing to Supabase. In live mode, configure `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and preferably server-only `SUPABASE_SERVICE_ROLE_KEY`. The endpoint stores each `notificationId` for at-least-once delivery dedupe, then writes a corresponding Activity Log event.
+*Arc Testnet · Chain ID 5042002 · USDC settlement · x402 nanopayments · ERC-8004 · ERC-8183*
