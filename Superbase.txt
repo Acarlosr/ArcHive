@@ -1,0 +1,80 @@
+ArcHive Superbase
+
+
+Create a new project
+Your project will have its own dedicated instance and full Postgres database. An API will be set up so you can easily interact with your new database.
+
+Organization
+
+ArcHive
+Free
+
+ArcHiveFree
+Project name
+senacarlos@gmail.com's Project
+Database password
+ZZKj9VYsqLXPjPqM
+This password is strong. Generate a password.
+
+Region
+
+region icon
+Americas
+
+AmericasRecommended
+Select the region closest to your users for the best performance.
+
+Security
+
+Enable Data API
+Autogenerate a RESTful API for your public schema. Recommended if using a client library like supabase-js.
+
+Automatically expose new tables
+Grants privileges to Data API roles by default, exposing new tables.
+We recommend disabling this to control access manually.
+
+Enable automatic RLS
+Create an event trigger that automatically enables Row Level Security on all new tables in the public schema.
+
+_____________________________________________________________________________________
+API Keys
+Configure API keys to securely control access to your project
+
+Docs
+Publishable and secret API keys
+Legacy anon, service_role API keys
+Your new API keys are here
+
+We've updated our API keys to better support your application needs. Join the discussion on GitHub
+
+Having trouble with the new API keys? Contact support
+
+
+Publishable key
+This key is safe to use in a browser if you have enabled Row Level Security (RLS) for your tables and configured policies.
+
+
+New publishable key
+Name	API Key	
+default
+No description
+sb_publishable_yqwAbuegULJGdDBieQ92IQ_lGfmz-1Z
+
+
+Publishable keys can be safely shared publicly
+
+Secret keys
+These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application.
+
+
+New secret key
+Name	API Key	
+default
+No description
+sb_secret_h6Mhy
+sb_secret_h6MhyQP8uJ49QkPstZL5cA_Boy_0A6w
+
+Project URL completo é:
+https://ibhrrxqjxojzfrprinbq.supabase.co
+anon public: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliaHJyeHFqeG9qemZycHJpbmJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTYxNTksImV4cCI6MjA5MzQ5MjE1OX0.zYS-aSRliYbaLH0uPTKOErJDHt0nZl428oq10cE1vJE
+

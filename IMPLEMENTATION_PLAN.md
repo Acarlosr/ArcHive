@@ -33,7 +33,20 @@
 - fund escrow
 - submit deliverable hash
 - approve and pay
-- refund path
+- refund path (mock — contrato Arc não expõe refund público nesta implementação)
+
+### Máquina de estados do job (ERC-8183 Arc Testnet)
+```
+        createJob()       setBudget()+fund()     submit(hash)      complete()
+[vazio] ──────────► Open ──────────────► Funded ──────────► Submitted ──────────► Completed
+                      │                                                                 │
+                      │ expiredAt ultrapassado                              Proof Pack ◄┘
+                      ▼
+                   Expired  (gerenciado internamente — sem função pública de timeout)
+                   Rejected (avaliador rejeita)
+```
+Cada transição emite evento on-chain → alimenta Activity Log e Proof Pack automaticamente.
+Status nomes oficiais: Open, Funded, Submitted, Completed, Rejected, Expired.
 
 ## Fase 6 — Dashboard e activity
 - my jobs
@@ -56,6 +69,11 @@
 - preparar shape para indexação Goldsky
 - manter onboarding futuro com Dynamic/account abstraction sem transformar o produto em payment link
 - alinhar narrativa com Circle Agent Stack sem criar DEX, yield ou token próprio
+
+## Pós-Testnet (fora do MVP)
+- Indexação avançada com Goldsky subgraphs
+- Session keys / account abstraction para reduzir fricção de assinatura em fluxos recorrentes
+- Implementar path de `Rejected` na UI (avaliador rejeita entrega)
 
 ## Critério de demo pronto
 A demo precisa mostrar sem explicação longa:

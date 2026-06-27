@@ -76,9 +76,13 @@ Organizar em:
 - `fundEscrow()`
 - `acceptJob()`
 - `submitDeliverable()`
-- `approveAndPay()`
-- `refundEscrow()`
+- `approveAndPay()` — chama `complete()` on-chain
+- `refundEscrow()` — mock apenas; contrato ERC-8183 da Arc não expõe refund público
 - `getJobById()`
+
+## Estados do job (ERC-8183 Arc Testnet)
+Open → Funded → Submitted → Completed | Rejected | Expired
+O status `Expired` é gerenciado internamente pelo contrato via campo `expiredAt`. Não há função pública de timeout — nenhum `claimAfterTimeout` existe nesta implementação de referência.
 
 ## Rotas esperadas
 - `/`
