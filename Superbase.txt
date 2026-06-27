@@ -13,7 +13,7 @@ ArcHiveFree
 Project name
 senacarlos@gmail.com's Project
 Database password
-ZZKj9VYsqLXPjPqM
+[REMOVED - Use environment variables]
 This password is strong. Generate a password.
 
 Region
@@ -68,13 +68,13 @@ These API keys allow privileged access to your project's APIs. Use in servers, f
 
 
 New secret key
-Name	API Key	
+Name	API Key
 default
 No description
-sb_secret_h6Mhy
-sb_secret_h6MhyQP8uJ49QkPstZL5cA_Boy_0A6w
+[REMOVED - Store in .env.local or GitHub Secrets]
+[REMOVED - Store in .env.local or GitHub Secrets]
 
 Project URL completo é:
 https://ibhrrxqjxojzfrprinbq.supabase.co
-anon public: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliaHJyeHFqeG9qemZycHJpbmJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTYxNTksImV4cCI6MjA5MzQ5MjE1OX0.zYS-aSRliYbaLH0uPTKOErJDHt0nZl428oq10cE1vJE
+anon public: [REMOVED - Store in .env.local]
 
