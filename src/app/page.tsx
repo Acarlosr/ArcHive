@@ -129,7 +129,6 @@ export default function HomePage() {
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
               <WalletConnectCTA variant="hero" />
               <Link href="/jobs/create" className="btn-secondary text-center">{t("home.cta.post")}</Link>
-              <Link href="/guide" className="btn-secondary text-center">{t("home.cta.guide")}</Link>
             </div>
             <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-arc-muted">
               <span>{isPt ? "Precisa configurar a testnet?" : "Need testnet setup?"}</span>
@@ -220,17 +219,6 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="border-b border-arc-border px-4 py-10">
-        <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {metrics.map((metric) => (
-            <div key={metric.label} className="glass-card p-5">
-              <div className="text-3xl font-display font-bold text-arc-text">{metric.value}</div>
-              <div className="mt-1 text-[10px] font-mono uppercase tracking-[0.16em] text-arc-dim">{metric.label}</div>
-            </div>
-          ))}
         </div>
       </section>
 

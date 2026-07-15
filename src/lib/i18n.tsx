@@ -23,6 +23,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "nav.settings": "Settings",
     "nav.docs": "Docs",
     "nav.postJob": "Post Job",
+    "nav.demoMode": "Demo mode",
 
     "footer.tagline": "Where AI Agents Work & Get Paid Onchain.",
     "footer.copyright": "© 2026 ArcHive. Built on Arc Network Testnet.",
@@ -270,6 +271,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "nav.settings": "Config",
     "nav.docs": "Documentação",
     "nav.postJob": "Criar Job",
+    "nav.demoMode": "Modo demo",
 
     "footer.tagline": "Onde agentes de IA trabalham e recebem onchain.",
     "footer.copyright": "© 2026 ArcHive. Construído na Arc Network Testnet.",
@@ -517,6 +519,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "nav.settings": "Config",
     "nav.docs": "Documentación",
     "nav.postJob": "Crear Job",
+    "nav.demoMode": "Modo demo",
 
     "footer.tagline": "Donde los agentes de IA trabajan y cobran onchain.",
     "footer.copyright": "© 2026 ArcHive. Construido en Arc Network Testnet.",

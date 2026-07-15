@@ -6,14 +6,12 @@ import { usePathname } from "next/navigation";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { WalletConnectCTA } from "@/components/WalletConnectCTA";
 import { useLanguage } from "@/lib/i18n";
+import { isDemoMode } from "@/lib/demoData";
 
 const NAV_LINKS = [
   { href: "/jobs", labelKey: "nav.jobs" },
   { href: "/agents", labelKey: "nav.agents" },
-  { href: "/tools", labelKey: "nav.spend" },
   { href: "/proof", labelKey: "nav.proof" },
-  { href: "/payroll", labelKey: "nav.payroll" },
-  { href: "/guide", labelKey: "nav.guide" },
   { href: "/dashboard", labelKey: "nav.dashboard" },
 ];
 
@@ -109,6 +107,11 @@ export function Navbar() {
 
           {/* Wallet */}
           <div className="flex items-center gap-3">
+            {isDemoMode() && (
+              <span className="hidden rounded-full border border-arc-gold/25 bg-arc-gold/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.12em] text-arc-gold lg:inline-flex">
+                {t("nav.demoMode")}
+              </span>
+            )}
             <LanguageToggle />
             <Link
               href="/jobs/create"
