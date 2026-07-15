@@ -11,7 +11,8 @@ import { JobTimeline } from "@/components/JobTimeline";
 import { StatusChip } from "@/components/StatusChip";
 import { WalletOnboardingModal } from "@/components/WalletOnboardingModal";
 import { getJobById, updateJobStatus, type Job } from "@/lib/db/jobs";
-import { acceptJob, approveAndPay, fundEscrow, refundEscrow, submitDeliverable } from "@/lib/arc/jobMarketplace";
+import { acceptJob, approveAndPay, autoReleaseEscrow, fundEscrow, refundEscrow, submitDeliverable } from "@/lib/arc/jobMarketplace";
+import { formatCountdown, getTimelockState } from "@/lib/arc/timelock";
 import { formatWallet } from "@/lib/demoData";
 import { WalletProviderIsland } from "@/components/WalletProviderIsland";
 import { useLanguage } from "@/lib/i18n";
@@ -37,14 +38,23 @@ function JobDetailContent() {
   const [actionState, setActionState] = useState<ActionState>("idle");
   const [error, setError] = useState("");
   const [deliverableProof, setDeliverableProof] = useState("ipfs://bafybeihive-deliverable");
+  const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
     getJobById(params.id as string).then(setJob).finally(() => setLoading(false));
   }, [params.id]);
 
+  // Tick the clock once a minute so the approval countdown stays live.
+  useEffect(() => {
+    if (job?.status !== "submitted") return;
+    const timer = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(timer);
+  }, [job?.status]);
+
   const currentWallet = address?.toLowerCase();
   const isClient = Boolean(job && currentWallet === job.client_wallet.toLowerCase());
   const isProvider = Boolean(job && currentWallet === job.provider_wallet.toLowerCase());
+  const timelock = getTimelockState(job?.submitted_at, now);
 
   async function runAction(action: () => Promise<any>, nextStatus: Job["status"], extras?: Partial<Job>) {
     if (!job) return;
@@ -147,14 +157,45 @@ function JobDetailContent() {
                           ? "Adicione um recibo de entrega, link de arquivo, URI IPFS ou referência técnica que prove o que foi entregue. O ArcHive salva isso como registro de prova do job."
                           : "Add a delivery receipt, file link, IPFS URI, or technical reference that proves what was delivered. ArcHive stores it as the job proof record."}
                       </p>
-                      <button className="btn-primary w-full" disabled={actionState === "processing" || !deliverableProof.trim()} onClick={() => runAction(() => submitDeliverable({ walletClient, jobId: job.onchain_id ?? job.id, deliverableHash: deliverableProof }), "submitted", { deliverable_hash: deliverableProof })}>
+                      <button className="btn-primary w-full" disabled={actionState === "processing" || !deliverableProof.trim()} onClick={() => runAction(() => submitDeliverable({ walletClient, jobId: job.onchain_id ?? job.id, deliverableHash: deliverableProof }), "submitted", { deliverable_hash: deliverableProof, submitted_at: new Date().toISOString() })}>
                         {isPt ? "Enviar prova de entrega" : "Submit proof of delivery"}
                       </button>
+                    </div>
+                  )}
+                  {job.status === "submitted" && timelock.hasSubmission && (
+                    <div className={`rounded-lg border p-4 text-sm leading-6 ${timelock.eligibleForAutoRelease ? "border-arc-green/30 bg-arc-green/10" : "border-arc-cyan/25 bg-arc-cyan/5"}`}>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-[10px] font-mono uppercase tracking-[0.16em] text-arc-dim">
+                          {isPt ? "Timelock de aprovação" : "Approval timelock"}
+                        </span>
+                        <span className={`font-mono text-sm font-semibold ${timelock.eligibleForAutoRelease ? "text-arc-green" : "text-arc-cyan"}`}>
+                          {timelock.eligibleForAutoRelease ? (isPt ? "prazo encerrado" : "window closed") : formatCountdown(timelock.msRemaining, isPt)}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-arc-muted">
+                        {timelock.eligibleForAutoRelease
+                          ? isPt
+                            ? "A janela de revisão terminou sem ação do cliente. O pagamento está elegível para liberação automática ao prestador."
+                            : "The review window closed with no client action. The payout is eligible for auto-release to the provider."
+                          : isPt
+                            ? `O cliente tem até ${timelock.autoReleaseAt?.toLocaleString()} (janela de ${timelock.windowHours}h) para aprovar ou reembolsar. Sem ação, o pagamento libera automaticamente ao prestador.`
+                            : `The client has until ${timelock.autoReleaseAt?.toLocaleString()} (${timelock.windowHours}h window) to approve or refund. With no action, the payout auto-releases to the provider.`}
+                      </p>
                     </div>
                   )}
                   {isClient && job.status === "submitted" && (
                     <button className="btn-primary w-full" disabled={actionState === "processing"} onClick={() => runAction(() => approveAndPay({ walletClient, jobId: job.onchain_id ?? job.id }), "completed")}>
                       {isPt ? "Aprovar trabalho e liberar pagamento" : "Approve work and release payment"}
+                    </button>
+                  )}
+                  {isClient && job.status === "submitted" && !timelock.eligibleForAutoRelease && (
+                    <button className="btn-secondary w-full" disabled={actionState === "processing"} onClick={() => runAction(() => refundEscrow({ walletClient, jobId: job.onchain_id ?? job.id, reason: "client-dispute" }), "refunded")}>
+                      {isPt ? "Contestar e solicitar reembolso" : "Dispute and request refund"}
+                    </button>
+                  )}
+                  {isProvider && job.status === "submitted" && timelock.eligibleForAutoRelease && (
+                    <button className="btn-primary w-full" disabled={actionState === "processing"} onClick={() => runAction(() => autoReleaseEscrow({ walletClient, jobId: job.onchain_id ?? job.id }), "completed")}>
+                      {isPt ? "Reivindicar liberação automática" : "Claim auto-release payout"}
                     </button>
                   )}
                   {isClient && ["expired", "open"].includes(job.status) && (

@@ -46,6 +46,8 @@ export interface DemoJob {
   tx_hash: string | null;
   expires_at: string;
   created_at: string;
+  /** When the provider submitted the deliverable; drives the approval timelock. */
+  submitted_at?: string | null;
 }
 
 export interface DemoActivityEvent {

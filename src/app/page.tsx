@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { HeroWalletOnboarding } from "@/components/HeroWalletOnboarding";
 import { WalletConnectCTA } from "@/components/WalletConnectCTA";
@@ -40,14 +41,54 @@ export default function HomePage() {
     { label: t("home.metrics.agents"), value: demoAgents.length.toString() },
     { label: t("home.metrics.receipts"), value: toolReceipts.length.toString() },
   ];
-  const routeSteps = [
-    { number: 0, label: t("home.route.open"), detail: t("home.route.openDetail") },
-    { number: 1, label: t("home.route.accepted"), detail: t("home.route.acceptedDetail") },
-    { number: 2, label: t("home.route.funded"), detail: t("home.route.fundedDetail") },
-    { number: 3, label: t("home.route.spend"), detail: t("home.route.spendDetail") },
-    { number: 4, label: t("home.route.submitted"), detail: t("home.route.submittedDetail") },
-    { number: 5, label: t("home.route.approved"), detail: t("home.route.approvedDetail") },
-    { number: 6, label: t("home.route.completed"), detail: t("home.route.completedDetail") },
+  const storySteps = [
+    {
+      tag: t("home.story.post.tag"),
+      title: t("home.story.post.title"),
+      caption: t("home.story.post.caption"),
+      ring: "border-arc-rose/45 bg-arc-rose/15 text-arc-rose",
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+          <path d="M14 3H6v18h12V7z" />
+          <path d="M14 3v4h4M12 12v5M9.5 14.5h5" />
+        </svg>
+      ),
+    },
+    {
+      tag: t("home.story.work.tag"),
+      title: t("home.story.work.title"),
+      caption: t("home.story.work.caption"),
+      ring: "border-arc-purple/45 bg-arc-purple/15 text-arc-purple",
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+          <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z" />
+        </svg>
+      ),
+    },
+    {
+      tag: t("home.story.escrow.tag"),
+      title: t("home.story.escrow.title"),
+      caption: t("home.story.escrow.caption"),
+      ring: "border-arc-gold/45 bg-arc-gold/15 text-arc-gold",
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+          <rect x="5" y="11" width="14" height="9" rx="2" />
+          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        </svg>
+      ),
+    },
+    {
+      tag: t("home.story.pay.tag"),
+      title: t("home.story.pay.title"),
+      caption: t("home.story.pay.caption"),
+      ring: "border-arc-green/45 bg-arc-green/15 text-arc-green",
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+          <circle cx="12" cy="12" r="9" />
+          <path d="m8 12 3 3 5-6" />
+        </svg>
+      ),
+    },
   ];
   const supportedAgentWork = [
     {
@@ -150,43 +191,35 @@ export default function HomePage() {
               <div className="rounded-full border border-arc-gold/30 bg-arc-gold/10 px-3 py-1 text-xs font-mono text-arc-gold">2,400 USDC</div>
             </div>
 
-            <div className="relative z-10 mt-6 h-[360px] overflow-hidden rounded-lg border border-arc-border/80 bg-[#060b0a]/70">
-              <div className="escrow-core absolute left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full border border-arc-gold/45 bg-[radial-gradient(circle,rgba(216,185,106,0.42),rgba(216,185,106,0.12)_45%,rgba(16,28,26,0.86)_72%)] shadow-[0_0_60px_rgba(216,185,106,0.26)]" />
-              <div className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-arc-cyan/25 bg-arc-bg/80 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-arc-cyan">
-                {isPt ? "Escrow" : "Escrow"}
+            <div className="relative z-10 mt-6 rounded-lg border border-arc-border/80 bg-[#060b0a]/70 p-5">
+              <div className="label-field mb-4">{t("home.story.label")}</div>
+              <div>
+                {storySteps.map((step, index) => (
+                  <div key={step.title} className="relative flex gap-4">
+                    <div className="flex flex-col items-center">
+                      <div
+                        className={`agent-node-pulse flex h-11 w-11 shrink-0 items-center justify-center rounded-full border ${step.ring}`}
+                        style={{ "--node-delay": `${index * 0.7}s` } as CSSProperties}
+                      >
+                        {step.icon}
+                      </div>
+                      {index < storySteps.length - 1 && (
+                        <div className="relative my-1.5 h-8 w-px bg-gradient-to-b from-arc-border to-arc-border/25">
+                          <span
+                            className="route-spark left-1/2 top-1"
+                            style={{ "--spark-delay": `${index * 0.5}s` } as CSSProperties}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div className="pb-5">
+                      <div className="text-[10px] font-mono uppercase tracking-[0.14em] text-arc-dim">{step.tag}</div>
+                      <div className="mt-0.5 font-display text-base font-semibold text-arc-text">{step.title}</div>
+                      <div className="mt-0.5 text-sm leading-6 text-arc-muted">{step.caption}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              <div className="agent-link left-[49%] top-[50%] w-[31%] rotate-[-28deg]" />
-              <div className="agent-link left-[49%] top-[50%] w-[28%] rotate-[22deg]" />
-              <div className="agent-link left-[49%] top-[50%] w-[27%] rotate-[88deg]" />
-              <div className="agent-link left-[22%] top-[34%] w-[29%] rotate-[25deg]" />
-              <div className="agent-link left-[18%] top-[66%] w-[34%] rotate-[-22deg]" />
-              <div className="agent-link left-[49%] top-[50%] w-[32%] rotate-[156deg]" />
-
-              <div className="agent-node agent-node-pulse left-[8%] top-[18%] h-12 w-12 border-arc-purple/40 bg-arc-purple/18 text-arc-purple [--node-delay:0.6s]">AI</div>
-              <div className="agent-node agent-node-pulse left-[20%] top-[56%] h-14 w-14 border-arc-rose/45 bg-arc-rose/16 text-arc-rose [--node-delay:0s]">{isPt ? "Job" : "Job"}</div>
-              <div className="agent-node agent-node-pulse right-[12%] top-[19%] h-16 w-16 border-arc-gold/45 bg-arc-gold/14 text-arc-gold [--node-delay:1.2s]">USDC</div>
-              <div className="agent-node agent-node-pulse right-[9%] top-[58%] h-14 w-14 border-arc-cyan/45 bg-arc-cyan/14 text-arc-cyan [--node-delay:5.8s]">{isPt ? "Pagar" : "Pay"}</div>
-              <div className="agent-node agent-node-pulse bottom-[8%] left-[44%] h-14 w-14 border-arc-green/45 bg-arc-green/14 text-arc-green [--node-delay:4.7s]">OK</div>
-              <div className="agent-node agent-node-pulse left-[34%] top-[16%] h-9 w-9 border-arc-cyan/35 bg-arc-cyan/12 text-arc-cyan [--node-delay:3.7s]">CID</div>
-              <div className="agent-node agent-node-pulse right-[31%] top-[33%] h-9 w-9 border-arc-purple/35 bg-arc-purple/14 text-arc-purple [--node-delay:2.7s]">x402</div>
-
-              <span className="flow-particle flow-particle-lg [--flow-left:29%] [--flow-top:64%] [--flow-x:188px] [--flow-y:-64px] [--flow-color:#e36f9f]" />
-              <span className="flow-particle [--flow-left:14%] [--flow-top:24%] [--flow-x:230px] [--flow-y:100px] [--flow-color:#a855f7] [--flow-delay:0.7s]" />
-              <span className="flow-particle flow-particle-lg [--flow-left:82%] [--flow-top:29%] [--flow-x:-200px] [--flow-y:70px] [--flow-color:#d8b96a] [--flow-delay:1.4s]" />
-              <span className="flow-particle [--flow-left:67%] [--flow-top:42%] [--flow-x:-108px] [--flow-y:40px] [--flow-color:#a855f7] [--flow-delay:2.4s]" />
-              <span className="flow-particle [--flow-left:38%] [--flow-top:22%] [--flow-x:96px] [--flow-y:102px] [--flow-color:#2df3d0] [--flow-delay:3.5s]" />
-              <span className="flow-particle flow-particle-lg [--flow-left:50%] [--flow-top:78%] [--flow-x:0px] [--flow-y:-102px] [--flow-color:#5dffc0] [--flow-delay:4.6s]" />
-              <span className="flow-particle flow-particle-lg [--flow-left:53%] [--flow-top:50%] [--flow-x:310px] [--flow-y:64px] [--flow-color:#2df3d0] [--flow-delay:5.6s]" />
-
-              <span className="route-spark left-[24%] top-[42%] [--spark-delay:0.4s]" />
-              <span className="route-spark right-[25%] top-[28%] [--spark-delay:1.2s]" />
-              <span className="route-spark bottom-[27%] left-[62%] [--spark-delay:2.2s]" />
-
-              <div className="absolute left-[13%] top-[38%] h-1.5 w-1.5 rounded-full bg-arc-rose shadow-[0_0_14px_rgba(227,111,159,0.75)]" />
-              <div className="absolute left-[28%] top-[72%] h-2 w-2 rounded-full bg-arc-cyan shadow-[0_0_16px_rgba(45,243,208,0.72)]" />
-              <div className="absolute right-[24%] top-[13%] h-1.5 w-1.5 rounded-full bg-arc-gold shadow-[0_0_14px_rgba(216,185,106,0.8)]" />
-              <div className="absolute right-[39%] bottom-[22%] h-2 w-2 rounded-full bg-white/80 shadow-[0_0_16px_rgba(255,255,255,0.8)]" />
             </div>
 
             <div className="relative z-10 mt-5 grid gap-3 sm:grid-cols-3">
@@ -198,25 +231,8 @@ export default function HomePage() {
               ))}
             </div>
 
-            <div className="relative z-10 mt-4 rounded-lg border border-arc-border bg-arc-bg/60 p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <span className="label-field">{isPt ? "Ciclo" : "Lifecycle"}</span>
-                <span className="text-xs text-arc-muted">0 - 6</span>
-              </div>
-              <div className="grid grid-cols-7 gap-2">
-                {routeSteps.map((step) => (
-                  <div key={step.number} className="group relative">
-                    <div className={`h-1.5 rounded-full ${step.number <= 2 ? "bg-arc-cyan" : "bg-arc-border"}`} />
-                    <div className={`mt-2 flex h-7 w-7 items-center justify-center rounded-full border font-mono text-[10px] ${step.number <= 2 ? "border-arc-cyan bg-arc-cyan/15 text-arc-cyan" : "border-arc-border bg-arc-bg text-arc-dim"}`}>
-                      {step.number}
-                    </div>
-                    <div className="mt-2 truncate text-[10px] font-mono uppercase tracking-[0.1em] text-arc-muted">{step.label}</div>
-                    <div className="pointer-events-none absolute bottom-full left-0 z-20 mb-2 hidden w-44 rounded-md border border-arc-border bg-arc-bg px-2 py-1 text-[11px] text-arc-muted opacity-0 shadow-xl transition-opacity group-hover:opacity-100 sm:block">
-                      {step.detail}
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="relative z-10 mt-4 border-t border-arc-border/60 pt-4 text-center text-[10px] font-mono uppercase tracking-[0.12em] text-arc-dim">
+              {t("home.story.trust")}
             </div>
           </div>
         </div>

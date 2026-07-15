@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import { Providers } from "@/components/Providers";
 import { LanguageProvider } from "@/lib/i18n";
 import "./globals.css";
 
@@ -58,9 +59,11 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <LanguageProvider>
-          <Navbar />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
+          <Providers>
+            <Navbar />
+            <main className="min-h-screen">{children}</main>
+            <Footer />
+          </Providers>
         </LanguageProvider>
       </body>
     </html>

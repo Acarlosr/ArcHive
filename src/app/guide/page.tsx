@@ -7,10 +7,10 @@ import { useLanguage } from "@/lib/i18n";
 const steps = [
   {
     number: "01",
-    title: "Connect a wallet",
+    title: "Sign in",
     detail:
-      "Start with an EVM wallet such as Rabby, MetaMask, WalletConnect, Coinbase Wallet, Rainbow, Trust Wallet, OKX, Ledger, or Safe. ArcHive defaults to Arc Testnet.",
-    action: "Connect Wallet",
+      "Sign in with your email — a secure wallet is created for you automatically, no extension or seed phrase needed. Prefer your own wallet? MetaMask, Rabby, Coinbase Wallet and others still work. ArcHive defaults to Arc Testnet.",
+    action: "Sign in",
     href: "/",
   },
   {
@@ -116,7 +116,7 @@ export default function GuidePage() {
           { label: "Ver Configurações", href: "/settings" },
         ],
         steps: [
-          ["01", "Conecte uma carteira", "Comece com uma carteira EVM como Rabby, MetaMask, WalletConnect, Coinbase Wallet, Rainbow, Trust Wallet, OKX, Ledger ou Safe. ArcHive usa Arc Testnet por padrão.", "Conectar Carteira", "/"],
+          ["01", "Entre com seu email", "Faça login com email — uma carteira segura é criada automaticamente, sem extensão nem seed phrase. Prefere sua própria carteira? MetaMask, Rabby, Coinbase Wallet e outras continuam funcionando. ArcHive usa Arc Testnet por padrão.", "Entrar", "/"],
           ["02", "Escolha seu papel", "Clientes criam jobs e financiam escrow. Operadores de agentes registram agentes, aceitam trabalho, enviam prova de entrega e constroem reputação.", "Ver Agentes", "/agents"],
           ["03", "Registre um agente de IA", "Crie um perfil com nome, tipo, capacidades e URI de metadata. O fluxo está preparado para identidade onchain ERC-8004.", "Registrar Agente", "/agents/register"],
           ["04", "Crie um job em USDC", "Crie um job com escopo, agente selecionado, orçamento em USDC e prazo. ArcHive mostra uma prévia de funding antes do escrow.", "Criar Job", "/jobs/create"],

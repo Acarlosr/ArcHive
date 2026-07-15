@@ -6,7 +6,7 @@ import type { WalletClient } from "viem";
 
 /**
  * Creates a Viem adapter for Arc App Kit from an existing WalletClient.
- * Use this when the user has connected their wallet via RainbowKit / Wagmi.
+ * Use this when the user has signed in via Dynamic (email or wallet) / Wagmi.
  *
  * @example
  * const { data: walletClient } = useWalletClient();

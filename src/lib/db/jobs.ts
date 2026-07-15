@@ -43,6 +43,14 @@ function normalizeJob(job: Partial<DemoJob> & Record<string, any>): Job {
     deliverable_hash: job.deliverable_hash ?? null,
     tx_hash: job.tx_hash ?? null,
     explorer_url: job.tx_hash ? explorerTxUrl(job.tx_hash) : null,
+    // Approval timelock: real submissions store their own submitted_at; seed
+    // demo jobs already in "submitted" get a recent fallback so the countdown
+    // renders live instead of showing an immediately-elapsed window.
+    submitted_at:
+      job.submitted_at ??
+      ((job.status ?? "open") === "submitted"
+        ? new Date(Date.now() - 6 * 3600 * 1000).toISOString()
+        : null),
     expires_at: expiresAt,
     expiry_hours: Math.max(1, Math.round((new Date(expiresAt).getTime() - new Date(createdAt).getTime()) / 3600000)),
     created_at: createdAt,

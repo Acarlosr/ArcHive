@@ -11,7 +11,7 @@ const WalletConnectCTAClient = dynamic(
         type="button"
         className="rounded-lg bg-arc-green px-5 py-2.5 text-sm font-display font-bold text-arc-bg shadow-[0_0_28px_rgba(0,229,160,0.25)]"
       >
-        Connect Wallet
+        Sign in
       </button>
     ),
   },

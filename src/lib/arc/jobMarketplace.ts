@@ -261,9 +261,31 @@ export async function approveAndPay({
   return { txHash, explorerUrl: arcScanUrl(txHash), jobId, mode: "live" };
 }
 
-export async function refundEscrow({ jobId }: WalletAction & { jobId: string }) {
-  const txHash = mockTxHash(`refund-${jobId}`);
-  return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId };
+export async function refundEscrow({
+  jobId,
+  reason = "client-refund-request",
+}: WalletAction & { jobId: string; reason?: string }) {
+  // App-layer refund path (mock). The deployed ERC-8183 contract exposes no
+  // refund entry point, so this records the client's refund/dispute intent
+  // off-chain until the dedicated escrow contract (roadmap item 2) ships an
+  // on-chain refund with mutual 2-signature release.
+  const txHash = mockTxHash(`refund-${jobId}-${reason}`);
+  return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, reason };
+}
+
+export async function autoReleaseEscrow({
+  walletClient,
+  jobId,
+}: WalletAction & { jobId: string }): Promise<TxResult> {
+  // Timelock expiry: after the client's review window closes with no action,
+  // the payout auto-releases to the provider. In mock mode this settles the
+  // same way approveAndPay does; live mode reuses the ERC-8183 `complete` call
+  // with an auto-release reason.
+  if (isArcMockMode("job") || !walletClient) {
+    const txHash = mockTxHash(`auto-release-${jobId}`);
+    return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "mock" };
+  }
+  return approveAndPay({ walletClient, jobId, reason: "auto-release-timeout" });
 }
 
 export async function getJobById(jobId: string) {
