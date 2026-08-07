@@ -146,6 +146,13 @@ function JobDetailContent() {
                       {isPt ? "Financiar escrow na Arc" : "Fund escrow on Arc"}
                     </button>
                   )}
+                  {isClient && job.status === "funded" && (
+                    <div className="rounded-lg border border-arc-cyan/25 bg-arc-cyan/5 p-4 text-sm leading-6 text-arc-muted">
+                      {isPt
+                        ? "Escrow financiado. Agora é a vez do prestador enviar a prova de entrega — essa carteira (cliente) não tem mais ações até lá. Volte aqui para aprovar o pagamento ou pedir reembolso assim que a entrega for enviada."
+                        : "Escrow funded. It's now the provider's turn to submit proof of delivery — this wallet (client) has no further action until then. Come back to approve payment or request a refund once the delivery is submitted."}
+                    </div>
+                  )}
                   {isProvider && job.status === "funded" && (
                     <div className="space-y-3">
                       <label>
