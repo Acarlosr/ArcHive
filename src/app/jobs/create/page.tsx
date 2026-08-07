@@ -12,7 +12,7 @@ import { UnifiedBalanceCard } from "@/components/UnifiedBalanceCard";
 import { WalletOnboardingModal } from "@/components/WalletOnboardingModal";
 import { WalletProviderIsland } from "@/components/WalletProviderIsland";
 import { TestnetFundsCard } from "@/components/TestnetFundsCard";
-import { jobTemplates } from "@/lib/agentWork";
+import { getJobTemplates } from "@/lib/agentWork";
 import { useLanguage } from "@/lib/i18n";
 
 type ActionState = "idle" | "creating" | "funding" | "success" | "error";
@@ -38,6 +38,7 @@ export default function CreateJobPage() {
 function CreateJobContent() {
   const { locale } = useLanguage();
   const isPt = locale === "pt-BR";
+  const jobTemplates = useMemo(() => getJobTemplates(locale), [locale]);
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestedAgent = searchParams.get("agent");
@@ -148,7 +149,7 @@ function CreateJobContent() {
             </p>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {jobTemplates.map((template) => (
-                <div key={template.title} className="rounded-lg border border-arc-border bg-arc-surface/70 p-4">
+                <div key={template.id} className="rounded-lg border border-arc-border bg-arc-surface/70 p-4">
                   <div className="mb-2 text-[10px] font-mono uppercase tracking-[0.14em] text-arc-green">
                     {template.agentType}
                   </div>
@@ -188,7 +189,7 @@ function CreateJobContent() {
                 <div className="grid gap-3 md:grid-cols-2">
                   {jobTemplates.map((template) => (
                     <button
-                      key={template.title}
+                      key={template.id}
                       type="button"
                       onClick={() => applyTemplate(template)}
                       className="rounded-lg border border-arc-border bg-arc-surface/70 p-4 text-left transition-colors hover:border-arc-cyan/35 hover:bg-arc-cyan/10"
