@@ -1,5 +1,5 @@
 import type { WalletClient } from "viem";
-import { ARC_TESTNET, getArcAppKit, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
+import { ARC_TESTNET, assertWalletClientReady, getArcAppKit, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
 import { CHAIN_IDS, type SupportedChain } from "@/lib/arc/adapters";
 
 export interface DepositParams {
@@ -51,7 +51,7 @@ export interface SpendResult {
 }
 
 export async function depositToUnifiedBalance(params: DepositParams) {
-  if (isArcMockMode() || !params.walletClient) {
+  if (isArcMockMode()) {
     return {
       txHash: mockTxHash(`deposit-${params.amount}`),
       explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${mockTxHash("deposit")}`,
@@ -60,6 +60,7 @@ export async function depositToUnifiedBalance(params: DepositParams) {
       mode: "mock" as const,
     };
   }
+  assertWalletClientReady(params.walletClient);
 
   const [adapterModule, kit] = await Promise.all([
     import("@circle-fin/adapter-viem-v2"),
@@ -170,7 +171,7 @@ export async function estimateSpend({
 }
 
 export async function spendFromUnifiedBalance(params: SpendParams): Promise<SpendResult> {
-  if (isArcMockMode() || !params.walletClient) {
+  if (isArcMockMode()) {
     const txHash = mockTxHash(`spend-${params.jobId ?? params.recipientAddress}`);
     return {
       txHash,
@@ -180,6 +181,7 @@ export async function spendFromUnifiedBalance(params: SpendParams): Promise<Spen
       mode: "mock" as const,
     };
   }
+  assertWalletClientReady(params.walletClient);
 
   const [adapterModule, kit] = await Promise.all([
     import("@circle-fin/adapter-viem-v2"),

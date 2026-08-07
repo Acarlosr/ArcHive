@@ -1,6 +1,6 @@
 import type { WalletClient } from "viem";
 import { demoAgents } from "@/lib/demoData";
-import { ARC_TESTNET, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
+import { ARC_TESTNET, assertWalletClientReady, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
 
 export async function registerAgent({
   walletClient,
@@ -12,7 +12,7 @@ export async function registerAgent({
   metadataURI?: string;
 }): Promise<{ txHash: `0x${string}`; agentId: string; explorerUrl: string; mode: "mock" | "live" }> {
   const uri = metadataUri ?? metadataURI ?? "ipfs://bafybeihive-agent";
-  if (isArcMockMode("agent") || !walletClient) {
+  if (isArcMockMode("agent")) {
     const txHash = mockTxHash(`agent-${uri}`);
     return {
       txHash,
@@ -21,6 +21,7 @@ export async function registerAgent({
       mode: "mock",
     };
   }
+  assertWalletClientReady(walletClient);
 
   const { createPublicClient, http, parseAbi, parseAbiItem } = await import("viem");
   const { arcTestnet } = await import("viem/chains");

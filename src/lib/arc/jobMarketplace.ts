@@ -1,7 +1,7 @@
 import type { Hex, WalletClient } from "viem";
 import { getJobById as getJobRecordById } from "@/lib/db/jobs";
 import { spendFromUnifiedBalance } from "@/lib/arc/unifiedBalance";
-import { ARC_TESTNET, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
+import { ARC_TESTNET, assertWalletClientReady, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
 import { agenticCommerceAbi, erc20Abi, USDC_CONTRACT } from "@/lib/arc/contracts";
 import { callWithMemo, arcScanUrl } from "@/lib/arc/memo";
 
@@ -56,7 +56,7 @@ export async function createJob({
   budgetUsdc: string;
   expiryHours?: number;
 }): Promise<{ txHash: `0x${string}`; jobId: string; explorerUrl: string; mode: "mock" | "live" }> {
-  if (isArcMockMode("job") || !walletClient) {
+  if (isArcMockMode("job")) {
     const txHash = mockTxHash(`create-job-${description}`);
     return {
       txHash,
@@ -65,6 +65,7 @@ export async function createJob({
       mode: "mock",
     };
   }
+  assertWalletClientReady(walletClient);
 
   const { decodeEventLog } = await import("viem");
   const { account, arcTestnet, publicClient } = await getLiveClients(walletClient);
@@ -108,11 +109,12 @@ export async function fundEscrow({
   budgetUsdc: string;
   recipientAddress?: string;
 }): Promise<TxResult> {
-  if (isArcMockMode("job") || !walletClient) {
+  if (isArcMockMode("job")) {
     const recipient = recipientAddress ?? process.env.NEXT_PUBLIC_ARC_ESCROW_VAULT_ADDRESS ?? zeroAddress;
     const result = await spendFromUnifiedBalance({ walletClient, amount: budgetUsdc, recipientAddress: recipient, jobId });
     return { txHash: result.txHash, explorerUrl: result.explorerUrl, jobId, mode: "mock" };
   }
+  assertWalletClientReady(walletClient);
 
   const { parseUnits, encodeFunctionData } = await import("viem");
   const { account, arcTestnet, publicClient } = await getLiveClients(walletClient);
@@ -158,10 +160,11 @@ export async function acceptJob({
   jobId,
   budgetUsdc,
 }: WalletAction & { jobId: string; budgetUsdc?: string }): Promise<TxResult> {
-  if (isArcMockMode("job") || !walletClient) {
+  if (isArcMockMode("job")) {
     const txHash = mockTxHash(`accept-${jobId}`);
     return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "mock" };
   }
+  assertWalletClientReady(walletClient);
 
   if (!budgetUsdc) throw new Error("Provider budget is required before the client can fund escrow.");
   const { parseUnits } = await import("viem");
@@ -192,12 +195,13 @@ export async function submitDeliverable({
   const source = deliverableDescription ?? jobId;
   const submittedHash = deliverableHash ?? source;
 
-  if (isArcMockMode("job") || !walletClient) {
+  if (isArcMockMode("job")) {
     const encoded = Array.from(source).map((char) => char.charCodeAt(0).toString(16)).join("").slice(0, 42);
     const hash = deliverableHash ?? `ipfs://${encoded.padEnd(42, "0")}`;
     const txHash = mockTxHash(`submit-${jobId}-${hash}`);
     return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, deliverableHash: hash, mode: "mock" };
   }
+  assertWalletClientReady(walletClient);
 
   const { encodeFunctionData } = await import("viem");
   const { account } = await getLiveClients(walletClient);
@@ -230,10 +234,11 @@ export async function approveAndPay({
   jobId,
   reason = "deliverable-approved",
 }: WalletAction & { jobId: string; reason?: string }): Promise<TxResult> {
-  if (isArcMockMode("job") || !walletClient) {
+  if (isArcMockMode("job")) {
     const txHash = mockTxHash(`approve-pay-${jobId}`);
     return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "mock" };
   }
+  assertWalletClientReady(walletClient);
 
   const { encodeFunctionData } = await import("viem");
   const { account } = await getLiveClients(walletClient);
@@ -281,10 +286,11 @@ export async function autoReleaseEscrow({
   // the payout auto-releases to the provider. In mock mode this settles the
   // same way approveAndPay does; live mode reuses the ERC-8183 `complete` call
   // with an auto-release reason.
-  if (isArcMockMode("job") || !walletClient) {
+  if (isArcMockMode("job")) {
     const txHash = mockTxHash(`auto-release-${jobId}`);
     return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "mock" };
   }
+  assertWalletClientReady(walletClient);
   return approveAndPay({ walletClient, jobId, reason: "auto-release-timeout" });
 }
 

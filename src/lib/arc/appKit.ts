@@ -12,6 +12,24 @@ export function isArcMockMode(integration?: "agent" | "job" | "unifiedBalance") 
   );
 }
 
+/**
+ * Guards every live (non-mock) action against a not-yet-ready wallet client.
+ *
+ * Callers used to fall back to a fabricated mock transaction whenever
+ * `walletClient` was still `undefined` — e.g. the instant after connecting,
+ * before wagmi/Dynamic finish resolving the signer. That silently recorded
+ * a fake tx_hash as if it were a real onchain action, with no error shown.
+ * Failing loudly here means a flaky wallet-client hook surfaces as a retry
+ * prompt instead of phantom data.
+ */
+export function assertWalletClientReady(walletClient: unknown): asserts walletClient {
+  if (!walletClient) {
+    throw new Error(
+      "Wallet is still connecting — this action was not sent onchain. Wait a moment after your wallet finishes connecting, then try again.",
+    );
+  }
+}
+
 export function getArcAppKit() {
   appKit ??= new AppKit();
   return appKit;
