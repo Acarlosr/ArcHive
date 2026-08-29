@@ -81,7 +81,7 @@ export async function callWithMemo({
 
   const publicClient = createPublicClient({
     chain: arcTestnet,
-    transport: http(process.env.NEXT_PUBLIC_ARC_RPC_URL ?? "https://rpc.testnet.arc.network"),
+    transport: http(process.env.NEXT_PUBLIC_ARC_RPC_URL ?? "https://rpc.testnet.arc.io"),
   });
 
   // memoId = keccak256 do evento + jobId — único e lookupável por indexadores

@@ -9,7 +9,7 @@ export function TestnetFundsCard({ compact = false }: { compact?: boolean }) {
     [isPt ? "Rede" : "Network", "Arc Testnet"],
     ["Chain ID", "5042002"],
     [isPt ? "Moeda" : "Currency", "USDC"],
-    ["RPC", "https://rpc.testnet.arc.network"],
+    ["RPC", "https://rpc.testnet.arc.io"],
     [isPt ? "Explorador" : "Explorer", "https://testnet.arcscan.app"],
   ];
 

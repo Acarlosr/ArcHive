@@ -31,9 +31,9 @@ const WalletProvidersMountedContext = createContext(false);
 export const arcTestnet = defineChain({
   id: 5042002,
   name: "Arc Testnet",
-  nativeCurrency: { name: "USD Coin", symbol: "USDC", decimals: 6 },
+  nativeCurrency: { name: "USD Coin", symbol: "USDC", decimals: 18 },
   rpcUrls: {
-    default: { http: ["https://rpc.testnet.arc.network"] },
+    default: { http: ["https://rpc.testnet.arc.io"] },
   },
   blockExplorers: {
     default: { name: "ArcScan", url: "https://testnet.arcscan.app" },
@@ -54,7 +54,7 @@ const dynamicEvmNetworks = [
     name: "Arc Testnet",
     nativeCurrency: arcTestnet.nativeCurrency,
     networkId: arcTestnet.id,
-    rpcUrls: ["https://rpc.testnet.arc.network"],
+    rpcUrls: ["https://rpc.testnet.arc.io"],
     vanityName: "Arc Testnet",
   },
 ];
@@ -65,7 +65,7 @@ const wagmiConfig = createConfig({
   multiInjectedProviderDiscovery: !hasDynamicAuth,
   connectors: hasDynamicAuth ? [] : [injected()],
   transports: {
-    [arcTestnet.id]: http("https://rpc.testnet.arc.network"),
+    [arcTestnet.id]: http("https://rpc.testnet.arc.io"),
     [baseSepolia.id]: http(),
     [arbitrumSepolia.id]: http(),
     [sepolia.id]: http(),

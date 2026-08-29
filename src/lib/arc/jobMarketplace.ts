@@ -23,7 +23,7 @@ async function getLiveClients(walletClient: WalletClient) {
   if (!account) throw new Error("No wallet account is connected.");
   const publicClient = createPublicClient({
     chain: arcTestnet,
-    transport: http(process.env.NEXT_PUBLIC_ARC_RPC_URL ?? "https://rpc.testnet.arc.network"),
+    transport: http(process.env.NEXT_PUBLIC_ARC_RPC_URL ?? "https://rpc.testnet.arc.io"),
   });
   return { account, arcTestnet, publicClient };
 }
