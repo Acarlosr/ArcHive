@@ -31,3 +31,13 @@ pnpm-debug.log*
 
 # Vercel
 .vercel/
+
+# TypeScript build cache
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# scratch
+*_build_scratch.tar.gz
+
+# documentos internos (nunca vao pro GitHub)
+_local/

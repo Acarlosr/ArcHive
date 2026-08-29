@@ -144,7 +144,7 @@ Um build é aceitável quando permite demonstrar:
 - não inventar contratos “mágicos” sem scaffold claro
 - não esconder erros reais de integração
 - não acoplar UI diretamente a ABI/contract call se puder isolar num service
-- não trocar a narrativa do projeto sem atualizar MEMORY.md e SOUL.md
+- não trocar a narrativa do projeto sem atualizar _local/MEMORY.md e _local/SOUL.md
 
 ## Imported Claude Cowork project instructions
 
