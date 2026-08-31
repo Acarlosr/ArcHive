@@ -20,6 +20,7 @@ import { injected } from "wagmi/connectors";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
 import { defineChain } from "viem";
+import { arcTransport, ARC_RPC_URLS } from "@/lib/arc/rpc";
 
 // Dynamic forbids more than one DynamicContextProvider in the tree. The app
 // wraps many wallet-touching components in their own <Providers> island, so we
@@ -33,7 +34,7 @@ export const arcTestnet = defineChain({
   name: "Arc Testnet",
   nativeCurrency: { name: "USD Coin", symbol: "USDC", decimals: 18 },
   rpcUrls: {
-    default: { http: ["https://rpc.testnet.arc.io"] },
+    default: { http: ARC_RPC_URLS },
   },
   blockExplorers: {
     default: { name: "ArcScan", url: "https://testnet.arcscan.app" },
@@ -65,7 +66,7 @@ const wagmiConfig = createConfig({
   multiInjectedProviderDiscovery: !hasDynamicAuth,
   connectors: hasDynamicAuth ? [] : [injected()],
   transports: {
-    [arcTestnet.id]: http("https://rpc.testnet.arc.io"),
+    [arcTestnet.id]: arcTransport(),
     [baseSepolia.id]: http(),
     [arbitrumSepolia.id]: http(),
     [sepolia.id]: http(),

@@ -5,6 +5,7 @@
 import type { WalletClient } from "viem";
 import { MEMO_CONTRACT, memoAbi } from "@/lib/arc/contracts";
 import { ARC_TESTNET } from "@/lib/arc/appKit";
+import { arcTransport } from "@/lib/arc/rpc";
 
 // ── Tipos de payload de memo por fluxo do ArcHive ──
 
@@ -73,7 +74,7 @@ export async function callWithMemo({
   calldata: `0x${string}`;
   memoPayload: ArcHiveMemoPayload;
 }): Promise<`0x${string}`> {
-  const { createPublicClient, http, keccak256, toHex } = await import("viem");
+  const { createPublicClient, keccak256, toHex } = await import("viem");
   const { arcTestnet } = await import("viem/chains");
 
   const [account] = await walletClient.getAddresses();
@@ -81,7 +82,7 @@ export async function callWithMemo({
 
   const publicClient = createPublicClient({
     chain: arcTestnet,
-    transport: http(process.env.NEXT_PUBLIC_ARC_RPC_URL ?? "https://rpc.testnet.arc.io"),
+    transport: arcTransport(),
   });
 
   // memoId = keccak256 do evento + jobId — único e lookupável por indexadores

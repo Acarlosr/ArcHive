@@ -1,6 +1,7 @@
 import type { WalletClient } from "viem";
 import { demoAgents } from "@/lib/demoData";
 import { ARC_TESTNET, assertWalletClientReady, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
+import { arcTransport } from "@/lib/arc/rpc";
 
 export async function registerAgent({
   walletClient,
@@ -23,12 +24,12 @@ export async function registerAgent({
   }
   assertWalletClientReady(walletClient);
 
-  const { createPublicClient, http, parseAbi, parseAbiItem } = await import("viem");
+  const { createPublicClient, parseAbi, parseAbiItem } = await import("viem");
   const { arcTestnet } = await import("viem/chains");
   const identityRegistry = process.env.NEXT_PUBLIC_ARC_AGENT_REGISTRY_ADDRESS as `0x${string}`;
   const abi = parseAbi(["function register(string metadataUri) returns (uint256)"]);
   const [account] = await walletClient.getAddresses();
-  const publicClient = createPublicClient({ chain: arcTestnet, transport: http(process.env.NEXT_PUBLIC_ARC_RPC_URL) });
+  const publicClient = createPublicClient({ chain: arcTestnet, transport: arcTransport() });
   const txHash = await walletClient.writeContract({
     address: identityRegistry,
     abi,

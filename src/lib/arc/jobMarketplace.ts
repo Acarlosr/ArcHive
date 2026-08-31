@@ -4,6 +4,7 @@ import { spendFromUnifiedBalance } from "@/lib/arc/unifiedBalance";
 import { ARC_TESTNET, assertWalletClientReady, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
 import { agenticCommerceAbi, erc20Abi, USDC_CONTRACT } from "@/lib/arc/contracts";
 import { callWithMemo, arcScanUrl } from "@/lib/arc/memo";
+import { arcTransport } from "@/lib/arc/rpc";
 
 type WalletAction = { walletClient?: WalletClient | null };
 type TxResult = { txHash: `0x${string}`; explorerUrl: string; jobId: string; mode: "mock" | "live" };
@@ -17,13 +18,13 @@ function getJobMarketplaceAddress() {
 }
 
 async function getLiveClients(walletClient: WalletClient) {
-  const { createPublicClient, http } = await import("viem");
+  const { createPublicClient } = await import("viem");
   const { arcTestnet } = await import("viem/chains");
   const [account] = await walletClient.getAddresses();
   if (!account) throw new Error("No wallet account is connected.");
   const publicClient = createPublicClient({
     chain: arcTestnet,
-    transport: http(process.env.NEXT_PUBLIC_ARC_RPC_URL ?? "https://rpc.testnet.arc.io"),
+    transport: arcTransport(),
   });
   return { account, arcTestnet, publicClient };
 }
