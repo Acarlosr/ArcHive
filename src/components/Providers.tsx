@@ -55,7 +55,7 @@ const dynamicEvmNetworks = [
     name: "Arc Testnet",
     nativeCurrency: arcTestnet.nativeCurrency,
     networkId: arcTestnet.id,
-    rpcUrls: ["https://rpc.testnet.arc.io"],
+    rpcUrls: ARC_RPC_URLS,
     vanityName: "Arc Testnet",
   },
 ];

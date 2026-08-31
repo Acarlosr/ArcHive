@@ -23,7 +23,7 @@ export function HeroWalletOnboarding() {
           </div>
           <div className="rounded-md border border-arc-border bg-arc-bg/60 p-3">
             <div className="font-mono text-arc-dim">RPC</div>
-            <div className="mt-1 break-all text-arc-text">https://rpc.testnet.arc.io</div>
+            <div className="mt-1 break-all text-arc-text">https://rpc.testnet.arc.network</div>
           </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-3">
