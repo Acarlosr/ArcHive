@@ -61,7 +61,7 @@ function AgentRegistrationFormInner() {
         agent_type: form.agentType,
         capabilities: capabilityList,
         metadata_uri: form.metadataUri,
-        reputation_score: 72,
+        reputation_score: 0,
         tx_hash: onchain.txHash,
       });
 

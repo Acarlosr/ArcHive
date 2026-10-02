@@ -8,15 +8,24 @@ import { useLanguage } from "@/lib/i18n";
 const sellerBaseUrl =
   process.env.NEXT_PUBLIC_NANOPAYMENTS_SELLER_URL ?? "http://localhost:4021";
 
+const TEST_JOB_ID = "job-tools-demo";
+const TEST_JOB_BUDGET_USDC = "10";
+
 const toolPayloads: Record<string, Record<string, unknown>> = {
   "summarize-pdf": {
+    jobId: TEST_JOB_ID,
+    jobBudgetUsdc: TEST_JOB_BUDGET_USDC,
     text: "ArcHive agent reviewed a funded escrow job and needs a concise client-ready brief.",
   },
   "extract-json": {
+    jobId: TEST_JOB_ID,
+    jobBudgetUsdc: TEST_JOB_BUDGET_USDC,
     title: "Extract ArcHive job metadata",
     entities: ["agent", "escrow", "deliverable", "tool_spend"],
   },
   "score-deliverable": {
+    jobId: TEST_JOB_ID,
+    jobBudgetUsdc: TEST_JOB_BUDGET_USDC,
     requirements: "Verify the submitted work proof, summarize the output, and confirm job criteria.",
     deliverable: "ipfs://bafybeihive-deliverable with completed research and structured findings.",
   },
@@ -28,7 +37,10 @@ const tools = agentPaidTools.map((tool) => ({
   price: `${tool.priceUsdc} USDC`,
   status: "x402 protected",
   method: tool.method,
-  path: tool.endpoint,
+  path:
+    tool.method === "GET"
+      ? `${tool.endpoint}?jobId=${TEST_JOB_ID}&jobBudgetUsdc=${TEST_JOB_BUDGET_USDC}`
+      : tool.endpoint,
   body: tool.method === "POST" ? toolPayloads[tool.id] : undefined,
 }));
 

@@ -6,6 +6,7 @@
 import { useAccount } from "wagmi";
 import { usePayLink } from "@/hooks/usePayLink";
 import { useFeeEstimate } from "@/hooks/useFeeEstimate";
+import { safeExternalUrl } from "@/lib/safeUrls";
 import { FeeBreakdown } from "./FeeBreakdown";
 import { TxStatus } from "./TxStatus";
 import { WalletConnectCTA } from "@/components/WalletConnectCTA";
@@ -50,6 +51,7 @@ function PayCardInner({ linkId }: PayCardProps) {
   const { isConnected } = useAccount();
   const { link, status, txHash, explorerUrl, error, pay } =
     usePayLink(linkId);
+  const safeExplorerUrl = safeExternalUrl(explorerUrl);
 
   const { estimate, isLoading: estimatingFees } = useFeeEstimate({
     amount: link?.amount ?? "0",
@@ -94,9 +96,9 @@ function PayCardInner({ linkId }: PayCardProps) {
             </div>
           </div>
         </div>
-        {txHash && (
+        {txHash && safeExplorerUrl && (
           <a
-            href={explorerUrl ?? "#"}
+            href={safeExplorerUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="block text-center text-xs font-mono text-[#00d4ff] hover:underline"

@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { useWalletClient } from "wagmi";
 import { getLinkById, markLinkPaid, type PayLink } from "@/lib/db/links";
 import { spendFromUnifiedBalance } from "@/lib/arc/unifiedBalance";
+import { explorerTxUrl, safeExternalUrl } from "@/lib/safeUrls";
 
 type PayStatus =
   | "idle"
@@ -52,7 +53,7 @@ export function usePayLink(linkId: string): UsePayLinkResult {
         if (data.status === "paid") {
           setLink(data);
           setTxHash(data.tx_hash);
-          setExplorerUrl(data.explorer_url);
+          setExplorerUrl(data.tx_hash ? explorerTxUrl(data.tx_hash) : null);
           setStatus("already-paid");
           return;
         }
@@ -95,7 +96,7 @@ export function usePayLink(linkId: string): UsePayLinkResult {
       // Step 3: confirm
       setStatus("confirming");
       setTxHash(result.txHash);
-      setExplorerUrl(result.explorerUrl);
+      setExplorerUrl(safeExternalUrl(result.explorerUrl) ?? explorerTxUrl(result.txHash));
 
       // Step 4: persist to DB
       await markLinkPaid(link.id, result.txHash, result.explorerUrl);

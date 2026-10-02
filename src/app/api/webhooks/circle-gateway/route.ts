@@ -1,8 +1,21 @@
 import { NextResponse } from "next/server";
 import { recordGatewayWebhook } from "@/lib/db/gatewayWebhooks";
 import { normalizeGatewayWebhook } from "@/lib/gatewayWebhooks";
+import { checkRateLimit, clientIpFromRequest } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
+  const { allowed, retryAfterSeconds } = checkRateLimit(
+    `webhook:${clientIpFromRequest(request)}`,
+    30,
+    60_000,
+  );
+  if (!allowed) {
+    return NextResponse.json(
+      { ok: false, error: "Too many webhook requests from this IP." },
+      { status: 429, headers: { "Retry-After": String(retryAfterSeconds) } },
+    );
+  }
+
   try {
     const payload = await request.json();
     const webhook = normalizeGatewayWebhook(payload);

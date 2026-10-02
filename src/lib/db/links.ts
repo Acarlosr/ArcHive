@@ -3,6 +3,7 @@
 // Links live in the DB; the actual payment execution happens onchain via Arc.
 
 import { createClient } from "@supabase/supabase-js";
+import { safeExternalUrl } from "@/lib/safeUrls";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -106,12 +107,13 @@ export async function markLinkPaid(
   txHash: string,
   explorerUrl: string
 ): Promise<void> {
+  const safeUrl = safeExternalUrl(explorerUrl);
   const { error } = await supabase
     .from("pay_links")
     .update({
       status: "paid",
-      tx_hash: txHash,
-      explorer_url: explorerUrl,
+      tx_hash: /^0x[0-9a-fA-F]{64}$/.test(txHash) ? txHash : null,
+      explorer_url: safeUrl,
     })
     .eq("id", id);
 

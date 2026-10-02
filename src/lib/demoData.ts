@@ -1,3 +1,5 @@
+import { explorerTxUrl as explorerTxUrlCanonical } from "@/lib/safeUrls";
+
 export type JobStatus = "open" | "funded" | "accepted" | "submitted" | "approved" | "paid" | "completed" | "refunded" | "expired";
 
 export type ActivityType =
@@ -284,7 +286,7 @@ export const demoActivityEvents: DemoActivityEvent[] = [
 ];
 
 export function explorerTxUrl(txHash: string) {
-  return `https://testnet.arcscan.app/tx/${txHash}`;
+  return explorerTxUrlCanonical(txHash);
 }
 
 export function formatWallet(address: string) {

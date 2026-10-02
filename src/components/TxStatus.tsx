@@ -1,6 +1,8 @@
 "use client";
 // src/components/TxStatus.tsx
 
+import { safeExternalUrl } from "@/lib/safeUrls";
+
 interface TxStatusProps {
   status: "bridging" | "spending" | "confirming" | "success" | "error";
   title: string;
@@ -21,6 +23,7 @@ export function TxStatus({
   const isSuccess = status === "success";
   const isError = status === "error";
   const isLoading = !isSuccess && !isError;
+  const safeHref = safeExternalUrl(explorerUrl);
 
   return (
     <div className="flex flex-col items-center py-8 text-center gap-4">
@@ -51,9 +54,9 @@ export function TxStatus({
       </div>
 
       {/* Explorer link */}
-      {txHash && explorerUrl && (
+      {txHash && safeHref && (
         <a
-          href={explorerUrl}
+          href={safeHref}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs font-mono text-[#00d4ff] hover:underline break-all max-w-xs"
