@@ -1,9 +1,14 @@
 // src/lib/db/links.ts
-// Supabase CRUD for PayVeil payment links.
-// Links live in the DB; the actual payment execution happens onchain via Arc.
+// Supabase for PayVeil payment links.
+// Reads use the anon key (RLS: read-only). All writes go through the
+// Next.js API routes with a wallet-signed header — the browser can no
+// longer create links or mark payments directly (issues #1 and #2).
 
 import { createClient } from "@supabase/supabase-js";
-import { safeExternalUrl } from "@/lib/safeUrls";
+import { isDemoMode } from "@/lib/demoData";
+import type { WalletClient } from "viem";
+import { postToApi, walletAuthHeaders } from "@/lib/clientWalletAuth";
+import { explorerTxUrl } from "@/lib/safeUrls";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -36,34 +41,61 @@ export type CreateLinkInput = Omit<
 >;
 
 // ─────────────────────────────────────────────
-// GENERATE ID
+// DEMO MODE (no envs): links live in localStorage
 // ─────────────────────────────────────────────
 
-function generateId(): string {
-  return Math.random().toString(36).slice(2, 10).toUpperCase();
+const DEMO_LINKS_STORAGE_KEY = "archve.demo.links";
+
+function canUseLocalStorage() {
+  return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+}
+
+function getDemoLinkById(id: string): PayLink | null {
+  if (!canUseLocalStorage()) return null;
+  try {
+    const raw = window.localStorage.getItem(DEMO_LINKS_STORAGE_KEY);
+    const parsed = raw ? (JSON.parse(raw) as PayLink[]) : [];
+    return parsed.find((link) => link.id === id) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function saveDemoLink(link: PayLink) {
+  if (!canUseLocalStorage()) return;
+  const raw = window.localStorage.getItem(DEMO_LINKS_STORAGE_KEY);
+  const parsed = raw ? (JSON.parse(raw) as PayLink[]) : [];
+  const next = [link, ...parsed.filter((item) => item.id !== link.id)];
+  window.localStorage.setItem(DEMO_LINKS_STORAGE_KEY, JSON.stringify(next));
 }
 
 // ─────────────────────────────────────────────
-// CREATE
+// CREATE (server-side via /api/links)
 // ─────────────────────────────────────────────
 
-export async function createLink(input: CreateLinkInput): Promise<PayLink> {
-  const id = generateId();
-
-  const { data, error } = await supabase
-    .from("pay_links")
-    .insert({
+export async function createLink(
+  input: CreateLinkInput,
+  walletClient?: WalletClient | null
+): Promise<PayLink> {
+  if (isDemoMode()) {
+    const id = Math.random().toString(36).slice(2, 10).toUpperCase();
+    return {
       id,
       ...input,
       status: "pending",
       tx_hash: null,
       explorer_url: null,
-    })
-    .select()
-    .single();
+      created_at: new Date().toISOString(),
+    };
+  }
 
-  if (error) throw new Error(`Failed to create link: ${error.message}`);
-  return data as PayLink;
+  const headers = await walletAuthHeaders("create_link", walletClient ?? null);
+  const response = await postToApi("/api/links", input, headers);
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload?.error ?? `Failed to create link (${response.status})`);
+  }
+  return payload.link as PayLink;
 }
 
 // ─────────────────────────────────────────────
@@ -71,6 +103,7 @@ export async function createLink(input: CreateLinkInput): Promise<PayLink> {
 // ─────────────────────────────────────────────
 
 export async function getLinkById(id: string): Promise<PayLink | null> {
+  if (isDemoMode()) return getDemoLinkById(id);
   const { data, error } = await supabase
     .from("pay_links")
     .select("*")
@@ -99,65 +132,34 @@ export async function getLinksByCreator(
 }
 
 // ─────────────────────────────────────────────
-// MARK AS PAID (called after successful spend())
+// MARK AS PAID (server-side via /api/links/[id]/paid)
+// The server verifies the on-chain receipt: a real USDC transfer to the
+// link's recipient is required before status flips to "paid".
 // ─────────────────────────────────────────────
 
 export async function markLinkPaid(
   id: string,
   txHash: string,
-  explorerUrl: string
+  walletClient?: WalletClient | null
 ): Promise<void> {
-  const safeUrl = safeExternalUrl(explorerUrl);
-  const { error } = await supabase
-    .from("pay_links")
-    .update({
+  if (isDemoMode()) {
+    const link = getDemoLinkById(id);
+    if (!link) throw new Error("Link not found");
+    saveDemoLink({
+      ...link,
       status: "paid",
       tx_hash: /^0x[0-9a-fA-F]{64}$/.test(txHash) ? txHash : null,
-      explorer_url: safeUrl,
-    })
-    .eq("id", id);
+      explorer_url: explorerTxUrl(txHash),
+    });
+    return;
+  }
 
-  if (error) throw new Error(`Failed to mark link as paid: ${error.message}`);
+  const headers = await walletAuthHeaders("pay_link", walletClient ?? null);
+  const response = await postToApi(`/api/links/${encodeURIComponent(id)}/paid`, { tx_hash: txHash }, headers);
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload?.error ?? `Failed to confirm payment (${response.status})`);
+  }
 }
 
-// ─────────────────────────────────────────────
-// SUPABASE SQL MIGRATION (run once in Supabase SQL editor)
-// ─────────────────────────────────────────────
-/*
-CREATE TABLE pay_links (
-  id                TEXT PRIMARY KEY,
-  amount            TEXT NOT NULL,
-  description       TEXT NOT NULL,
-  recipient_wallet  TEXT NOT NULL,
-  creator_wallet    TEXT NOT NULL,
-  accepted_chains   TEXT[] NOT NULL DEFAULT '{}',
-  expiry            TIMESTAMPTZ,
-  status            TEXT NOT NULL DEFAULT 'pending'
-                    CHECK (status IN ('pending','paid','expired','cancelled')),
-  tx_hash           TEXT,
-  explorer_url      TEXT,
-  created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Index for dashboard queries by creator
-CREATE INDEX idx_pay_links_creator ON pay_links(creator_wallet);
-
--- Row Level Security: anyone can read pending links (for /pay/[id])
-ALTER TABLE pay_links ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Public can read pending links"
-  ON pay_links FOR SELECT
-  USING (status = 'pending');
-
-CREATE POLICY "Creator can read own links"
-  ON pay_links FOR SELECT
-  USING (creator_wallet = current_user);
-
-CREATE POLICY "Anyone can insert"
-  ON pay_links FOR INSERT
-  WITH CHECK (true);
-
-CREATE POLICY "Anyone can update status"
-  ON pay_links FOR UPDATE
-  USING (true);
-*/
+// Migration: supabase/migrations/001_enable_rls.sql (RLS + read-only pay_links).

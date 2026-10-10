@@ -1,3 +1,7 @@
+// src/lib/db/gatewayWebhooks.ts
+// Server-side only: called from the Circle Gateway webhook route.
+// Requires the service role key — no anon fallback (issues #1).
+
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { isDemoMode } from "@/lib/demoData";
 import type { NormalizedGatewayWebhook } from "@/lib/gatewayWebhooks";
@@ -8,7 +12,7 @@ function getServerSupabase() {
   if (isDemoMode()) return null;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) return null;
 

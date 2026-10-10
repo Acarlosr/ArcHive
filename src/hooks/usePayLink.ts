@@ -98,8 +98,8 @@ export function usePayLink(linkId: string): UsePayLinkResult {
       setTxHash(result.txHash);
       setExplorerUrl(safeExternalUrl(result.explorerUrl) ?? explorerTxUrl(result.txHash));
 
-      // Step 4: persist to DB
-      await markLinkPaid(link.id, result.txHash, result.explorerUrl);
+      // Step 4: persist to DB (server verifies the on-chain receipt)
+      await markLinkPaid(link.id, result.txHash, walletClient);
 
       setStatus("success");
     } catch (err: any) {

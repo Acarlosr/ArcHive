@@ -37,6 +37,11 @@ pnpm-debug.log*
 tsconfig.tsbuildinfo
 *.tsbuildinfo
 
+# Foundry (contracts) build artifacts
+contracts/**/out/
+contracts/**/cache/
+contracts/**/broadcast/
+
 # scratch
 *_build_scratch.tar.gz
 

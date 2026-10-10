@@ -4,7 +4,7 @@
 // On submit → saves to Supabase → returns the shareable URL.
 
 import { useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import { createLink } from "@/lib/db/links";
 
 const CHAINS = ["Ethereum", "Base", "Arbitrum", "Arc"] as const;
@@ -27,6 +27,7 @@ function getExpiryDate(value: string): string | null {
 
 export function CreateLinkForm() {
   const { address, isConnected } = useAccount();
+  const { data: walletClient } = useWalletClient();
 
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -71,7 +72,7 @@ export function CreateLinkForm() {
         creator_wallet: address.toLowerCase(),
         accepted_chains: selectedChains,
         expiry: getExpiryDate(expiry),
-      });
+      }, walletClient);
 
       const url = `${process.env.NEXT_PUBLIC_APP_URL}/pay/${link.id}`;
       setGeneratedLink(url);

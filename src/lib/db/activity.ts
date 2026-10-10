@@ -1,5 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { WalletClient } from "viem";
 import { demoActivityEvents, isDemoMode, type DemoActivityEvent } from "@/lib/demoData";
+import { postToApi, walletAuthHeaders } from "@/lib/clientWalletAuth";
 
 let supabase: SupabaseClient | null = null;
 
@@ -26,10 +28,22 @@ export async function getActivityEvents(): Promise<ActivityEvent[]> {
   return data ?? [];
 }
 
-export async function recordActivityEvent(event: Omit<ActivityEvent, "id" | "created_at">) {
-  const client = getSupabase();
-  if (!client) return;
+export async function recordActivityEvent(
+  event: Omit<ActivityEvent, "id" | "created_at">,
+  walletClient?: WalletClient | null
+) {
+  if (isDemoMode()) return;
 
-  const { error } = await client.from("activity_events").insert(event);
-  if (error) throw new Error(error.message);
+  try {
+    const headers = await walletAuthHeaders("create_link", walletClient ?? null);
+    const response = await postToApi("/api/activity", event, headers);
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body?.error ?? `Failed to record activity (${response.status})`);
+    }
+  } catch (err) {
+    // Activity log is best-effort: a signing prompt or a transient API
+    // failure must never break the main user flow that triggered it.
+    console.warn("recordActivityEvent skipped:", err instanceof Error ? err.message : err);
+  }
 }

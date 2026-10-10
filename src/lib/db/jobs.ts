@@ -1,5 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { WalletClient } from "viem";
 import { demoJobs, explorerTxUrl, isDemoMode, type DemoJob, type JobStatus } from "@/lib/demoData";
+import { postToApi, walletAuthHeaders } from "@/lib/clientWalletAuth";
 
 let supabase: SupabaseClient | null = null;
 const DEMO_JOBS_STORAGE_KEY = "archve.demo.jobs";
@@ -87,8 +89,10 @@ function getDemoJobs(status?: string) {
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 }
 
-export async function createJobRecord(data: Omit<Job, "id" | "created_at" | "deliverable_hash" | "explorer_url" | "expiry_hours">): Promise<Job> {
-  const client = getSupabase();
+export async function createJobRecord(
+  data: Omit<Job, "id" | "created_at" | "deliverable_hash" | "explorer_url" | "expiry_hours">,
+  walletClient?: WalletClient | null
+): Promise<Job> {
   const { id: _ignoredId, ...dataWithoutEmptyId } = data as typeof data & { id?: string };
   const payload = {
     ...dataWithoutEmptyId,
@@ -96,7 +100,7 @@ export async function createJobRecord(data: Omit<Job, "id" | "created_at" | "del
     budget_usdc: dataWithoutEmptyId.budget_usdc ?? dataWithoutEmptyId.budget,
   };
 
-  if (!client) {
+  if (isDemoMode()) {
     const job = normalizeJob({
       ...payload,
       id: `job_demo_${Date.now()}`,
@@ -107,13 +111,13 @@ export async function createJobRecord(data: Omit<Job, "id" | "created_at" | "del
     return job;
   }
 
-  const { data: job, error } = await client
-    .from("jobs")
-    .insert(payload)
-    .select()
-    .single();
-  if (error) throw new Error(error.message);
-  return normalizeJob(job);
+  const headers = await walletAuthHeaders("create_job", walletClient ?? null);
+  const response = await postToApi("/api/jobs", payload, headers);
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(body?.error ?? `Failed to create job (${response.status})`);
+  }
+  return normalizeJob(body.job);
 }
 
 export async function getJobs(status?: string): Promise<Job[]> {
@@ -162,9 +166,13 @@ export async function getJobsByWallet(wallet: string): Promise<Job[]> {
   return (data ?? []).map(normalizeJob);
 }
 
-export async function updateJobStatus(id: string, status: Job["status"], extras?: Partial<Job>) {
-  const client = getSupabase();
-  if (!client) {
+export async function updateJobStatus(
+  id: string,
+  status: Job["status"],
+  extras?: Partial<Job>,
+  walletClient?: WalletClient | null
+) {
+  if (isDemoMode()) {
     const jobs = getStoredDemoJobs();
     const current = getDemoJobs().find((job) => job.id === id || job.onchain_id === id || job.onchain_job_id === id);
     if (!current) return;
@@ -173,13 +181,20 @@ export async function updateJobStatus(id: string, status: Job["status"], extras?
     return;
   }
 
-  const { error } = await client.from("jobs").update({ status, ...extras }).eq("id", id);
-  if (error) throw new Error(error.message);
+  const headers = await walletAuthHeaders("update_job", walletClient ?? null);
+  const response = await fetch(`/api/jobs/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...headers },
+    body: JSON.stringify({ status, ...extras }),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body?.error ?? `Failed to update job (${response.status})`);
+  }
 }
 
-export async function updateJobOnchainId(id: string, onchainId: string, txHash: string) {
-  const client = getSupabase();
-  if (!client) {
+export async function updateJobOnchainId(id: string, onchainId: string, txHash: string, walletClient?: WalletClient | null) {
+  if (isDemoMode()) {
     const jobs = getStoredDemoJobs();
     const current = getDemoJobs().find((job) => job.id === id);
     if (!current) return;
@@ -188,9 +203,14 @@ export async function updateJobOnchainId(id: string, onchainId: string, txHash: 
     return;
   }
 
-  const { error } = await client
-    .from("jobs")
-    .update({ onchain_job_id: onchainId, onchain_id: onchainId, tx_hash: txHash })
-    .eq("id", id);
-  if (error) throw new Error(error.message);
+  const headers = await walletAuthHeaders("update_job", walletClient ?? null);
+  const response = await fetch(`/api/jobs/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...headers },
+    body: JSON.stringify({ onchain_id: onchainId, onchain_job_id: onchainId, tx_hash: txHash }),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body?.error ?? `Failed to update job (${response.status})`);
+  }
 }

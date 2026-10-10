@@ -1,5 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { WalletClient } from "viem";
 import { demoAgents, isDemoMode, type DemoAgent } from "@/lib/demoData";
+import { postToApi, walletAuthHeaders } from "@/lib/clientWalletAuth";
 
 let supabase: SupabaseClient | null = null;
 const DEMO_AGENTS_STORAGE_KEY = "archve.demo.agents";
@@ -53,9 +55,11 @@ function getDemoAgents() {
   return Array.from(agentsById.values()).sort((a, b) => Number(b.reputation_score) - Number(a.reputation_score));
 }
 
-export async function createAgent(data: Omit<Agent, "id" | "created_at" | "jobs_completed">): Promise<Agent> {
-  const client = getSupabase();
-  if (!client) {
+export async function createAgent(
+  data: Omit<Agent, "id" | "created_at" | "jobs_completed">,
+  walletClient?: WalletClient | null
+): Promise<Agent> {
+  if (isDemoMode()) {
     const agent = normalizeAgent({
       ...data,
       id: `agt_demo_${Date.now()}`,
@@ -67,17 +71,13 @@ export async function createAgent(data: Omit<Agent, "id" | "created_at" | "jobs_
     return agent;
   }
 
-  const { data: agent, error } = await client
-    .from("agents")
-    .insert({
-      ...data,
-      onchain_agent_id: data.onchain_agent_id ?? data.onchain_id,
-      jobs_completed: 0,
-    })
-    .select()
-    .single();
-  if (error) throw new Error(error.message);
-  return normalizeAgent(agent);
+  const headers = await walletAuthHeaders("create_agent", walletClient ?? null);
+  const response = await postToApi("/api/agents", data, headers);
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(body?.error ?? `Failed to register agent (${response.status})`);
+  }
+  return normalizeAgent(body.agent);
 }
 
 export async function getAgents(): Promise<Agent[]> {
@@ -125,9 +125,8 @@ export async function getAgentsByWallet(wallet: string): Promise<Agent[]> {
   return (data ?? []).map(normalizeAgent);
 }
 
-export async function updateAgentReputation(id: string, score: number) {
-  const client = getSupabase();
-  if (!client) {
+export async function updateAgentReputation(id: string, score: number, walletClient?: WalletClient | null) {
+  if (isDemoMode()) {
     const agents = getStoredDemoAgents();
     const current = getDemoAgents().find((agent) => agent.id === id || agent.onchain_id === id || agent.onchain_agent_id === id);
     if (!current) return;
@@ -136,16 +135,20 @@ export async function updateAgentReputation(id: string, score: number) {
     return;
   }
 
-  const { error } = await client
-    .from("agents")
-    .update({ reputation_score: score })
-    .eq("id", id);
-  if (error) throw new Error(error.message);
+  const headers = await walletAuthHeaders("update_agent", walletClient ?? null);
+  const response = await fetch(`/api/agents/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...headers },
+    body: JSON.stringify({ reputation_score: score }),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body?.error ?? `Failed to update reputation (${response.status})`);
+  }
 }
 
-export async function incrementJobsCompleted(id: string) {
-  const client = getSupabase();
-  if (!client) {
+export async function incrementJobsCompleted(id: string, walletClient?: WalletClient | null) {
+  if (isDemoMode()) {
     const agents = getStoredDemoAgents();
     const current = getDemoAgents().find((agent) => agent.id === id || agent.onchain_id === id || agent.onchain_agent_id === id);
     if (!current) return;
@@ -154,10 +157,14 @@ export async function incrementJobsCompleted(id: string) {
     return;
   }
 
-  const { data: agent } = await client.from("agents").select("jobs_completed").eq("id", id).single();
-  const { error } = await client
-    .from("agents")
-    .update({ jobs_completed: (agent?.jobs_completed ?? 0) + 1 })
-    .eq("id", id);
-  if (error) throw new Error(error.message);
+  const headers = await walletAuthHeaders("update_agent", walletClient ?? null);
+  const response = await fetch(`/api/agents/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...headers },
+    body: JSON.stringify({ increment_jobs_completed: true }),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body?.error ?? `Failed to update agent (${response.status})`);
+  }
 }

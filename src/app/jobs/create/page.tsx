@@ -124,7 +124,7 @@ function CreateJobContent() {
         agent_name: selectedAgent.name,
         tx_hash: onchain.txHash,
         expires_at: new Date(form.deadline).toISOString(),
-      } as any);
+      } as any, walletClient);
 
       setState("success");
       router.push(`/jobs/${job.id}`);

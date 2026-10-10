@@ -63,7 +63,7 @@ function AgentRegistrationFormInner() {
         metadata_uri: form.metadataUri,
         reputation_score: 0,
         tx_hash: onchain.txHash,
-      });
+      }, walletClient);
 
       setResultId(agent.onchain_agent_id);
       setState("success");

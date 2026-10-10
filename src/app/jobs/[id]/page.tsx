@@ -66,7 +66,7 @@ function JobDetailContent() {
         ...extras,
         ...(result?.txHash ? { tx_hash: result.txHash } : {}),
       };
-      await updateJobStatus(job.id, nextStatus, actionExtras);
+      await updateJobStatus(job.id, nextStatus, actionExtras, walletClient);
       setJob({ ...job, status: nextStatus, ...actionExtras });
       setActionState("success");
     } catch (err: any) {
