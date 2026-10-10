@@ -2,7 +2,7 @@ import type { Hex, WalletClient } from "viem";
 import { getJobById as getJobRecordById } from "@/lib/db/jobs";
 import { spendFromUnifiedBalance } from "@/lib/arc/unifiedBalance";
 import { ARC_CHAIN, assertWalletClientReady, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
-import { agenticCommerceAbi, erc20Abi, USDC_CONTRACT } from "@/lib/arc/contracts";
+import { AGENTIC_COMMERCE, agenticCommerceAbi, erc20Abi, resolveAddress, USDC_CONTRACT } from "@/lib/arc/contracts";
 import { callWithMemo, explorerTxUrl } from "@/lib/arc/memo";
 import { arcTransport } from "@/lib/arc/rpc";
 import { arcChain, ARC_NETWORK } from "@/lib/arc/network";
@@ -13,9 +13,12 @@ type TxResult = { txHash: `0x${string}`; explorerUrl: string; jobId: string; mod
 const zeroAddress = "0x0000000000000000000000000000000000000000" as const;
 
 function getJobMarketplaceAddress() {
-  const address = process.env.NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS;
-  if (!address) throw new Error("NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS is required for live ERC-8183 actions.");
-  return address as `0x${string}`;
+  // Env is only an override; the deployed ERC-8183 proxy constant wins otherwise.
+  const address = resolveAddress(process.env.NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS, AGENTIC_COMMERCE);
+  if (!address || address === zeroAddress) {
+    throw new Error("ERC-8183 marketplace address is not deployed on this network.");
+  }
+  return address;
 }
 
 async function getLiveClients(walletClient: WalletClient) {

@@ -4,6 +4,7 @@
 // and are selected by NEXT_PUBLIC_ARC_NETWORK (see src/lib/arc/network.ts).
 
 import type { Address } from "viem";
+import { getAddress } from "viem";
 import { ARC_NETWORK } from "@/lib/arc/network";
 
 // ── Contract Addresses ──
@@ -31,16 +32,31 @@ export const VALIDATION_REGISTRY: Address =
   VALIDATION_REGISTRY_BY_NETWORK[ARC_NETWORK];
 
 // ERC-8183: Arc only publishes a reference implementation on Testnet.
-// On Mainnet, ArcHive deploys its own copy — the deployed address must go in
-// NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS (the live job path always reads that
-// env, never this constant).
+// On Mainnet, ArcHive deploys its own copy (see contracts/erc8183/).
 const AGENTIC_COMMERCE_BY_NETWORK: Record<"mainnet" | "testnet", Address> = {
-  // Zero until the ArcHive mainnet deployment — actions guarded by env.
-  mainnet: "0x0000000000000000000000000000000000000000",
+  // ArcHive mainnet deployment, 2026-10-10: implementation behind UUPS proxy.
+  mainnet: "0x172c7f69a802ae1e019ba4c4a7f20e874b120681",
   testnet: "0x0747EEf0706327138c69792bF28Cd525089e4583",
 };
 
 export const AGENTIC_COMMERCE: Address = AGENTIC_COMMERCE_BY_NETWORK[ARC_NETWORK];
+
+/**
+ * Resolves an address from an env var with the in-repo constant as fallback.
+ * A malformed env value (typo, truncated paste, bad checksum) must never break
+ * live mode: it is ignored and the verified constant wins instead.
+ */
+export function resolveAddress(envValue: string | undefined, fallback: Address): Address {
+  if (!envValue || !envValue.trim()) return fallback;
+  try {
+    return getAddress(envValue.trim());
+  } catch {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn(`[arc] Ignoring invalid address env override: ${envValue.slice(0, 12)}…`);
+    }
+    return fallback;
+  }
+}
 
 // Same address on both networks (docs.arc.io/arc/references/contract-addresses).
 export const USDC_CONTRACT: Address = "0x3600000000000000000000000000000000000000";
