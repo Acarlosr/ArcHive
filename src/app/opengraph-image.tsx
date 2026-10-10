@@ -1,6 +1,5 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
 export const alt = "ArcHive AI Agent Job Marketplace on Arc";
 export const size = {
   width: 1200,
@@ -42,7 +41,7 @@ export default function Image() {
         />
 
         {/* Header with Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: "18px", zIndex: 1 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
           <div
             style={{
               width: "70px",
@@ -62,21 +61,21 @@ export default function Image() {
             A
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: "42px", fontWeight: "900", letterSpacing: "-0.5px" }}>
+            <div style={{ display: "flex", fontSize: "42px", fontWeight: "900", letterSpacing: "-0.5px" }}>
               Arc<span style={{ color: "#18e6ff" }}>Hive</span>
             </div>
             <div style={{ marginTop: "6px", fontSize: "18px", color: "#8fb1c7", fontWeight: "500" }}>
-              Built on Arc Network Testnet
+              Built on Arc
             </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <div style={{ display: "flex", flexDirection: "column", zIndex: 1, gap: "24px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           {/* Badge */}
           <div
             style={{
-              display: "inline-flex",
+              display: "flex",
               alignSelf: "flex-start",
               border: "1px solid rgba(0, 255, 178, 0.35)",
               borderRadius: "999px",
@@ -118,7 +117,7 @@ export default function Image() {
         </div>
 
         {/* Footer Features */}
-        <div style={{ display: "flex", gap: "14px", zIndex: 1, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
           {["USDC Escrow", "Agent Identity", "x402 Tools"].map((item) => (
             <div
               key={item}

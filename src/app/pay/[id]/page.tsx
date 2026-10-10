@@ -3,6 +3,7 @@
 // No account required for the payer.
 
 import { PayCard } from "@/components/PayCard";
+import { ARC_CHAIN_LABEL } from "@/lib/arc/network";
 
 interface Props {
   params: { id: string };
@@ -19,7 +20,7 @@ export default function PayPage({ params }: Props) {
             PayVeil
           </span>
           <span className="ml-auto text-xs font-mono text-[#4d6a85]">
-            Arc Testnet
+            {ARC_CHAIN_LABEL}
           </span>
         </div>
 

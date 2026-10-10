@@ -1,5 +1,6 @@
 import { recoverTypedDataAddress, type Hex } from "viem";
 import { demoJobs } from "@/lib/demoData";
+import { ARC_CHAIN_ID } from "@/lib/arc/network";
 import type { ProofPack } from "@/lib/proofPacks";
 
 /**
@@ -14,7 +15,7 @@ import type { ProofPack } from "@/lib/proofPacks";
 export const AUDITOR_ACCESS_DOMAIN = {
   name: "ArcHive Governed Visibility",
   version: "1",
-  chainId: 5042002, // Arc testnet
+  chainId: ARC_CHAIN_ID,
 } as const;
 
 export const AUDITOR_ACCESS_TYPES = {

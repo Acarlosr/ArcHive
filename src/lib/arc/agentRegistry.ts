@@ -1,9 +1,10 @@
 import type { WalletClient } from "viem";
 import { demoAgents } from "@/lib/demoData";
 import { getAgentByOnchainId } from "@/lib/db/agents";
-import { ARC_TESTNET, assertWalletClientReady, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
+import { ARC_CHAIN, assertWalletClientReady, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
 import { REPUTATION_REGISTRY, reputationRegistryAbi } from "@/lib/arc/contracts";
 import { arcTransport } from "@/lib/arc/rpc";
+import { arcChain } from "@/lib/arc/network";
 
 export async function registerAgent({
   walletClient,
@@ -20,25 +21,24 @@ export async function registerAgent({
     return {
       txHash,
       agentId: `8004-${Math.floor(1000 + Math.random() * 8999)}`,
-      explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`,
+      explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${txHash}`,
       mode: "mock",
     };
   }
   assertWalletClientReady(walletClient);
 
   const { createPublicClient, parseAbi, parseAbiItem } = await import("viem");
-  const { arcTestnet } = await import("viem/chains");
   const identityRegistry = process.env.NEXT_PUBLIC_ARC_AGENT_REGISTRY_ADDRESS as `0x${string}`;
   const abi = parseAbi(["function register(string metadataUri) returns (uint256)"]);
   const [account] = await walletClient.getAddresses();
-  const publicClient = createPublicClient({ chain: arcTestnet, transport: arcTransport() });
+  const publicClient = createPublicClient({ chain: arcChain, transport: arcTransport() });
   const txHash = await walletClient.writeContract({
     address: identityRegistry,
     abi,
     functionName: "register",
     args: [uri],
     account,
-    chain: arcTestnet,
+    chain: arcChain,
   });
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
   const transferLogs = await publicClient.getLogs({
@@ -49,7 +49,7 @@ export async function registerAgent({
     toBlock: receipt.blockNumber,
   });
   const tokenId = transferLogs[transferLogs.length - 1]?.args.tokenId?.toString() ?? receipt.transactionIndex.toString();
-  return { txHash, agentId: tokenId, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, mode: "live" };
+  return { txHash, agentId: tokenId, explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${txHash}`, mode: "live" };
 }
 
 export async function getAgentById(agentId: string) {
@@ -105,7 +105,7 @@ export async function recordAgentFeedback({
       agentId,
       score,
       tag,
-      explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`,
+      explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${txHash}`,
       mode: "mock",
     };
   }
@@ -121,9 +121,8 @@ export async function recordAgentFeedback({
   }
 
   const { createPublicClient } = await import("viem");
-  const { arcTestnet } = await import("viem/chains");
   const [account] = await walletClient.getAddresses();
-  const publicClient = createPublicClient({ chain: arcTestnet, transport: arcTransport() });
+  const publicClient = createPublicClient({ chain: arcChain, transport: arcTransport() });
   const txHash = await walletClient.writeContract({
     address: REPUTATION_REGISTRY,
     abi: reputationRegistryAbi,
@@ -139,7 +138,7 @@ export async function recordAgentFeedback({
       `0x${"0".repeat(64)}` as `0x${string}`,
     ],
     account,
-    chain: arcTestnet,
+    chain: arcChain,
   });
   await publicClient.waitForTransactionReceipt({ hash: txHash });
   return {
@@ -147,7 +146,7 @@ export async function recordAgentFeedback({
     agentId,
     score,
     tag,
-    explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`,
+    explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${txHash}`,
     mode: "live",
   };
 }

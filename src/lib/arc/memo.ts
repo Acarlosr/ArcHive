@@ -4,8 +4,9 @@
 
 import type { WalletClient } from "viem";
 import { MEMO_CONTRACT, memoAbi } from "@/lib/arc/contracts";
-import { ARC_TESTNET } from "@/lib/arc/appKit";
+import { ARC_CHAIN } from "@/lib/arc/appKit";
 import { arcTransport } from "@/lib/arc/rpc";
+import { arcChain } from "@/lib/arc/network";
 
 // ── Tipos de payload de memo por fluxo do ArcHive ──
 
@@ -75,13 +76,11 @@ export async function callWithMemo({
   memoPayload: ArcHiveMemoPayload;
 }): Promise<`0x${string}`> {
   const { createPublicClient, keccak256, toHex } = await import("viem");
-  const { arcTestnet } = await import("viem/chains");
-
   const [account] = await walletClient.getAddresses();
   if (!account) throw new Error("No wallet account connected.");
 
   const publicClient = createPublicClient({
-    chain: arcTestnet,
+    chain: arcChain,
     transport: arcTransport(),
   });
 
@@ -97,7 +96,7 @@ export async function callWithMemo({
     functionName: "memo",
     args: [target, calldata, memoId, memoData],
     account,
-    chain: arcTestnet,
+    chain: arcChain,
   });
 
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
@@ -109,6 +108,6 @@ export async function callWithMemo({
 }
 
 /** URL do ArcScan para um txHash */
-export function arcScanUrl(txHash: string): string {
-  return `${ARC_TESTNET.explorerUrl}/tx/${txHash}`;
+export function explorerTxUrl(txHash: string): string {
+  return `${ARC_CHAIN.explorerUrl}/tx/${txHash}`;
 }

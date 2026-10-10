@@ -15,12 +15,19 @@ import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { DynamicWagmiConnector } from "@dynamic-labs/wagmi-connector";
 import { WagmiProvider, createConfig, http } from "wagmi";
-import { baseSepolia, arbitrumSepolia, sepolia } from "wagmi/chains";
+import {
+  baseSepolia,
+  arbitrumSepolia,
+  sepolia,
+  mainnet,
+  base,
+  arbitrum,
+} from "wagmi/chains";
 import { injected } from "wagmi/connectors";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
-import { defineChain } from "viem";
 import { arcTransport, ARC_RPC_URLS } from "@/lib/arc/rpc";
+import { arcChain, ARC_NETWORK } from "@/lib/arc/network";
 
 // Dynamic forbids more than one DynamicContextProvider in the tree. The app
 // wraps many wallet-touching components in their own <Providers> island, so we
@@ -28,48 +35,38 @@ import { arcTransport, ARC_RPC_URLS } from "@/lib/arc/rpc";
 // flags the context; any nested Providers becomes a transparent passthrough.
 const WalletProvidersMountedContext = createContext(false);
 
-// ── Arc Testnet chain definition ──
-export const arcTestnet = defineChain({
-  id: 5042002,
-  name: "Arc Testnet",
-  nativeCurrency: { name: "USD Coin", symbol: "USDC", decimals: 18 },
-  rpcUrls: {
-    default: { http: ARC_RPC_URLS },
-  },
-  blockExplorers: {
-    default: { name: "ArcScan", url: "https://testnet.arcscan.app" },
-  },
-  testnet: true,
-});
-
 const DYNAMIC_ENV_ID = process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
 export const hasDynamicAuth = Boolean(DYNAMIC_ENV_ID);
 
-// Arc Testnet as a Dynamic custom EVM network (mirrors `arcTestnet` above).
+// Funding-source chains mirror the Arc App Kit mapping: mainnet chains on
+// mainnet, Sepolia variants on testnet.
+const fundingChains = ARC_NETWORK === "mainnet"
+  ? [mainnet, base, arbitrum]
+  : [baseSepolia, arbitrumSepolia, sepolia];
+
+// The Arc network as a Dynamic custom EVM network (mirrors `arcChain`).
 const dynamicEvmNetworks = [
   {
-    blockExplorerUrls: ["https://testnet.arcscan.app"],
-    chainId: arcTestnet.id,
-    chainName: "Arc Testnet",
+    blockExplorerUrls: [arcChain.blockExplorers?.default.url ?? "https://explorer.arc.io"],
+    chainId: arcChain.id,
+    chainName: arcChain.name,
     iconUrls: ["https://archivearc.xyz/icon.png"],
-    name: "Arc Testnet",
-    nativeCurrency: arcTestnet.nativeCurrency,
-    networkId: arcTestnet.id,
+    name: arcChain.name,
+    nativeCurrency: arcChain.nativeCurrency,
+    networkId: arcChain.id,
     rpcUrls: ARC_RPC_URLS,
-    vanityName: "Arc Testnet",
+    vanityName: arcChain.name,
   },
 ];
 
 const wagmiConfig = createConfig({
-  chains: [arcTestnet, baseSepolia, arbitrumSepolia, sepolia],
+  chains: [arcChain, ...fundingChains],
   // Dynamic implements multi-injected provider discovery itself.
   multiInjectedProviderDiscovery: !hasDynamicAuth,
   connectors: hasDynamicAuth ? [] : [injected()],
   transports: {
-    [arcTestnet.id]: arcTransport(),
-    [baseSepolia.id]: http(),
-    [arbitrumSepolia.id]: http(),
-    [sepolia.id]: http(),
+    [arcChain.id]: arcTransport(),
+    ...Object.fromEntries(fundingChains.map((chain) => [chain.id, http()])),
   },
   ssr: true,
 });

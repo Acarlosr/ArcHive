@@ -1,25 +1,26 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n";
+import { ARC_CHAIN_ID, ARC_CHAIN_LABEL } from "@/lib/arc/network";
 
 const envRows = [
   ["NEXT_PUBLIC_SUPABASE_URL", "Supabase project URL for app state"],
   ["NEXT_PUBLIC_SUPABASE_ANON_KEY", "Supabase anon key for browser CRUD"],
   ["NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID", "Wallet onboarding"],
-  ["NEXT_PUBLIC_ARC_RPC_URL", "Arc Testnet RPC override"],
+  ["NEXT_PUBLIC_ARC_NETWORK", "Arc network: mainnet (5042) or testnet (5042002)"],
   ["NEXT_PUBLIC_ARC_AGENT_REGISTRY_ADDRESS", "ERC-8004 identity registry"],
   ["NEXT_PUBLIC_ARC_REPUTATION_REGISTRY_ADDRESS", "ERC-8004 reputation registry"],
   ["NEXT_PUBLIC_ARC_VALIDATION_REGISTRY_ADDRESS", "ERC-8004 validation registry"],
   ["NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS", "ERC-8183 job and escrow contract"],
   ["NEXT_PUBLIC_ARC_ESCROW_VAULT_ADDRESS", "Unified Balance escrow recipient"],
-  ["NEXT_PUBLIC_ARC_USDC_ADDRESS", "Arc Testnet USDC token"],
+  ["NEXT_PUBLIC_ARC_USDC_ADDRESS", "Arc USDC token (native gas)"],
   ["NEXT_PUBLIC_NANOPAYMENTS_SELLER_URL", "x402 seller base URL for agent tool calls"],
   ["SUPABASE_SERVICE_ROLE_KEY", "Server-only key for Gateway webhook persistence and dedupe"],
   ["NEXT_PUBLIC_ARC_MOCK_MODE", "Demo/live mode switch"],
 ];
 
 const readinessRows = [
-  ["Ready", "Arc Testnet network", "Chain ID 5042002, RPC, explorer, and USDC gas assumptions are configured."],
+  ["Ready", `${ARC_CHAIN_LABEL} network`, `Chain ID ${ARC_CHAIN_ID}, RPC, explorer, and USDC gas assumptions are configured.`],
   ["Ready", "ERC-8004 identity", "IdentityRegistry, ReputationRegistry, and ValidationRegistry addresses are mapped from Arc docs."],
   ["Ready", "ERC-8183 core flow", "Job creation, provider budget setting, USDC approval/funding, submission, and completion are wired for live mode."],
   ["Ready", "x402 metered tools", "Circle Gateway seller service is isolated under services/nanopayments-seller."],
@@ -38,13 +39,13 @@ export default function SettingsPage() {
         "URL do projeto Supabase para estado do app",
         "Chave anon do Supabase para CRUD no navegador",
         "Onboarding de carteira",
-        "Override de RPC da Arc Testnet",
+        "Seletor de rede Arc (mainnet/testnet)",
         "Registro de identidade ERC-8004",
         "Registro de reputação ERC-8004",
         "Registro de validação ERC-8004",
         "Contrato de job e escrow ERC-8183",
         "Destinatário de escrow via Unified Balance",
-        "Token USDC na Arc Testnet",
+        "Token USDC na Arc (gas nativo)",
         "URL base do seller x402 para chamadas de tools",
         "Chave server-only para persistência e dedupe de webhooks Gateway",
         "Chave de modo demo/live",
@@ -52,7 +53,7 @@ export default function SettingsPage() {
     : null;
   const readiness = isPt
     ? [
-        ["Pronto", "Rede Arc Testnet", "Chain ID 5042002, RPC, explorer e premissas de gas em USDC estão configurados."],
+        ["Pronto", `Rede ${ARC_CHAIN_LABEL}`, `Chain ID ${ARC_CHAIN_ID}, RPC, explorer e premissas de gas em USDC estão configurados.`],
         ["Pronto", "Identidade ERC-8004", "Endereços de IdentityRegistry, ReputationRegistry e ValidationRegistry estão mapeados a partir dos docs da Arc."],
         ["Pronto", "Fluxo principal ERC-8183", "Criação de job, orçamento do prestador, aprovação/funding em USDC, submissão e conclusão estão conectados para modo live."],
         ["Pronto", "Tools medidas x402", "O serviço seller do Circle Gateway fica isolado em services/nanopayments-seller."],
@@ -110,7 +111,7 @@ export default function SettingsPage() {
               <h2 className="mt-2 font-display text-xl font-semibold text-arc-text">{isPt ? "Prontidão para produção" : "Production readiness"}</h2>
             </div>
             <a
-              href="https://docs.arc.network/build"
+              href="https://docs.arc.io/arc/build"
               target="_blank"
               rel="noreferrer"
               className="text-sm font-medium text-arc-cyan hover:text-white"

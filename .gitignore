@@ -28,6 +28,7 @@ pnpm-debug.log*
 .DS_Store
 .vscode/
 .idea/
+.claude/settings.local.json
 
 # Vercel
 .vercel/
@@ -41,3 +42,6 @@ tsconfig.tsbuildinfo
 
 # documentos internos (nunca vao pro GitHub)
 _local/
+
+# python cache
+__pycache__/

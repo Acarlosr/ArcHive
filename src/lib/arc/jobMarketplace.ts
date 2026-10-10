@@ -1,10 +1,11 @@
 import type { Hex, WalletClient } from "viem";
 import { getJobById as getJobRecordById } from "@/lib/db/jobs";
 import { spendFromUnifiedBalance } from "@/lib/arc/unifiedBalance";
-import { ARC_TESTNET, assertWalletClientReady, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
+import { ARC_CHAIN, assertWalletClientReady, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
 import { agenticCommerceAbi, erc20Abi, USDC_CONTRACT } from "@/lib/arc/contracts";
-import { callWithMemo, arcScanUrl } from "@/lib/arc/memo";
+import { callWithMemo, explorerTxUrl } from "@/lib/arc/memo";
 import { arcTransport } from "@/lib/arc/rpc";
+import { arcChain, ARC_NETWORK } from "@/lib/arc/network";
 
 type WalletAction = { walletClient?: WalletClient | null };
 type TxResult = { txHash: `0x${string}`; explorerUrl: string; jobId: string; mode: "mock" | "live" };
@@ -19,14 +20,13 @@ function getJobMarketplaceAddress() {
 
 async function getLiveClients(walletClient: WalletClient) {
   const { createPublicClient } = await import("viem");
-  const { arcTestnet } = await import("viem/chains");
   const [account] = await walletClient.getAddresses();
   if (!account) throw new Error("No wallet account is connected.");
   const publicClient = createPublicClient({
-    chain: arcTestnet,
+    chain: arcChain,
     transport: arcTransport(),
   });
-  return { account, arcTestnet, publicClient };
+  return { account, arcChain, publicClient };
 }
 
 function assertSuccessfulReceipt(receipt: { status: "success" | "reverted"; transactionHash: `0x${string}` }, action: string) {
@@ -62,14 +62,14 @@ export async function createJob({
     return {
       txHash,
       jobId: `8183-${Math.floor(1000 + Math.random() * 8999)}`,
-      explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`,
+      explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${txHash}`,
       mode: "mock",
     };
   }
   assertWalletClientReady(walletClient);
 
   const { decodeEventLog } = await import("viem");
-  const { account, arcTestnet, publicClient } = await getLiveClients(walletClient);
+  const { account, arcChain, publicClient } = await getLiveClients(walletClient);
   const block = await publicClient.getBlock();
   const address = getJobMarketplaceAddress();
   const txHash = await walletClient.writeContract({
@@ -84,7 +84,7 @@ export async function createJob({
       zeroAddress,
     ],
     account,
-    chain: arcTestnet,
+    chain: arcChain,
   });
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
   assertSuccessfulReceipt(receipt, "Create job");
@@ -97,7 +97,7 @@ export async function createJob({
     }
   })[0];
 
-  return { txHash, jobId: created ?? receipt.transactionIndex.toString(), explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, mode: "live" };
+  return { txHash, jobId: created ?? receipt.transactionIndex.toString(), explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${txHash}`, mode: "live" };
 }
 
 export async function fundEscrow({
@@ -118,7 +118,7 @@ export async function fundEscrow({
   assertWalletClientReady(walletClient);
 
   const { parseUnits, encodeFunctionData } = await import("viem");
-  const { account, arcTestnet, publicClient } = await getLiveClients(walletClient);
+  const { account, arcChain, publicClient } = await getLiveClients(walletClient);
   const marketplaceAddress = getJobMarketplaceAddress();
   const amount = parseUnits(budgetUsdc, 6);
 
@@ -129,7 +129,7 @@ export async function fundEscrow({
     functionName: "approve",
     args: [marketplaceAddress, amount],
     account,
-    chain: arcTestnet,
+    chain: arcChain,
   });
   const approveReceipt = await publicClient.waitForTransactionReceipt({ hash: approveHash });
   assertSuccessfulReceipt(approveReceipt, "Approve USDC");
@@ -153,7 +153,7 @@ export async function fundEscrow({
     },
   });
 
-  return { txHash: fundHash, explorerUrl: arcScanUrl(fundHash), jobId, mode: "live" };
+  return { txHash: fundHash, explorerUrl: explorerTxUrl(fundHash), jobId, mode: "live" };
 }
 
 export async function acceptJob({
@@ -163,24 +163,24 @@ export async function acceptJob({
 }: WalletAction & { jobId: string; budgetUsdc?: string }): Promise<TxResult> {
   if (isArcMockMode("job")) {
     const txHash = mockTxHash(`accept-${jobId}`);
-    return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "mock" };
+    return { txHash, explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${txHash}`, jobId, mode: "mock" };
   }
   assertWalletClientReady(walletClient);
 
   if (!budgetUsdc) throw new Error("Provider budget is required before the client can fund escrow.");
   const { parseUnits } = await import("viem");
-  const { account, arcTestnet, publicClient } = await getLiveClients(walletClient);
+  const { account, arcChain, publicClient } = await getLiveClients(walletClient);
   const txHash = await walletClient.writeContract({
     address: getJobMarketplaceAddress(),
     abi: agenticCommerceAbi,
     functionName: "setBudget",
     args: [BigInt(jobId), parseUnits(budgetUsdc, 6), "0x"],
     account,
-    chain: arcTestnet,
+    chain: arcChain,
   });
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
   assertSuccessfulReceipt(receipt, "Set budget");
-  return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "live" };
+  return { txHash, explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${txHash}`, jobId, mode: "live" };
 }
 
 export async function submitDeliverable({
@@ -200,7 +200,7 @@ export async function submitDeliverable({
     const encoded = Array.from(source).map((char) => char.charCodeAt(0).toString(16)).join("").slice(0, 42);
     const hash = deliverableHash ?? `ipfs://${encoded.padEnd(42, "0")}`;
     const txHash = mockTxHash(`submit-${jobId}-${hash}`);
-    return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, deliverableHash: hash, mode: "mock" };
+    return { txHash, explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${txHash}`, jobId, deliverableHash: hash, mode: "mock" };
   }
   assertWalletClientReady(walletClient);
 
@@ -227,7 +227,7 @@ export async function submitDeliverable({
     },
   });
 
-  return { txHash, explorerUrl: arcScanUrl(txHash), jobId, deliverableHash: submittedHash, mode: "live" };
+  return { txHash, explorerUrl: explorerTxUrl(txHash), jobId, deliverableHash: submittedHash, mode: "live" };
 }
 
 export async function approveAndPay({
@@ -237,7 +237,7 @@ export async function approveAndPay({
 }: WalletAction & { jobId: string; reason?: string }): Promise<TxResult> {
   if (isArcMockMode("job")) {
     const txHash = mockTxHash(`approve-pay-${jobId}`);
-    return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "mock" };
+    return { txHash, explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${txHash}`, jobId, mode: "mock" };
   }
   assertWalletClientReady(walletClient);
 
@@ -264,19 +264,36 @@ export async function approveAndPay({
     },
   });
 
-  return { txHash, explorerUrl: arcScanUrl(txHash), jobId, mode: "live" };
+  return { txHash, explorerUrl: explorerTxUrl(txHash), jobId, mode: "live" };
 }
 
 export async function refundEscrow({
+  walletClient,
   jobId,
   reason = "client-refund-request",
 }: WalletAction & { jobId: string; reason?: string }) {
-  // App-layer refund path (mock). The deployed ERC-8183 contract exposes no
-  // refund entry point, so this records the client's refund/dispute intent
-  // off-chain until the dedicated escrow contract (roadmap item 2) ships an
-  // on-chain refund with mutual 2-signature release.
+  // Mainnet runs ArcHive's own ERC-8183 deployment (contracts/erc8183), which
+  // keeps the EIP's permissionless `claimRefund` after expiry. The official
+  // Testnet reference has no refund entry point, so Testnet stays mock-only.
+  if (ARC_NETWORK === "mainnet" && !isArcMockMode("job") && walletClient) {
+    assertWalletClientReady(walletClient);
+    const { account } = await getLiveClients(walletClient);
+    const marketplaceAddress = getJobMarketplaceAddress();
+    const txHash = await walletClient.writeContract({
+      address: marketplaceAddress,
+      abi: agenticCommerceAbi,
+      functionName: "claimRefund",
+      args: [BigInt(jobId)],
+      account,
+      chain: arcChain,
+    });
+    return { txHash, explorerUrl: explorerTxUrl(txHash), jobId, reason, mode: "live" as const };
+  }
+
+  // App-layer refund path (mock). Records the client's refund/dispute intent
+  // off-chain; on Testnet there is no on-chain refund to call.
   const txHash = mockTxHash(`refund-${jobId}-${reason}`);
-  return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, reason };
+  return { txHash, explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${txHash}`, jobId, reason };
 }
 
 export async function autoReleaseEscrow({
@@ -289,7 +306,7 @@ export async function autoReleaseEscrow({
   // with an auto-release reason.
   if (isArcMockMode("job")) {
     const txHash = mockTxHash(`auto-release-${jobId}`);
-    return { txHash, explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`, jobId, mode: "mock" };
+    return { txHash, explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${txHash}`, jobId, mode: "mock" };
   }
   assertWalletClientReady(walletClient);
   return approveAndPay({ walletClient, jobId, reason: "auto-release-timeout" });

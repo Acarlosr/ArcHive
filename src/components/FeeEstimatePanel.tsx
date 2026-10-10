@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n";
+import { ARC_CHAIN_LABEL } from "@/lib/arc/network";
 
 export function FeeEstimatePanel({ amount = "0.00" }: { amount?: string }) {
   const { locale } = useLanguage();
@@ -15,7 +16,7 @@ export function FeeEstimatePanel({ amount = "0.00" }: { amount?: string }) {
       <div className="mb-3 flex items-center justify-between">
         <div>
           <div className="text-sm font-display font-semibold text-arc-text">{isPt ? "Estimativa de taxas" : "Fee estimate"}</div>
-          <p className="text-xs text-arc-muted">{isPt ? "Prévia de gasto via Unified Balance na Arc Testnet." : "Unified Balance spend preview for Arc Testnet."}</p>
+          <p className="text-xs text-arc-muted">{isPt ? `Prévia de gasto via Unified Balance na ${ARC_CHAIN_LABEL}.` : `Unified Balance spend preview for ${ARC_CHAIN_LABEL}.`}</p>
         </div>
         <span className="rounded-full border border-arc-cyan/25 bg-arc-cyan/10 px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.14em] text-arc-cyan">
           USDC

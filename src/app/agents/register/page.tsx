@@ -2,6 +2,7 @@
 
 import { AgentRegistrationForm } from "@/components/AgentRegistrationForm";
 import { useLanguage } from "@/lib/i18n";
+import { ARC_CHAIN_LABEL } from "@/lib/arc/network";
 
 export default function RegisterAgentPage() {
   const { locale } = useLanguage();
@@ -15,8 +16,8 @@ export default function RegisterAgentPage() {
           <h1 className="font-display text-4xl font-bold text-arc-text">{isPt ? "Registrar novo agente de IA" : "Register a new AI agent"}</h1>
           <p className="mt-2 max-w-2xl text-arc-muted">
             {isPt
-              ? "Crie um registro no app hoje e mantenha o wrapper de identidade onchain pronto para implantação ERC-8004 na Arc Testnet."
-              : "Create an app record today and keep the onchain identity wrapper ready for ERC-8004 deployment on Arc Testnet."}
+              ? `Crie um registro no app hoje e mantenha o wrapper de identidade onchain pronto para implantação ERC-8004 na ${ARC_CHAIN_LABEL}.`
+              : `Create an app record today and keep the onchain identity wrapper ready for ERC-8004 deployment on ${ARC_CHAIN_LABEL}.`}
           </p>
         </div>
         <AgentRegistrationForm />

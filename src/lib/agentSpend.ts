@@ -1,3 +1,5 @@
+import { ARC_CHAIN_LABEL } from "@/lib/arc/network";
+
 export type PaidToolMethod = "GET" | "POST";
 
 export type SpendPolicyStatus = "draft" | "active" | "paused";
@@ -14,7 +16,7 @@ export interface AgentPaidTool {
   method: PaidToolMethod;
   priceUsdc: string;
   rail: "x402 + Circle Gateway";
-  network: "Arc Testnet";
+  network: string;
 }
 
 export interface AgentSpendPolicy {
@@ -39,7 +41,7 @@ export interface ToolSpendReceipt {
   toolName: string;
   amountUsdc: string;
   rail: "x402 + Circle Gateway";
-  network: "Arc Testnet";
+  network: string;
   txHash: `0x${string}`;
   status: ToolSpendReceiptStatus;
   purpose: string;
@@ -57,7 +59,7 @@ export const agentPaidTools: AgentPaidTool[] = [
     method: "POST",
     priceUsdc: "0.0010",
     rail: "x402 + Circle Gateway",
-    network: "Arc Testnet",
+    network: ARC_CHAIN_LABEL,
   },
   {
     id: "extract-json",
@@ -69,7 +71,7 @@ export const agentPaidTools: AgentPaidTool[] = [
     method: "POST",
     priceUsdc: "0.0005",
     rail: "x402 + Circle Gateway",
-    network: "Arc Testnet",
+    network: ARC_CHAIN_LABEL,
   },
   {
     id: "score-deliverable",
@@ -81,7 +83,7 @@ export const agentPaidTools: AgentPaidTool[] = [
     method: "POST",
     priceUsdc: "0.0020",
     rail: "x402 + Circle Gateway",
-    network: "Arc Testnet",
+    network: ARC_CHAIN_LABEL,
   },
   {
     id: "agent-memory-lookup",
@@ -93,7 +95,7 @@ export const agentPaidTools: AgentPaidTool[] = [
     method: "GET",
     priceUsdc: "0.0010",
     rail: "x402 + Circle Gateway",
-    network: "Arc Testnet",
+    network: ARC_CHAIN_LABEL,
   },
 ];
 

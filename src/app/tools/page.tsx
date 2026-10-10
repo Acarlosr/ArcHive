@@ -4,6 +4,7 @@ import { AgentSpendConsole } from "@/components/AgentSpendConsole";
 import { MeteredToolTester } from "@/components/MeteredToolTester";
 import { agentPaidTools } from "@/lib/agentSpend";
 import { useLanguage } from "@/lib/i18n";
+import { ARC_CAIP_ID } from "@/lib/arc/network";
 
 const sellerBaseUrl =
   process.env.NEXT_PUBLIC_NANOPAYMENTS_SELLER_URL ?? "http://localhost:4021";
@@ -104,7 +105,7 @@ export default function ToolsPage() {
               <div className="label-field mb-2">{t("tools.network")}</div>
               <p className="text-sm leading-6 text-arc-muted">
                 {t("tools.networkDetail")}
-                <span className="font-mono text-arc-cyan"> eip155:5042002</span>.
+                <span className="font-mono text-arc-cyan"> {ARC_CAIP_ID}</span>.
               </p>
             </div>
           </div>

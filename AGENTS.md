@@ -77,12 +77,19 @@ Organizar em:
 - `acceptJob()`
 - `submitDeliverable()`
 - `approveAndPay()` — chama `complete()` on-chain
-- `refundEscrow()` — mock apenas; contrato ERC-8183 da Arc não expõe refund público
+- `refundEscrow()` — Testnet: mock apenas (o contrato oficial ERC-8183 da Arc não expõe refund público). Mainnet: chama `claimRefund()` do deploy próprio (contracts/erc8183), permissionless após `expiredAt`
 - `getJobById()`
 
-## Estados do job (ERC-8183 Arc Testnet)
+## Estados do job (ERC-8183)
 Open → Funded → Submitted → Completed | Rejected | Expired
-O status `Expired` é gerenciado internamente pelo contrato via campo `expiredAt`. Não há função pública de timeout — nenhum `claimAfterTimeout` existe nesta implementação de referência.
+O status `Expired` é gerenciado pelo contrato via campo `expiredAt` + função `claimRefund` (permissionless após expiração, presente na reference implementation do EIP-8183 e no deploy próprio do ArcHive na mainnet — ver `contracts/erc8183/`). O contrato oficial da Arc Testnet não tem `claimRefund`; por isso refund em Testnet segue mock.
+
+## Redes
+- Seletor: `NEXT_PUBLIC_ARC_NETWORK=mainnet|testnet` (default testnet) — fonte única em `src/lib/arc/network.ts`
+- Mainnet: chain 5042, RPC `rpc.mainnet.arc.io`, explorer `explorer.arc.io`
+- Testnet: chain 5042002, RPC `rpc.testnet.arc.io`, explorer `explorer.testnet.arc.io`
+- ERC-8004 mainnet: Identity `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432`, Reputation `0x8004BAa17C55a88189AE136b182e5fdA19dE9b63`, Validation `0x8004Cc8439f36fd5F9F049D9fF86523Df6dAAB58`
+- ERC-8183 não existe oficialmente na mainnet — ArcHive deploya o próprio (endereço em `NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS`)
 
 ## Rotas esperadas
 - `/`

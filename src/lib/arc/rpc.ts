@@ -1,7 +1,8 @@
 import { fallback, http } from "viem";
+import { ARC_NETWORK } from "@/lib/arc/network";
 
 /**
- * Endpoints RPC da Arc Testnet, em ordem de preferência.
+ * Endpoints RPC da Arc, em ordem de preferência, por rede.
  *
  * Por que a lista é grande E alterna entre dois domínios:
  *
@@ -16,12 +17,22 @@ import { fallback, http } from "viem";
  *
  * Por isso a lista **alterna os domínios**: se uma regra de bloqueio derrubar
  * `arc.io` inteiro, a próxima tentativa já cai em `arc.network`, e vice-versa.
- * Os dois domínios servem a mesma rede (chain ID 5042002, verificado).
  */
-const PADROES = [
+const PADROES_MAINNET = [
   // `.network` vem primeiro DE PROPOSITO: e o unico que funciona para quem tem
   // bloqueador de anuncios (ver comentario acima). `.io` e o dominio oficial nos
-  // docs e continua na lista logo atras, para o dia em que `.network` sair do ar.
+  // docs e continua na lista logo atras.
+  "https://rpc.mainnet.arc.network",
+  "https://rpc.mainnet.arc.io",
+  "https://rpc.quicknode.mainnet.arc.network",
+  "https://rpc.quicknode.mainnet.arc.io",
+  "https://rpc.drpc.mainnet.arc.network",
+  "https://rpc.drpc.mainnet.arc.io",
+  "https://rpc.blockdaemon.mainnet.arc.network",
+  "https://rpc.blockdaemon.mainnet.arc.io",
+];
+
+const PADROES_TESTNET = [
   "https://rpc.testnet.arc.network",
   "https://rpc.testnet.arc.io",
   "https://rpc.quicknode.testnet.arc.network",
@@ -34,7 +45,7 @@ const PADROES = [
 
 export const ARC_RPC_URLS = [
   ...(process.env.NEXT_PUBLIC_ARC_RPC_URL ? [process.env.NEXT_PUBLIC_ARC_RPC_URL] : []),
-  ...PADROES,
+  ...(ARC_NETWORK === "mainnet" ? PADROES_MAINNET : PADROES_TESTNET),
 ].filter((url, index, all) => all.indexOf(url) === index);
 
 /**

@@ -19,13 +19,18 @@ declare global {
 const PORT = Number(process.env.PORT ?? 4021);
 const SELLER_ADDRESS = process.env.SELLER_ADDRESS;
 const ACCEPT_ARC_ONLY = process.env.ACCEPT_ARC_ONLY !== "false";
-const ARC_TESTNET_NETWORK = "eip155:5042002";
+const ARC_NETWORK = process.env.ARC_NETWORK;
+const FACILITATOR_URL = process.env.FACILITATOR_URL;
+// CAIP-2 network per ARC_NETWORK: Arc Testnet 5042002, Arc Mainnet 5042.
+const ARC_CAIP_BY_NETWORK = {
+  testnet: "eip155:5042002",
+  mainnet: "eip155:5042",
+} as const;
+const ARC_TESTNET_NETWORK = ARC_CAIP_BY_NETWORK[ARC_NETWORK as "testnet" | "mainnet"];
 const FACILITATOR_BY_NETWORK = {
   testnet: "https://gateway-api-testnet.circle.com",
   mainnet: "https://gateway-api.circle.com",
 } as const;
-const ARC_NETWORK = process.env.ARC_NETWORK;
-const FACILITATOR_URL = process.env.FACILITATOR_URL;
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGIN ?? "")
   .split(",")
   .map((origin) => origin.trim())

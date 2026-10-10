@@ -27,15 +27,17 @@ const nextConfig = {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
   images: {
-    domains: ["gateway.pinata.cloud", "ipfs.io"],
+    remotePatterns: [
+      { protocol: "https", hostname: "gateway.pinata.cloud" },
+      { protocol: "https", hostname: "ipfs.io" },
+    ],
   },
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      "@react-native-async-storage/async-storage": false,
-      "pino-pretty": false,
-    };
-    return config;
+  turbopack: {
+    resolveAlias: {
+      // Dynamic pulls Node-only / RN-only packages; stub them out for the browser bundle.
+      "@react-native-async-storage/async-storage": "./stubs/empty.js",
+      "pino-pretty": "./stubs/empty.js",
+    },
   },
 };
 

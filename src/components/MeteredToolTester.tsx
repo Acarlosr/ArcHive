@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useLanguage } from "@/lib/i18n";
+import { ARC_CHAIN_LABEL } from "@/lib/arc/network";
 
 type MeteredTool = {
   name: string;
@@ -50,7 +51,7 @@ function getPaymentSummary(payload: unknown) {
   }
 
   return {
-    network: String(first.network ?? "Arc Testnet"),
+    network: String(first.network ?? ARC_CHAIN_LABEL),
     amount: String(first.maxAmountRequired ?? first.amount ?? "USDC payment required"),
     asset: String(first.asset ?? "USDC"),
     payTo: String(first.payTo ?? "seller wallet"),

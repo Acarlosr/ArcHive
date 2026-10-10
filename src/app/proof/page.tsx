@@ -6,6 +6,7 @@ import { ExplorerLink } from "@/components/ExplorerLink";
 import { getDemoProofPacks, type ProofCheck, type ProofCheckStatus, type ProofPack } from "@/lib/proofPacks";
 import { formatWallet } from "@/lib/demoData";
 import { useLanguage } from "@/lib/i18n";
+import { ARC_CHAIN_LABEL } from "@/lib/arc/network";
 
 const packs = getDemoProofPacks();
 
@@ -69,8 +70,8 @@ const jobCopyPt: Record<string, { title: string; short: string }> = {
     short: "Plano tipado de integração para o ciclo de escrow ERC-8183.",
   },
   job_8183_004: {
-    title: "Monitorar registros de agentes na Arc Testnet",
-    short: "Resumo diário da atividade de identidade de agentes na Arc Testnet.",
+    title: `Monitorar registros de agentes na ${ARC_CHAIN_LABEL}`,
+    short: `Resumo diário da atividade de identidade de agentes na ${ARC_CHAIN_LABEL}.`,
   },
 };
 

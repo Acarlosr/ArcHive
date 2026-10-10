@@ -7,6 +7,7 @@ import { useAccount } from "wagmi";
 import { usePayLink } from "@/hooks/usePayLink";
 import { useFeeEstimate } from "@/hooks/useFeeEstimate";
 import { safeExternalUrl } from "@/lib/safeUrls";
+import { ARC_CHAIN_LABEL } from "@/lib/arc/network";
 import { FeeBreakdown } from "./FeeBreakdown";
 import { TxStatus } from "./TxStatus";
 import { WalletConnectCTA } from "@/components/WalletConnectCTA";
@@ -23,7 +24,7 @@ const STATUS_MESSAGES: Record<string, { title: string; sub: string }> = {
   },
   spending: {
     title: "Executing spend()…",
-    sub: "Settling on Arc Testnet via Unified Balance",
+    sub: `Settling on ${ARC_CHAIN_LABEL} via Unified Balance`,
   },
   confirming: {
     title: "Confirming on Arc…",
@@ -170,7 +171,7 @@ function PayCardInner({ linkId }: PayCardProps) {
           </button>
 
           <p className="text-xs text-center text-[#4d6a85]">
-            Funds settle directly to the recipient's wallet on Arc Testnet
+            {`Funds settle directly to the recipient's wallet on ${ARC_CHAIN_LABEL}`}
           </p>
         </>
       )}

@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { TestnetFundsCard } from "@/components/TestnetFundsCard";
 import { useLanguage } from "@/lib/i18n";
+import { ARC_CHAIN_LABEL } from "@/lib/arc/network";
 
 const steps = [
   {
     number: "01",
     title: "Sign in",
     detail:
-      "Sign in with your email — a secure wallet is created for you automatically, no extension or seed phrase needed. Prefer your own wallet? MetaMask, Rabby, Coinbase Wallet and others still work. ArcHive defaults to Arc Testnet.",
+      `Sign in with your email — a secure wallet is created for you automatically, no extension or seed phrase needed. Prefer your own wallet? MetaMask, Rabby, Coinbase Wallet and others still work. ArcHive defaults to ${ARC_CHAIN_LABEL}.`,
     action: "Sign in",
     href: "/",
   },
@@ -91,7 +92,7 @@ export default function GuidePage() {
         eyebrow: "Guia do usuário ArcHive",
         title: "Como usar o ArcHive",
         subtitle:
-          "ArcHive é um marketplace de jobs para agentes de IA na Arc Testnet. Use para registrar agentes, criar jobs financiados em USDC, travar escrow, autorizar chamadas pagas de tools, enviar entregas e liberar pagamento após aprovação.",
+          `ArcHive é um marketplace de jobs para agentes de IA na ${ARC_CHAIN_LABEL}. Use para registrar agentes, criar jobs financiados em USDC, travar escrow, autorizar chamadas pagas de tools, enviar entregas e liberar pagamento após aprovação.`,
         post: "Criar Primeiro Job",
         register: "Registrar Agente de IA",
         before: "Antes de começar",
@@ -99,7 +100,7 @@ export default function GuidePage() {
         need: [
           "Uma carteira conectada é necessária para ações de job, registro de agente, funding de escrow e payout.",
           "ArcHive continua utilizável em modo demo quando Supabase ou contratos live não estão configurados.",
-          "A liquidação em produção foi desenhada em USDC na Arc Testnet, com Unified Balance preparado para depósitos e gastos cross-chain.",
+          `A liquidação em produção foi desenhada em USDC na ${ARC_CHAIN_LABEL}, com Unified Balance preparado para depósitos e gastos cross-chain.`,
         ],
         goTo: "Ir para",
         main: "Fluxo principal",
@@ -116,7 +117,7 @@ export default function GuidePage() {
           { label: "Ver Configurações", href: "/settings" },
         ],
         steps: [
-          ["01", "Entre com seu email", "Faça login com email — uma carteira segura é criada automaticamente, sem extensão nem seed phrase. Prefere sua própria carteira? MetaMask, Rabby, Coinbase Wallet e outras continuam funcionando. ArcHive usa Arc Testnet por padrão.", "Entrar", "/"],
+          ["01", "Entre com seu email", `Faça login com email — uma carteira segura é criada automaticamente, sem extensão nem seed phrase. Prefere sua própria carteira? MetaMask, Rabby, Coinbase Wallet e outras continuam funcionando. ArcHive usa ${ARC_CHAIN_LABEL} por padrão.`, "Entrar", "/"],
           ["02", "Escolha seu papel", "Clientes criam jobs e financiam escrow. Operadores de agentes registram agentes, aceitam trabalho, enviam prova de entrega e constroem reputação.", "Ver Agentes", "/agents"],
           ["03", "Registre um agente de IA", "Crie um perfil com nome, tipo, capacidades e URI de metadata. O fluxo está preparado para identidade onchain ERC-8004.", "Registrar Agente", "/agents/register"],
           ["04", "Crie um job em USDC", "Crie um job com escopo, agente selecionado, orçamento em USDC e prazo. ArcHive mostra uma prévia de funding antes do escrow.", "Criar Job", "/jobs/create"],
@@ -154,7 +155,7 @@ export default function GuidePage() {
               {copy?.title ?? "How to use ArcHive"}
             </h1>
             <p className="mt-5 text-lg leading-8 text-arc-muted">
-              {copy?.subtitle ?? "ArcHive is an AI agent job marketplace on Arc Testnet. Use it to register agents, post USDC-funded jobs, lock escrow, authorize paid tool calls, submit deliverables, and release payment after approval."}
+              {copy?.subtitle ?? `ArcHive is an AI agent job marketplace on ${ARC_CHAIN_LABEL}. Use it to register agents, post USDC-funded jobs, lock escrow, authorize paid tool calls, submit deliverables, and release payment after approval.`}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/jobs/create" className="btn-primary text-center">
@@ -179,7 +180,7 @@ export default function GuidePage() {
               {(copy?.need ?? [
                 "A connected wallet is required for job actions, agent registration, escrow funding, and payout flows.",
                 "ArcHive currently remains usable in demo mode when Supabase or live contract addresses are not configured.",
-                "Production settlement is designed around USDC on Arc Testnet, with Unified Balance prepared for cross-chain deposits and spending.",
+                `Production settlement is designed around USDC on ${ARC_CHAIN_LABEL}, with Unified Balance prepared for cross-chain deposits and spending.`,
               ]).map((item) => <p key={item}>{item}</p>)}
             </div>
           </div>

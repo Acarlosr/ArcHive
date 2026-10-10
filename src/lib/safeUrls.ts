@@ -1,7 +1,15 @@
-const EXPLORER_HOSTS = ["testnet.arcscan.app", "explorer.arc.io"] as const;
+import { ARC_CHAIN } from "@/lib/arc/network";
+
+// Explorer hosts we will link to (active network + legacy hosts from older
+// deployments, so historical tx hashes keep resolving).
+const EXPLORER_HOSTS = [
+  "testnet.arcscan.app",
+  "explorer.testnet.arc.io",
+  "explorer.arc.io",
+] as const;
 
 export function explorerTxUrl(txHash: string) {
-  return `https://testnet.arcscan.app/tx/${txHash}`;
+  return `${ARC_CHAIN.explorerUrl}/tx/${txHash}`;
 }
 
 export function safeExternalUrl(url: string | null | undefined): string | null {

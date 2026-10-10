@@ -1,6 +1,7 @@
 import type { WalletClient } from "viem";
-import { ARC_TESTNET, assertWalletClientReady, getArcAppKit, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
+import { ARC_CHAIN, assertWalletClientReady, getArcAppKit, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
 import { CHAIN_IDS, type SupportedChain } from "@/lib/arc/adapters";
+import { ARC_KIT_CHAIN, ARC_NETWORK } from "@/lib/arc/network";
 
 export interface DepositParams {
   walletClient?: WalletClient | null;
@@ -54,7 +55,7 @@ export async function depositToUnifiedBalance(params: DepositParams) {
   if (isArcMockMode()) {
     return {
       txHash: mockTxHash(`deposit-${params.amount}`),
-      explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${mockTxHash("deposit")}`,
+      explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${mockTxHash("deposit")}`,
       amount: params.amount,
       chain: CHAIN_IDS[params.chain],
       mode: "mock" as const,
@@ -95,9 +96,17 @@ export async function getUnifiedBalances(walletClients: WalletClient[] = []): Pr
       totalPendingBalance: "320.00",
       token: "USDC",
       breakdown: [
-        { chain: "Arc Testnet", confirmedUsdc: "3820.42", pendingUsdc: "0.00" },
-        { chain: "Base Sepolia", confirmedUsdc: "940.00", pendingUsdc: "120.00" },
-        { chain: "Ethereum Sepolia", confirmedUsdc: "510.18", pendingUsdc: "200.00" },
+        { chain: ARC_CHAIN.name, confirmedUsdc: "3820.42", pendingUsdc: "0.00" },
+        {
+          chain: ARC_NETWORK === "mainnet" ? "Base" : "Base Sepolia",
+          confirmedUsdc: "940.00",
+          pendingUsdc: "120.00",
+        },
+        {
+          chain: ARC_NETWORK === "mainnet" ? "Ethereum" : "Ethereum Sepolia",
+          confirmedUsdc: "510.18",
+          pendingUsdc: "200.00",
+        },
       ],
     };
   }
@@ -110,7 +119,7 @@ export async function getUnifiedBalances(walletClients: WalletClient[] = []): Pr
   const sources = walletClients.map((walletClient) => ({ adapter: createViemAdapter({ walletClient }) }));
   const result = await kit.unifiedBalance.getBalances({
     sources,
-    networkType: "testnet",
+    networkType: ARC_NETWORK,
     includePending: true,
   });
 
@@ -144,7 +153,7 @@ export async function estimateJobFunding({
     marketplaceFee: marketplaceFee.toFixed(2),
     totalFee: totalFee.toFixed(2),
     totalFundingRequired: (value + totalFee).toFixed(2),
-    settlementChain: ARC_TESTNET.name,
+    settlementChain: ARC_CHAIN.name,
   };
 }
 
@@ -175,7 +184,7 @@ export async function spendFromUnifiedBalance(params: SpendParams): Promise<Spen
     const txHash = mockTxHash(`spend-${params.jobId ?? params.recipientAddress}`);
     return {
       txHash,
-      explorerUrl: `${ARC_TESTNET.explorerUrl}/tx/${txHash}`,
+      explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${txHash}`,
       amount: params.amount,
       recipient: params.recipientAddress,
       mode: "mock" as const,
@@ -195,7 +204,7 @@ export async function spendFromUnifiedBalance(params: SpendParams): Promise<Spen
     from: [{ adapter }],
     to: {
       adapter,
-      chain: "Arc_Testnet",
+      chain: ARC_KIT_CHAIN,
       recipientAddress: params.recipientAddress as `0x${string}`,
     },
   });
@@ -203,7 +212,7 @@ export async function spendFromUnifiedBalance(params: SpendParams): Promise<Spen
   const spendResult = result as any;
   return {
     txHash: spendResult.txHash as `0x${string}`,
-    explorerUrl: spendResult.explorerUrl ?? `${ARC_TESTNET.explorerUrl}/tx/${spendResult.txHash}`,
+    explorerUrl: spendResult.explorerUrl ?? `${ARC_CHAIN.explorerUrl}/tx/${spendResult.txHash}`,
     amount: spendResult.amount ?? params.amount,
     recipient: params.recipientAddress,
     mode: "live" as const,

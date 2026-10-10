@@ -1,11 +1,13 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n";
+import { ARC_NETWORK } from "@/lib/arc/network";
 
+const isMainnet = ARC_NETWORK === "mainnet";
 const balances = [
-  { chain: "Arc Testnet", amount: "3,820.42", stateEn: "Spend-ready", statePt: "Pronto para gastar" },
-  { chain: "Base Sepolia", amount: "940.00", stateEn: "Depositable", statePt: "Depositável" },
-  { chain: "Ethereum Sepolia", amount: "510.18", stateEn: "Depositable", statePt: "Depositável" },
+  { chain: isMainnet ? "Arc" : "Arc Testnet", amount: "3,820.42", stateEn: "Spend-ready", statePt: "Pronto para gastar" },
+  { chain: isMainnet ? "Base" : "Base Sepolia", amount: "940.00", stateEn: "Depositable", statePt: "Depositável" },
+  { chain: isMainnet ? "Ethereum" : "Ethereum Sepolia", amount: "510.18", stateEn: "Depositable", statePt: "Depositável" },
 ];
 
 export function UnifiedBalanceCard() {

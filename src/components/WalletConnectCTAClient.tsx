@@ -9,7 +9,8 @@
 import { useDynamicContext, DynamicUserProfile } from "@dynamic-labs/sdk-react-core";
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
 import { WalletProviderIsland } from "@/components/WalletProviderIsland";
-import { hasDynamicAuth, arcTestnet } from "@/components/Providers";
+import { hasDynamicAuth } from "@/components/Providers";
+import { arcChain, ARC_CHAIN_LABEL } from "@/lib/arc/network";
 import { useLanguage } from "@/lib/i18n";
 
 type Variant = "nav" | "hero";
@@ -66,15 +67,15 @@ function DynamicCTA({ variant }: { variant: Variant }) {
     );
   }
 
-  if (chain?.id !== arcTestnet.id) {
+  if (chain?.id !== arcChain.id) {
     return (
       <button
         type="button"
         disabled={isSwitching}
-        onClick={() => switchChain({ chainId: arcTestnet.id })}
+        onClick={() => switchChain({ chainId: arcChain.id })}
         className={styles.switch(isHero)}
       >
-        {isPt ? "Trocar para Arc Testnet" : "Switch to Arc Testnet"}
+        {isPt ? `Trocar para ${ARC_CHAIN_LABEL}` : `Switch to ${ARC_CHAIN_LABEL}`}
       </button>
     );
   }
@@ -117,15 +118,15 @@ function FallbackCTA({ variant }: { variant: Variant }) {
     );
   }
 
-  if (chain?.id !== arcTestnet.id) {
+  if (chain?.id !== arcChain.id) {
     return (
       <button
         type="button"
         disabled={isSwitching}
-        onClick={() => switchChain({ chainId: arcTestnet.id })}
+        onClick={() => switchChain({ chainId: arcChain.id })}
         className={styles.switch(isHero)}
       >
-        {isPt ? "Trocar para Arc Testnet" : "Switch to Arc Testnet"}
+        {isPt ? `Trocar para ${ARC_CHAIN_LABEL}` : `Switch to ${ARC_CHAIN_LABEL}`}
       </button>
     );
   }

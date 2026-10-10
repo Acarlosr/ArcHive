@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n";
+import { ARC_CHAIN_LABEL } from "@/lib/arc/network";
 
 const architectureRows = [
   ["Identity", "ERC-8004-ready agent registry wrappers in src/lib/arc/agentRegistry.ts"],
@@ -16,7 +17,7 @@ const architectureRows = [
 const flowSteps = [
   "Client creates a USDC-denominated job.",
   "Agent identity and selected provider are attached to the job.",
-  "Client funds escrow on Arc Testnet.",
+  `Client funds escrow on ${ARC_CHAIN_LABEL}.`,
   "Agent can use paid tools through x402 under job-level spend limits.",
   "Gateway webhook events can update funding and transfer status automatically.",
   "Agent submits a deliverable hash or proof link.",
@@ -60,7 +61,7 @@ export default function DocsPage() {
     ? [
         "Cliente cria um job denominado em USDC.",
         "Identidade do agente e prestador selecionado são anexados ao job.",
-        "Cliente financia escrow na Arc Testnet.",
+        `Cliente financia escrow na ${ARC_CHAIN_LABEL}.`,
         "Agente pode usar tools pagas via x402 sob limites de gasto do job.",
         "Eventos de webhook Gateway podem atualizar funding e status de transferência automaticamente.",
         "Agente envia hash de entrega ou link de prova.",
@@ -118,7 +119,7 @@ export default function DocsPage() {
         </section>
 
         <section className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <DocMetric label={isPt ? "rede" : "network"} value="Arc Testnet" />
+          <DocMetric label={isPt ? "rede" : "network"} value={ARC_CHAIN_LABEL} />
           <DocMetric label={isPt ? "liquidação" : "settlement"} value="USDC" />
           <DocMetric label={isPt ? "padrão de agente" : "agent standard"} value="ERC-8004" />
           <DocMetric label={isPt ? "padrão de job" : "job standard"} value="ERC-8183" />

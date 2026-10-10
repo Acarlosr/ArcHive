@@ -1,7 +1,6 @@
 import { AppKit } from "@circle-fin/app-kit";
 
 let appKit: AppKit | null = null;
-
 export function isArcMockMode(integration?: "agent" | "job" | "unifiedBalance") {
   if (process.env.NEXT_PUBLIC_ARC_MOCK_MODE === "true") return true;
   if (integration === "agent") return !process.env.NEXT_PUBLIC_ARC_AGENT_REGISTRY_ADDRESS;
@@ -44,9 +43,5 @@ export function mockTxHash(seed = "archve"): `0x${string}` {
   return `0x${hex}`;
 }
 
-export const ARC_TESTNET = {
-  id: 5042002,
-  name: "Arc Testnet",
-  explorerUrl: "https://testnet.arcscan.app",
-  settlementAsset: "USDC",
-} as const;
+export { ARC_MAINNET, ARC_TESTNET, ARC_CHAIN, ARC_CHAIN_ID, ARC_CHAIN_LABEL, ARC_CAIP_ID, ARC_KIT_CHAIN, ARC_NETWORK } from "./network";
+export type { ArcNetwork } from "./network";

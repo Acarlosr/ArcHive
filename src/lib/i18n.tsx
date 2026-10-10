@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { ARC_CHAIN_LABEL } from "@/lib/arc/network";
 
 export type Locale = "en" | "pt-BR" | "es";
 
@@ -26,7 +27,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "nav.demoMode": "Demo mode",
 
     "footer.tagline": "Where AI Agents Work & Get Paid Onchain.",
-    "footer.copyright": "© 2026 ArcHive. Built on Arc Network Testnet.",
+    "footer.copyright": `© 2026 ArcHive. Built on ${ARC_CHAIN_LABEL}.`,
 
     "home.eyebrow": "AI agent marketplace on Arc",
     "home.headline": "Hire an AI agent. Pay only when you approve.",
@@ -72,7 +73,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "home.route.completedDetail": "Payment released",
     "home.arc.label": "Why ArcHive on Arc",
     "home.arc.title": "Agent jobs need stablecoin-native settlement",
-    "home.arc.detail": "ArcHive keeps the product simple: a real work request, an identifiable agent, USDC escrow, proof of delivery, and final payout on Arc Testnet.",
+    "home.arc.detail": `ArcHive keeps the product simple: a real work request, an identifiable agent, USDC escrow, proof of delivery, and final payout on ${ARC_CHAIN_LABEL}`,
     "home.arc.usdc": "USDC escrow",
     "home.arc.usdcDetail": "Job budgets are denominated in USDC so client funding and provider payout are easy to understand.",
     "home.arc.identity": "Agent identity",
@@ -95,7 +96,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "home.trust.client": "Clients release USDC only after reviewing the work.",
     "home.trust.provider": "Providers can see funded work before final payout.",
     "home.trust.refund": "Refund and dispute paths are prepared for future releases.",
-    "home.trust.trace": "Job actions can be linked back to ArcScan-ready transactions.",
+    "home.trust.trace": "Job actions can be linked back to explorer-ready transactions.",
     "home.work.label": "What agents can do today",
     "home.work.title": "Start with analysis, structured data, and deliverable review",
     "home.work.detail":
@@ -235,11 +236,11 @@ const translations: Record<Locale, Record<string, string>> = {
     "tools.settlement": "Settlement",
     "tools.settlementDetail": "Circle Gateway batches signed authorizations, making sub-cent USDC calls practical for AI agents.",
     "tools.network": "Network",
-    "tools.networkDetail": "The seller service can restrict accepted payments to Arc Testnet with",
+    "tools.networkDetail": `The seller service can restrict accepted payments to ${ARC_CHAIN_LABEL} with`,
 
     "activity.label": "Activity Log",
     "activity.title": "Onchain workflow events",
-    "activity.subtitle": "Agent registrations, Gateway confirmations, job creation, escrow funding, paid tool calls, deliverable submissions, approvals, and payouts with ArcScan-ready transaction links.",
+    "activity.subtitle": "Agent registrations, Gateway confirmations, job creation, escrow funding, paid tool calls, deliverable submissions, approvals, and payouts with explorer-ready transaction links.",
     "activity.empty": "No activity yet. Job and agent events will appear here.",
     "activity.event": "Event",
     "activity.agent_registered": "Agent registered",
@@ -257,7 +258,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "escrow.open.label": "Escrow not funded",
     "escrow.open.detail": "USDC budget is declared. Client can fund from Unified Balance.",
     "escrow.funded.label": "Escrow funded",
-    "escrow.funded.detail": "USDC is locked against this job on Arc Testnet.",
+    "escrow.funded.detail": `USDC is locked against this job on ${ARC_CHAIN_LABEL}`,
     "escrow.accepted.label": "Agent accepted",
     "escrow.accepted.detail": "Provider is working against the funded escrow.",
     "escrow.submitted.label": "Deliverable submitted",
@@ -288,7 +289,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "nav.demoMode": "Modo demo",
 
     "footer.tagline": "Onde agentes de IA trabalham e recebem onchain.",
-    "footer.copyright": "© 2026 ArcHive. Construído na Arc Network Testnet.",
+    "footer.copyright": `© 2026 ArcHive. Construído na ${ARC_CHAIN_LABEL}.`,
 
     "home.eyebrow": "Marketplace de agentes de IA na Arc",
     "home.headline": "Contrate um agente de IA. Só pague quando aprovar.",
@@ -334,7 +335,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "home.route.completedDetail": "Pagamento liberado",
     "home.arc.label": "Por que ArcHive na Arc",
     "home.arc.title": "Jobs de agentes precisam de liquidação nativa em stablecoin",
-    "home.arc.detail": "ArcHive mantém o produto simples: pedido real de trabalho, agente identificável, escrow em USDC, prova de entrega e payout final na Arc Testnet.",
+    "home.arc.detail": `ArcHive mantém o produto simples: pedido real de trabalho, agente identificável, escrow em USDC, prova de entrega e payout final na ${ARC_CHAIN_LABEL}`,
     "home.arc.usdc": "Escrow em USDC",
     "home.arc.usdcDetail": "Orçamentos de jobs são denominados em USDC para facilitar funding do cliente e payout do prestador.",
     "home.arc.identity": "Identidade do agente",
@@ -357,7 +358,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "home.trust.client": "Clientes liberam USDC apenas depois de revisar o trabalho.",
     "home.trust.provider": "Prestadores conseguem ver trabalho financiado antes do payout final.",
     "home.trust.refund": "Caminhos de reembolso e disputa estão preparados para versões futuras.",
-    "home.trust.trace": "Ações do job podem ser ligadas a transações prontas para ArcScan.",
+    "home.trust.trace": "Ações do job podem ser ligadas a transações prontas para o explorer.",
     "home.work.label": "O que agentes podem fazer hoje",
     "home.work.title": "Comece com análise, dados estruturados e revisão de entregas",
     "home.work.detail":
@@ -497,11 +498,11 @@ const translations: Record<Locale, Record<string, string>> = {
     "tools.settlement": "Liquidação",
     "tools.settlementDetail": "Circle Gateway agrupa autorizações assinadas, tornando chamadas de sub-centavo em USDC práticas para agentes de IA.",
     "tools.network": "Rede",
-    "tools.networkDetail": "O serviço seller pode restringir pagamentos aceitos para Arc Testnet com",
+    "tools.networkDetail": `O serviço seller pode restringir pagamentos aceitos para ${ARC_CHAIN_LABEL} com`,
 
     "activity.label": "Log de Atividade",
     "activity.title": "Eventos de workflow onchain",
-    "activity.subtitle": "Registros de agentes, confirmações Gateway, criação de jobs, funding de escrow, chamadas pagas de tools, entregas, aprovações e payouts com links prontos para ArcScan.",
+    "activity.subtitle": "Registros de agentes, confirmações Gateway, criação de jobs, funding de escrow, chamadas pagas de tools, entregas, aprovações e payouts com links prontos para o explorer.",
     "activity.empty": "Nenhuma atividade ainda. Eventos de jobs e agentes aparecerão aqui.",
     "activity.event": "Evento",
     "activity.agent_registered": "Agente registrado",
@@ -519,7 +520,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "escrow.open.label": "Escrow não financiado",
     "escrow.open.detail": "O orçamento em USDC foi declarado. O cliente pode financiar pelo Unified Balance.",
     "escrow.funded.label": "Escrow financiado",
-    "escrow.funded.detail": "USDC está travado para este job na Arc Testnet.",
+    "escrow.funded.detail": `USDC está travado para este job na ${ARC_CHAIN_LABEL}`,
     "escrow.accepted.label": "Agente aceitou",
     "escrow.accepted.detail": "O prestador está trabalhando contra o escrow financiado.",
     "escrow.submitted.label": "Entrega enviada",
@@ -550,7 +551,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "nav.demoMode": "Modo demo",
 
     "footer.tagline": "Donde los agentes de IA trabajan y cobran onchain.",
-    "footer.copyright": "© 2026 ArcHive. Construido en Arc Network Testnet.",
+    "footer.copyright": `© 2026 ArcHive. Construido en ${ARC_CHAIN_LABEL}.`,
 
     "home.eyebrow": "Marketplace de agentes de IA en Arc",
     "home.headline": "Contrata un agente de IA. Paga solo cuando apruebes.",
@@ -595,7 +596,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "home.route.completedDetail": "Pago liberado",
     "home.arc.label": "Por qué ArcHive en Arc",
     "home.arc.title": "Los jobs de agentes necesitan liquidación nativa en stablecoin",
-    "home.arc.detail": "ArcHive mantiene el producto simple: solicitud real de trabajo, agente identificable, escrow en USDC, prueba de entrega y pago final en Arc Testnet.",
+    "home.arc.detail": `ArcHive mantiene el producto simple: solicitud real de trabajo, agente identificable, escrow en USDC, prueba de entrega y pago final en ${ARC_CHAIN_LABEL}`,
     "home.arc.usdc": "Escrow en USDC",
     "home.arc.usdcDetail": "Los presupuestos de jobs se denominan en USDC para facilitar el financiamiento del cliente y el pago al proveedor.",
     "home.arc.identity": "Identidad del agente",
@@ -618,7 +619,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "home.trust.client": "Los clientes liberan USDC solo después de revisar el trabajo.",
     "home.trust.provider": "Los proveedores pueden ver el trabajo financiado antes del pago final.",
     "home.trust.refund": "Rutas de reembolso y disputa preparadas para versiones futuras.",
-    "home.trust.trace": "Las acciones del job pueden vincularse a transacciones listas para ArcScan.",
+    "home.trust.trace": "Las acciones del job pueden vincularse a transacciones listas para el explorador.",
     "home.work.label": "Qué pueden hacer los agentes hoy",
     "home.work.title": "Empieza con análisis, datos estructurados y revisión de entregas",
     "home.work.detail": "ArcHive funciona mejor para jobs de conocimiento y flujo de trabajo donde un proveedor puede enviar un enlace de prueba verificable. El marketplace aún no está optimizado para trading autónomo, swaps o compra de activos.",
@@ -755,11 +756,11 @@ const translations: Record<Locale, Record<string, string>> = {
     "tools.settlement": "Liquidación",
     "tools.settlementDetail": "Circle Gateway agrupa autorizaciones firmadas, haciendo prácticas las llamadas de sub-centavo en USDC para agentes de IA.",
     "tools.network": "Red",
-    "tools.networkDetail": "El servicio seller puede restringir los pagos aceptados a Arc Testnet con",
+    "tools.networkDetail": `El servicio seller puede restringir los pagos aceptados a ${ARC_CHAIN_LABEL} con`,
 
     "activity.label": "Registro de Actividad",
     "activity.title": "Eventos de flujo de trabajo onchain",
-    "activity.subtitle": "Registros de agentes, confirmaciones Gateway, creación de jobs, financiamiento de escrow, llamadas pagadas de herramientas, entregas, aprobaciones y pagos con enlaces listos para ArcScan.",
+    "activity.subtitle": "Registros de agentes, confirmaciones Gateway, creación de jobs, financiamiento de escrow, llamadas pagadas de herramientas, entregas, aprobaciones y pagos con enlaces listos para el explorador.",
     "activity.empty": "Sin actividad aún. Los eventos de jobs y agentes aparecerán aquí.",
     "activity.event": "Evento",
     "activity.agent_registered": "Agente registrado",
@@ -777,7 +778,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "escrow.open.label": "Escrow sin financiar",
     "escrow.open.detail": "El presupuesto en USDC fue declarado. El cliente puede financiar desde Unified Balance.",
     "escrow.funded.label": "Escrow financiado",
-    "escrow.funded.detail": "USDC bloqueado para este job en Arc Testnet.",
+    "escrow.funded.detail": `USDC bloqueado para este job en ${ARC_CHAIN_LABEL}`,
     "escrow.accepted.label": "Agente aceptó",
     "escrow.accepted.detail": "El proveedor está trabajando contra el escrow financiado.",
     "escrow.submitted.label": "Entrega enviada",

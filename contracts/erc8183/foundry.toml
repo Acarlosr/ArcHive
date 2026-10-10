@@ -1,0 +1,14 @@
+[profile.default]
+src = "src"
+out = "out"
+script = "script"
+solc = "0.8.28"
+evm_version = "osaka"
+optimizer = true
+optimizer_runs = 200
+
+# Arc-specific notes:
+# - Gas is paid in USDC (native), not ETH.
+# - The mempool enforces a 20 Gwei maxFeePerGas floor (docs.arc.io/arc/references/evm-differences).
+# - Deploy with Arc Foundry (arc-forge), the Arc-specific fork of Foundry:
+#   https://docs.arc.io/arc/tutorials/install-arc-foundry.md

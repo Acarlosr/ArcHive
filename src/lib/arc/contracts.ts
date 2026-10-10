@@ -1,13 +1,48 @@
 // src/lib/arc/contracts.ts
-// All deployed Arc Testnet contract addresses and ABIs for ArcHive
+// Deployed Arc contract addresses and ABIs for ArcHive.
+// Mainnet addresses come from https://docs.arc.io/arc/references/contract-addresses
+// and are selected by NEXT_PUBLIC_ARC_NETWORK (see src/lib/arc/network.ts).
 
 import type { Address } from "viem";
+import { ARC_NETWORK } from "@/lib/arc/network";
 
 // ── Contract Addresses ──
-export const IDENTITY_REGISTRY: Address = "0x8004A818BFB912233c491871b3d84c89A494BD9e";
-export const REPUTATION_REGISTRY: Address = "0x8004B663056A597Dffe9eCcC1965A193B7388713";
-export const VALIDATION_REGISTRY: Address = "0x8004Cb1BF31DAf7788923b405b754f57acEB4272";
-export const AGENTIC_COMMERCE: Address = "0x0747EEf0706327138c69792bF28Cd525089e4583";
+// ERC-8004 registries differ per network.
+const IDENTITY_REGISTRY_BY_NETWORK = {
+  mainnet: "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+  testnet: "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+} as const;
+
+const REPUTATION_REGISTRY_BY_NETWORK = {
+  mainnet: "0x8004BAa17C55a88189AE136b182e5fdA19dE9b63",
+  testnet: "0x8004B663056A597Dffe9eCcC1965A193B7388713",
+} as const;
+
+const VALIDATION_REGISTRY_BY_NETWORK = {
+  mainnet: "0x8004Cc8439f36fd5F9F049D9fF86523Df6dAAB58",
+  testnet: "0x8004Cb1BF31DAf7788923b405b754f57acEB4272",
+} as const;
+
+export const IDENTITY_REGISTRY: Address =
+  IDENTITY_REGISTRY_BY_NETWORK[ARC_NETWORK];
+export const REPUTATION_REGISTRY: Address =
+  REPUTATION_REGISTRY_BY_NETWORK[ARC_NETWORK];
+export const VALIDATION_REGISTRY: Address =
+  VALIDATION_REGISTRY_BY_NETWORK[ARC_NETWORK];
+
+// ERC-8183: Arc only publishes a reference implementation on Testnet.
+// On Mainnet, ArcHive deploys its own copy — the deployed address must go in
+// NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS (the live job path always reads that
+// env, never this constant).
+const AGENTIC_COMMERCE_BY_NETWORK: Record<"mainnet" | "testnet", Address> = {
+  // Zero until the ArcHive mainnet deployment — actions guarded by env.
+  mainnet: "0x0000000000000000000000000000000000000000",
+  testnet: "0x0747EEf0706327138c69792bF28Cd525089e4583",
+};
+
+export const AGENTIC_COMMERCE: Address = AGENTIC_COMMERCE_BY_NETWORK[ARC_NETWORK];
+
+// Same address on both networks (docs.arc.io/arc/references/contract-addresses).
 export const USDC_CONTRACT: Address = "0x3600000000000000000000000000000000000000";
 // Arc Transaction Memos — https://docs.arc.io/arc/concepts/transaction-memos
 export const MEMO_CONTRACT: Address = "0x5294E9927c3306DcBaDb03fe70b92e01cCede505";
@@ -113,6 +148,15 @@ export const agenticCommerceAbi = [
       { name: "reason", type: "bytes32" },
       { name: "optParams", type: "bytes" },
     ],
+    outputs: [],
+  },
+  {
+    // Part of the ERC-8183 reference implementation; available on ArcHive's
+    // own mainnet deployment, not on the official Testnet reference.
+    name: "claimRefund",
+    type: "function",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "jobId", type: "uint256" }],
     outputs: [],
   },
   {

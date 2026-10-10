@@ -1,4 +1,5 @@
 import { explorerTxUrl as explorerTxUrlCanonical } from "@/lib/safeUrls";
+import { ARC_NETWORK, ARC_CHAIN_LABEL } from "@/lib/arc/network";
 
 export type JobStatus = "open" | "funded" | "accepted" | "submitted" | "approved" | "paid" | "completed" | "refunded" | "expired";
 
@@ -191,9 +192,9 @@ export const demoJobs: DemoJob[] = [
   {
     id: "job_8183_004",
     onchain_job_id: "8183-9204",
-    title: "Monitor Arc Testnet agent registrations",
+    title: `Monitor ${ARC_CHAIN_LABEL} agent registrations`,
     description: "Prepare a daily activity digest of new agent identities, metadata URI changes, and reputation events.",
-    short_description: "Daily digest for Arc Testnet agent identity activity.",
+    short_description: `Daily digest for ${ARC_CHAIN_LABEL} agent identity activity.`,
     budget_usdc: "420.00",
     status: "completed",
     client_wallet: "0xA71ce00000000000000000000000000000000004",
@@ -218,7 +219,7 @@ export const demoActivityEvents: DemoActivityEvent[] = [
     metadata_json: {
       amount: "2400.000000",
       domain: "26",
-      env: "testnet",
+      env: ARC_NETWORK,
       notificationId: "demo-gateway-deposit-finalized",
     },
     created_at: "2026-04-29T09:35:00.000Z",

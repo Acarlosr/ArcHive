@@ -7,6 +7,7 @@ import { WalletConnectCTA } from "@/components/WalletConnectCTA";
 import { agentPaidTools, getDemoSpendReceipts } from "@/lib/agentSpend";
 import { demoAgents, demoJobs } from "@/lib/demoData";
 import { useLanguage } from "@/lib/i18n";
+import { ARC_CHAIN_LABEL } from "@/lib/arc/network";
 
 const toolReceipts = getDemoSpendReceipts("job_8183_001");
 
@@ -172,9 +173,9 @@ export default function HomePage() {
               <Link href="/jobs/create" className="btn-secondary text-center">{t("home.cta.post")}</Link>
             </div>
             <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-arc-muted">
-              <span>{isPt ? "Precisa configurar a testnet?" : "Need testnet setup?"}</span>
+              <span>{isPt ? `Precisa configurar a rede?` : `Need network setup?`}</span>
               <Link href="/guide" className="font-medium text-arc-cyan transition-colors hover:text-white">
-                {isPt ? "Adicionar Arc Testnet" : "Add Arc Testnet"}
+                {isPt ? `Adicionar ${ARC_CHAIN_LABEL}` : `Add ${ARC_CHAIN_LABEL}`}
               </Link>
               <Link href="/tools" className="font-medium text-arc-gold transition-colors hover:text-white">
                 {isPt ? "Explorar tools medidas" : "Explore metered tools"}
