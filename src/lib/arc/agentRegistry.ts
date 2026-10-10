@@ -2,7 +2,7 @@ import type { WalletClient } from "viem";
 import { demoAgents } from "@/lib/demoData";
 import { getAgentByOnchainId } from "@/lib/db/agents";
 import { ARC_CHAIN, assertWalletClientReady, isArcMockMode, mockTxHash } from "@/lib/arc/appKit";
-import { IDENTITY_REGISTRY, REPUTATION_REGISTRY, reputationRegistryAbi, resolveAddress } from "@/lib/arc/contracts";
+import { IDENTITY_REGISTRY, REPUTATION_REGISTRY, reputationRegistryAbi } from "@/lib/arc/contracts";
 import { arcTransport } from "@/lib/arc/rpc";
 import { arcChain } from "@/lib/arc/network";
 
@@ -28,7 +28,9 @@ export async function registerAgent({
   assertWalletClientReady(walletClient);
 
   const { createPublicClient, parseAbi, parseAbiItem } = await import("viem");
-  const identityRegistry = resolveAddress(process.env.NEXT_PUBLIC_ARC_AGENT_REGISTRY_ADDRESS, IDENTITY_REGISTRY);
+  // Address constants in contracts.ts are the source of truth — env values are
+  // not trusted here (a mistyped env once routed register() to a no-op address).
+  const identityRegistry = IDENTITY_REGISTRY;
   const abi = parseAbi(["function register(string metadataUri) returns (uint256)"]);
   const [account] = await walletClient.getAddresses();
   const publicClient = createPublicClient({ chain: arcChain, transport: arcTransport() });

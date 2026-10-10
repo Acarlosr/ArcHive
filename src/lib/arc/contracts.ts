@@ -4,7 +4,6 @@
 // and are selected by NEXT_PUBLIC_ARC_NETWORK (see src/lib/arc/network.ts).
 
 import type { Address } from "viem";
-import { getAddress } from "viem";
 import { ARC_NETWORK } from "@/lib/arc/network";
 
 // ── Contract Addresses ──
@@ -40,23 +39,6 @@ const AGENTIC_COMMERCE_BY_NETWORK: Record<"mainnet" | "testnet", Address> = {
 };
 
 export const AGENTIC_COMMERCE: Address = AGENTIC_COMMERCE_BY_NETWORK[ARC_NETWORK];
-
-/**
- * Resolves an address from an env var with the in-repo constant as fallback.
- * A malformed env value (typo, truncated paste, bad checksum) must never break
- * live mode: it is ignored and the verified constant wins instead.
- */
-export function resolveAddress(envValue: string | undefined, fallback: Address): Address {
-  if (!envValue || !envValue.trim()) return fallback;
-  try {
-    return getAddress(envValue.trim());
-  } catch {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn(`[arc] Ignoring invalid address env override: ${envValue.slice(0, 12)}…`);
-    }
-    return fallback;
-  }
-}
 
 // Same address on both networks (docs.arc.io/arc/references/contract-addresses).
 export const USDC_CONTRACT: Address = "0x3600000000000000000000000000000000000000";

@@ -1,5 +1,5 @@
 import { AppKit } from "@circle-fin/app-kit";
-import { AGENTIC_COMMERCE, IDENTITY_REGISTRY, resolveAddress } from "@/lib/arc/contracts";
+import { AGENTIC_COMMERCE, IDENTITY_REGISTRY } from "@/lib/arc/contracts";
 
 let appKit: AppKit | null = null;
 
@@ -7,12 +7,10 @@ const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export function isArcMockMode(integration?: "agent" | "job" | "unifiedBalance") {
   if (process.env.NEXT_PUBLIC_ARC_MOCK_MODE === "true") return true;
-  // Live readiness follows the resolved addresses (env if valid, constants otherwise),
-  // so a mistyped env override can never silently flip actions back to mock.
-  const agentLive =
-    resolveAddress(process.env.NEXT_PUBLIC_ARC_AGENT_REGISTRY_ADDRESS, IDENTITY_REGISTRY) !== ZERO_ADDRESS;
-  const jobLive =
-    resolveAddress(process.env.NEXT_PUBLIC_ARC_JOB_MARKETPLACE_ADDRESS, AGENTIC_COMMERCE) !== ZERO_ADDRESS;
+  // Live readiness follows the address constants (the source of truth), not env
+  // presence — a mistyped env must never silently flip actions back to mock.
+  const agentLive = IDENTITY_REGISTRY !== ZERO_ADDRESS;
+  const jobLive = AGENTIC_COMMERCE !== ZERO_ADDRESS;
   if (integration === "agent") return !agentLive;
   if (integration === "job") return !jobLive;
   return !agentLive || !jobLive;
