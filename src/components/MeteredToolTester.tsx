@@ -58,6 +58,22 @@ function getPaymentSummary(payload: unknown) {
   };
 }
 
+// x402 v2 puts the payment requirements in the `payment-required` header
+// (base64 JSON); the 402 body itself is empty. Decode it so the tester can
+// show the real requirement (network, amount, payTo).
+function getPaymentSummaryFromHeader(response: Response) {
+  const encoded = response.headers.get("payment-required");
+  if (!encoded) return null;
+  try {
+    const normalized = encoded.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
+    const decoded = JSON.parse(atob(padded)) as Record<string, unknown>;
+    return getPaymentSummary(decoded);
+  } catch {
+    return null;
+  }
+}
+
 function formatPayload(payload: unknown) {
   try {
     return JSON.stringify(payload, null, 2);
@@ -96,10 +112,22 @@ export function MeteredToolTester({
     }));
 
     try {
-      const response = await fetch(`${sellerBaseUrl}${tool.path}`, {
+      // The seller enforces per-job spend caps, so every paid probe carries a
+      // diagnostic jobId (GET -> query param, POST -> body field).
+      const diagnosticJobId = "smoke-test";
+      let url = `${sellerBaseUrl}${tool.path}`;
+      let body: string | undefined;
+
+      if (tool.method === "GET") {
+        url += (url.includes("?") ? "&" : "?") + `jobId=${diagnosticJobId}`;
+      } else {
+        body = JSON.stringify({ ...(tool.body ?? {}), jobId: diagnosticJobId });
+      }
+
+      const response = await fetch(url, {
         method: tool.method,
         headers: tool.method === "POST" ? { "Content-Type": "application/json" } : undefined,
-        body: tool.method === "POST" ? JSON.stringify(tool.body ?? {}) : undefined,
+        body,
       });
 
       const contentType = response.headers.get("content-type") ?? "";
@@ -118,7 +146,8 @@ export function MeteredToolTester({
           };
 
       if (response.status === 402) {
-        const payment = getPaymentSummary(payload);
+        const payment =
+          getPaymentSummaryFromHeader(response) ?? getPaymentSummary(payload);
 
         setResults((current) => ({
           ...current,
@@ -127,8 +156,8 @@ export function MeteredToolTester({
             title: isPt ? "pagamento x402 exigido" : "x402 payment required",
             details: payment
               ? isPt
-                ? `${tool.price} em ${payment.network}. A autorização do comprador é necessária antes da tool retornar dados.`
-                : `${tool.price} on ${payment.network}. Buyer authorization is required before the tool returns data.`
+                ? `${tool.price} em ${payment.network}. Requisito confirmado: rede ${payment.network}, valor ${payment.amount}, vendedor ${payment.payTo}. A autorização do comprador é necessária antes da tool retornar dados.`
+                : `${tool.price} on ${payment.network}. Requirement confirmed: network ${payment.network}, amount ${payment.amount}, seller ${payment.payTo}. Buyer authorization is required before the tool returns data.`
               : isPt
                 ? `${tool.price}. A autorização do comprador é necessária antes da tool retornar dados.`
                 : `${tool.price}. Buyer authorization is required before the tool returns data.`,

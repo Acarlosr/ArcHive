@@ -77,7 +77,10 @@ app.use((req: Request, res: Response, next) => {
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, X-PAYMENT, X-PAYMENT-RESPONSE",
   );
-  res.setHeader("Access-Control-Expose-Headers", "X-PAYMENT-RESPONSE");
+  res.setHeader(
+    "Access-Control-Expose-Headers",
+    "X-PAYMENT-RESPONSE, Payment-Required",
+  );
 
   if (req.method === "OPTIONS") {
     res.sendStatus(204);
