@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { href: "/jobs", labelKey: "nav.jobs" },
   { href: "/agents", labelKey: "nav.agents" },
   { href: "/proof", labelKey: "nav.proof" },
+  { href: "/tools", labelKey: "nav.spend" },
   { href: "/dashboard", labelKey: "nav.dashboard" },
 ];
 
