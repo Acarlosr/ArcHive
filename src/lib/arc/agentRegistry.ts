@@ -5,6 +5,7 @@ import { ARC_CHAIN, assertWalletClientReady, isArcMockMode, mockTxHash } from "@
 import { IDENTITY_REGISTRY, REPUTATION_REGISTRY, reputationRegistryAbi } from "@/lib/arc/contracts";
 import { arcTransport } from "@/lib/arc/rpc";
 import { arcChain } from "@/lib/arc/network";
+import { waitForArcReceipt } from "@/lib/arc/receipts";
 
 export async function registerAgent({
   walletClient,
@@ -42,7 +43,7 @@ export async function registerAgent({
     account,
     chain: arcChain,
   });
-  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+  const receipt = await waitForArcReceipt(publicClient, txHash);
   const transferLogs = await publicClient.getLogs({
     address: identityRegistry,
     event: parseAbiItem("event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"),
@@ -142,7 +143,7 @@ export async function recordAgentFeedback({
     account,
     chain: arcChain,
   });
-  await publicClient.waitForTransactionReceipt({ hash: txHash });
+  await waitForArcReceipt(publicClient, txHash);
   return {
     txHash,
     agentId,

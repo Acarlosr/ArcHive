@@ -7,6 +7,7 @@ import { MEMO_CONTRACT, memoAbi } from "@/lib/arc/contracts";
 import { ARC_CHAIN } from "@/lib/arc/appKit";
 import { arcTransport } from "@/lib/arc/rpc";
 import { arcChain } from "@/lib/arc/network";
+import { waitForArcReceipt } from "@/lib/arc/receipts";
 
 // ── Tipos de payload de memo por fluxo do ArcHive ──
 
@@ -99,7 +100,7 @@ export async function callWithMemo({
     chain: arcChain,
   });
 
-  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+  const receipt = await waitForArcReceipt(publicClient, txHash);
   if (receipt.status !== "success") {
     throw new Error(`Memo transaction reverted: ${txHash}`);
   }

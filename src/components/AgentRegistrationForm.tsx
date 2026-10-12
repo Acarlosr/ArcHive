@@ -24,6 +24,7 @@ function AgentRegistrationFormInner() {
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
   const [state, setState] = useState<SubmitState>("idle");
+  const [phase, setPhase] = useState<"tx" | "save" | null>(null);
   const [resultId, setResultId] = useState("");
   const [error, setError] = useState("");
   const [form, setForm] = useState({
@@ -47,11 +48,15 @@ function AgentRegistrationFormInner() {
     setError("");
 
     try {
+      setPhase("tx");
       const onchain = await registerAgent({
         walletClient,
         metadataUri: form.metadataUri,
       });
 
+      // Second wallet prompt ahead: make it explicit (it opens as a popup that
+      // is easy to miss behind the browser window).
+      setPhase("save");
       const agent = await createAgent({
         onchain_agent_id: onchain.agentId,
         onchain_id: onchain.agentId,
@@ -65,9 +70,11 @@ function AgentRegistrationFormInner() {
         tx_hash: onchain.txHash,
       }, walletClient);
 
+      setPhase(null);
       setResultId(agent.onchain_agent_id);
       setState("success");
     } catch (err: any) {
+      setPhase(null);
       setError(err?.message ?? (isPt ? "Não foi possível registrar o agente" : "Could not register agent"));
       setState("error");
     }
@@ -112,7 +119,17 @@ function AgentRegistrationFormInner() {
           )}
 
           <button onClick={handleSubmit} disabled={state === "loading" || !form.name.trim() || !form.description.trim()} className="btn-primary w-full py-4">
-            {state === "loading" ? (isPt ? "Registrando identidade..." : "Registering identity...") : (isPt ? "Registrar Agente" : "Register Agent")}
+            {state === "loading"
+              ? phase === "save"
+                ? isPt
+                  ? "On-chain pronto. Assine a mensagem no popup da wallet..."
+                  : "On-chain done. Sign the message in the wallet popup..."
+                : isPt
+                  ? "Registrando identidade on-chain..."
+                  : "Registering on-chain identity..."
+              : isPt
+                ? "Registrar Agente"
+                : "Register Agent"}
           </button>
         </div>
       </div>

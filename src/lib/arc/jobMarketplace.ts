@@ -6,6 +6,7 @@ import { AGENTIC_COMMERCE, agenticCommerceAbi, erc20Abi, USDC_CONTRACT } from "@
 import { callWithMemo, explorerTxUrl } from "@/lib/arc/memo";
 import { arcTransport } from "@/lib/arc/rpc";
 import { arcChain, ARC_NETWORK } from "@/lib/arc/network";
+import { waitForArcReceipt } from "@/lib/arc/receipts";
 
 type WalletAction = { walletClient?: WalletClient | null };
 type TxResult = { txHash: `0x${string}`; explorerUrl: string; jobId: string; mode: "mock" | "live" };
@@ -35,7 +36,7 @@ async function getLiveClients(walletClient: WalletClient) {
 
 function assertSuccessfulReceipt(receipt: { status: "success" | "reverted"; transactionHash: `0x${string}` }, action: string) {
   if (receipt.status === "reverted") {
-    throw new Error(`${action} transaction reverted on Arc Testnet: ${receipt.transactionHash}`);
+    throw new Error(`${action} transaction reverted on Arc (${ARC_NETWORK}): ${receipt.transactionHash}`);
   }
 }
 
@@ -90,7 +91,7 @@ export async function createJob({
     account,
     chain: arcChain,
   });
-  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+  const receipt = await waitForArcReceipt(publicClient, txHash);
   assertSuccessfulReceipt(receipt, "Create job");
   const created = receipt.logs.flatMap((log) => {
     try {
@@ -135,7 +136,7 @@ export async function fundEscrow({
     account,
     chain: arcChain,
   });
-  const approveReceipt = await publicClient.waitForTransactionReceipt({ hash: approveHash });
+  const approveReceipt = await waitForArcReceipt(publicClient, approveHash);
   assertSuccessfulReceipt(approveReceipt, "Approve USDC");
 
   // 2. Fund escrow via Memo — anexa jobId, clientId e valor para reconciliação offchain
@@ -182,7 +183,7 @@ export async function acceptJob({
     account,
     chain: arcChain,
   });
-  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+  const receipt = await waitForArcReceipt(publicClient, txHash);
   assertSuccessfulReceipt(receipt, "Set budget");
   return { txHash, explorerUrl: `${ARC_CHAIN.explorerUrl}/tx/${txHash}`, jobId, mode: "live" };
 }
