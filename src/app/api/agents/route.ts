@@ -5,6 +5,15 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/db/server";
 import { verifyWalletAuth, rateLimit } from "@/lib/serverWalletAuth";
 
+export async function GET() {
+  return NextResponse.json({
+    service: "ArcHive agents API",
+    status: "ready",
+    write: "POST with X-ArcAuth wallet signature",
+    database: getSupabaseAdmin() ? "configured" : "missing",
+  });
+}
+
 export async function POST(request: Request) {
   if (!rateLimit(request)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
