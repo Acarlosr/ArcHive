@@ -46,8 +46,9 @@ export const ARC_CAIP_ID = `eip155:${ARC_CHAIN.id}` as const;
 export const ARC_KIT_CHAIN = ARC_NETWORK === "mainnet" ? "Arc" : "Arc_Testnet";
 
 // Primary RPC per network (failover list lives in src/lib/arc/rpc.ts)
+// Mainnet: `.arc.network` virou NXDOMAIN (12/10/2026) — `.io` e o vivo.
 const ARC_RPC_PRIMARY =
-  ARC_NETWORK === "mainnet" ? "https://rpc.mainnet.arc.network" : "https://rpc.testnet.arc.network";
+  ARC_NETWORK === "mainnet" ? "https://rpc.mainnet.arc.io" : "https://rpc.testnet.arc.network";
 
 // viem chain object for the active Arc network. Public clients always pass an
 // explicit transport (arcTransport), so the rpcUrls entry here is a fallback.

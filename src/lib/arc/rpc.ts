@@ -19,17 +19,20 @@ import { ARC_NETWORK } from "@/lib/arc/network";
  * `arc.io` inteiro, a próxima tentativa já cai em `arc.network`, e vice-versa.
  */
 const PADROES_MAINNET = [
-  // `.network` vem primeiro DE PROPOSITO: e o unico que funciona para quem tem
-  // bloqueador de anuncios (ver comentario acima). `.io` e o dominio oficial nos
-  // docs e continua na lista logo atras.
-  "https://rpc.mainnet.arc.network",
+  // `.io` vem primeiro DE PROPOSITO (reordenado em 12/10/2026): os endpoints
+  // mainnet em `.network` viraram NXDOMAIN (dominio morto) e o `.io` responde
+  // rapido com CORS correto. `.network` fica no fim como fallback, caso volte.
+  // A ordem alternada anterior (.network primeiro) existia porque bloqueadores
+  // de anuncios derrubavam o dominio `.io` inteiro — para quem usa bloqueador,
+  // o app precisa que o usuario crie uma excecao para archivearc.xyz.
   "https://rpc.mainnet.arc.io",
-  "https://rpc.quicknode.mainnet.arc.network",
   "https://rpc.quicknode.mainnet.arc.io",
-  "https://rpc.drpc.mainnet.arc.network",
   "https://rpc.drpc.mainnet.arc.io",
-  "https://rpc.blockdaemon.mainnet.arc.network",
   "https://rpc.blockdaemon.mainnet.arc.io",
+  "https://rpc.mainnet.arc.network",
+  "https://rpc.quicknode.mainnet.arc.network",
+  "https://rpc.drpc.mainnet.arc.network",
+  "https://rpc.blockdaemon.mainnet.arc.network",
 ];
 
 const PADROES_TESTNET = [
