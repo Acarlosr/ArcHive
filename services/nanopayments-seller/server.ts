@@ -161,7 +161,10 @@ function recordSpend(req: Request, priceUsdc: string) {
   const jobId = extractJobId(req);
   if (!jobId) return;
   const entry = ledgerEntry(jobId, extractJobBudget(req));
-  const amount = Number(req.payment?.amount ?? priceUsdc);
+  // req.payment.amount is in USDC atomic units (6 decimals) from the
+  // facilitator; the ledger tracks human USDC so it matches the caps.
+  const paidAtomic = Number(req.payment?.amount ?? 0);
+  const amount = paidAtomic > 0 ? paidAtomic / 1e6 : Number(priceUsdc);
   entry.spentUsdc += Number.isFinite(amount) ? amount : Number(priceUsdc);
 }
 
