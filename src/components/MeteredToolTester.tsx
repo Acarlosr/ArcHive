@@ -112,22 +112,13 @@ export function MeteredToolTester({
     }));
 
     try {
-      // The seller enforces per-job spend caps, so every paid probe carries a
-      // diagnostic jobId (GET -> query param, POST -> body field).
-      const diagnosticJobId = "smoke-test";
-      let url = `${sellerBaseUrl}${tool.path}`;
-      let body: string | undefined;
-
-      if (tool.method === "GET") {
-        url += (url.includes("?") ? "&" : "?") + `jobId=${diagnosticJobId}`;
-      } else {
-        body = JSON.stringify({ ...(tool.body ?? {}), jobId: diagnosticJobId });
-      }
-
-      const response = await fetch(url, {
+      // The tools list already carries the diagnostic jobId: GET paths include
+      // ?jobId=... (see tools/page.tsx) and POST bodies include jobId, so the
+      // seller can enforce its per-job spend cap on every probe.
+      const response = await fetch(`${sellerBaseUrl}${tool.path}`, {
         method: tool.method,
         headers: tool.method === "POST" ? { "Content-Type": "application/json" } : undefined,
-        body,
+        body: tool.method === "POST" ? JSON.stringify(tool.body ?? {}) : undefined,
       });
 
       const contentType = response.headers.get("content-type") ?? "";
