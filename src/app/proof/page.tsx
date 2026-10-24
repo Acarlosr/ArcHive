@@ -226,7 +226,7 @@ export default function ProofPage() {
   const totalReceipts = packs.reduce((sum, pack) => sum + pack.receipts.length, 0);
   const totalEvents = packs.reduce((sum, pack) => sum + pack.indexedEventCount, 0);
   const totalEscrow = packs.reduce((sum, pack) => sum + Number(pack.job.budget_usdc), 0);
-  const totalEscrowLabel = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(totalEscrow);
+  const totalEscrowLabel = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(totalEscrow);
   const map = isPt ? integrationMapPt : integrationMap;
 
   return (
