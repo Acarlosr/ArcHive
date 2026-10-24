@@ -1,7 +1,8 @@
 // src/lib/walletAuthMessage.ts
 // Shared between client (signing) and server (verifying).
-// The message binds an action, a wallet and a timestamp so a signed
-// header cannot be replayed after the window expires.
+// The message binds an action, a wallet, a timestamp and (for per-record
+// actions) the id of the record, so a signed header cannot be reused after the
+// window expires nor against a different job/agent/link.
 
 export const AUTH_HEADERS = {
   address: "x-arc-auth-address",
@@ -15,13 +16,20 @@ export type WalletAuthAction = "create_job" | "update_job" | "create_agent" | "u
 
 // NOTE: the message travels in an HTTP header (latin-1 only, no newlines),
 // so it is base64-encoded on the wire and decoded before verification.
-export function buildWalletAuthMessage(action: WalletAuthAction, address: string, timestamp: string): string {
-  return [
+export function buildWalletAuthMessage(
+  action: WalletAuthAction,
+  address: string,
+  timestamp: string,
+  resource?: string,
+): string {
+  const lines = [
     "ArcHive - authorize action",
     `Action: ${action}`,
     `Wallet: ${address.toLowerCase()}`,
-    `Timestamp: ${timestamp}`,
-  ].join("\n");
+  ];
+  if (resource) lines.push(`Resource: ${resource}`);
+  lines.push(`Timestamp: ${timestamp}`);
+  return lines.join("\n");
 }
 
 export function encodeWalletAuthMessage(message: string): string {

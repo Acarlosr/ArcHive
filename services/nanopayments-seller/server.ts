@@ -65,7 +65,40 @@ if (!Number.isFinite(JOB_CAP_FRACTION) || JOB_CAP_FRACTION < 0 || JOB_CAP_FRACTI
 }
 
 const app = express();
-app.use(express.json({ limit: "2mb" }));
+app.set("trust proxy", 1); // behind Render's proxy: req.ip is the real client
+app.use(express.json({ limit: "1mb" }));
+
+// ── Abuse limits (in memory; per instance) ──────────────────────────────
+const REQUESTS_PER_IP_PER_MIN = Number(process.env.REQUESTS_PER_IP_PER_MIN ?? "60");
+const NEW_JOBS_PER_IP_PER_HOUR = Number(process.env.NEW_JOBS_PER_IP_PER_HOUR ?? "20");
+const MAX_TRACKED_JOBS = Number(process.env.MAX_TRACKED_JOBS ?? "10000");
+const JOB_ID_RE = /^[A-Za-z0-9_-]{1,80}$/;
+const ipRequests = new Map<string, number[]>();
+const ipNewJobs = new Map<string, number[]>();
+
+function withinLimit(store: Map<string, number[]>, key: string, limit: number, windowMs: number, record = true) {
+  const now = Date.now();
+  const hits = (store.get(key) ?? []).filter((ts) => now - ts < windowMs);
+  if (hits.length >= limit) {
+    store.set(key, hits);
+    return false;
+  }
+  if (record) hits.push(now);
+  store.set(key, hits);
+  if (store.size > 20_000) {
+    for (const [k, v] of store) if (v.every((ts) => now - ts >= windowMs)) store.delete(k);
+  }
+  return true;
+}
+
+app.use((req: Request, res: Response, next) => {
+  if (req.method === "OPTIONS") return next();
+  if (!withinLimit(ipRequests, req.ip ?? "unknown", REQUESTS_PER_IP_PER_MIN, 60_000)) {
+    res.status(429).json({ error: "rate_limited", message: "Too many requests from this IP." });
+    return;
+  }
+  next();
+});
 app.use((req: Request, res: Response, next) => {
   const origin = req.headers.origin;
   if (origin && ALLOWED_ORIGINS.includes(origin)) {
@@ -108,6 +141,11 @@ function ledgerEntry(jobId: string, jobBudgetUsdc?: number) {
   let entry = jobLedger.get(jobId);
   if (!entry) {
     entry = { capUsdc: jobCapUsdc(jobBudgetUsdc), spentUsdc: 0 };
+    if (jobLedger.size >= MAX_TRACKED_JOBS) {
+      // Bounded memory: drop the oldest tracked job.
+      const oldest = jobLedger.keys().next().value;
+      if (oldest !== undefined) jobLedger.delete(oldest);
+    }
     jobLedger.set(jobId, entry);
     return entry;
   }
@@ -136,6 +174,15 @@ function capGuard(priceUsdc: string): RequestHandler {
         error: "jobId_required",
         message: "Paid calls must include a jobId so the seller can enforce the per-job spend cap.",
       });
+      return;
+    }
+    if (!JOB_ID_RE.test(jobId)) {
+      res.status(400).json({ error: "invalid_jobId", message: "jobId must be 1-80 chars: letters, digits, _ or -." });
+      return;
+    }
+    // Rotating jobIds would reset the cap, so brand-new jobs are rate limited per IP.
+    if (!jobLedger.has(jobId) && !withinLimit(ipNewJobs, req.ip ?? "unknown", NEW_JOBS_PER_IP_PER_HOUR, 3_600_000)) {
+      res.status(429).json({ error: "too_many_new_jobs", message: "Too many new jobIds from this IP." });
       return;
     }
     const entry = ledgerEntry(jobId, extractJobBudget(req));

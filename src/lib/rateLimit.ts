@@ -32,7 +32,14 @@ export function checkRateLimit(key: string, limit: number, windowMs: number) {
 }
 
 export function clientIpFromRequest(request: Request) {
+  // The first x-forwarded-for hop is client-controlled (spoofable). Prefer the
+  // platform-set header, then the LAST hop (appended by our own proxy).
+  const real = request.headers.get("x-real-ip") ?? request.headers.get("x-vercel-forwarded-for");
+  if (real) return real.split(",")[0].trim();
   const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0].trim();
-  return request.headers.get("x-real-ip") ?? "unknown";
+  if (forwarded) {
+    const hops = forwarded.split(",").map((hop) => hop.trim()).filter(Boolean);
+    if (hops.length) return hops[hops.length - 1];
+  }
+  return "unknown";
 }

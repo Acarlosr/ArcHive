@@ -8,7 +8,8 @@ import { AUTH_HEADERS, buildWalletAuthMessage, encodeWalletAuthMessage, type Wal
 
 export async function walletAuthHeaders(
   action: WalletAuthAction,
-  walletClient: WalletClient | null
+  walletClient: WalletClient | null,
+  resource?: string
 ): Promise<Record<string, string>> {
   if (!walletClient) {
     throw new Error("Wallet not connected. Connect your wallet to continue.");
@@ -18,7 +19,7 @@ export async function walletAuthHeaders(
   const address = account.address;
 
   const timestamp = new Date().toISOString();
-  const message = buildWalletAuthMessage(action, address, timestamp);
+  const message = buildWalletAuthMessage(action, address, timestamp, resource);
   const signature = await walletClient.signMessage({ message, account });
 
   return {

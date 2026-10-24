@@ -9,13 +9,12 @@ import { arcTransport } from "@/lib/arc/rpc";
 
 const TRANSFER_EVENT = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
-// 50 bps platform fee + rounding; anything below this is not the expected payment.
-const ACCEPT_TOLERANCE = 0.99;
 
 export interface VerifiedPayment {
   ok: boolean;
   reason?: string;
   amountTransferred?: string;
+  blockTimestamp?: number; // unix seconds
 }
 
 export async function verifyUsdcPayment(params: {
@@ -49,6 +48,7 @@ export async function verifyUsdcPayment(params: {
   }
 
   const expected = BigInt(Math.round(parseFloat(expectedAmount) * 1e6));
+  // 50 bps platform fee + rounding: anything below 99% is not the expected payment.
   if (total < (expected * BigInt(99)) / BigInt(100)) {
     return {
       ok: false,
@@ -56,5 +56,10 @@ export async function verifyUsdcPayment(params: {
     };
   }
 
-  return { ok: true, amountTransferred: formatUnits(total, 6) };
+  const block = await client.getBlock({ blockHash: receipt.blockHash }).catch(() => null);
+  return {
+    ok: true,
+    amountTransferred: formatUnits(total, 6),
+    blockTimestamp: block ? Number(block.timestamp) : undefined,
+  };
 }

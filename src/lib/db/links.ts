@@ -154,7 +154,7 @@ export async function markLinkPaid(
     return;
   }
 
-  const headers = await walletAuthHeaders("pay_link", walletClient ?? null);
+  const headers = await walletAuthHeaders("pay_link", walletClient ?? null, id);
   const response = await postToApi(`/api/links/${encodeURIComponent(id)}/paid`, { tx_hash: txHash }, headers);
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {

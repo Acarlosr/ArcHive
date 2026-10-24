@@ -135,7 +135,7 @@ export async function updateAgentReputation(id: string, score: number, walletCli
     return;
   }
 
-  const headers = await walletAuthHeaders("update_agent", walletClient ?? null);
+  const headers = await walletAuthHeaders("update_agent", walletClient ?? null, id);
   const response = await fetch(`/api/agents/${encodeURIComponent(id)}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...headers },
@@ -157,7 +157,7 @@ export async function incrementJobsCompleted(id: string, walletClient?: WalletCl
     return;
   }
 
-  const headers = await walletAuthHeaders("update_agent", walletClient ?? null);
+  const headers = await walletAuthHeaders("update_agent", walletClient ?? null, id);
   const response = await fetch(`/api/agents/${encodeURIComponent(id)}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...headers },

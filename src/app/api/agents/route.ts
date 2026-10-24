@@ -10,7 +10,6 @@ export async function GET() {
     service: "ArcHive agents API",
     status: "ready",
     write: "POST with X-ArcAuth wallet signature",
-    database: getSupabaseAdmin() ? "configured" : "missing",
   });
 }
 

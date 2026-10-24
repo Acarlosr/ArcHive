@@ -181,7 +181,7 @@ export async function updateJobStatus(
     return;
   }
 
-  const headers = await walletAuthHeaders("update_job", walletClient ?? null);
+  const headers = await walletAuthHeaders("update_job", walletClient ?? null, id);
   const response = await fetch(`/api/jobs/${encodeURIComponent(id)}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...headers },
@@ -203,7 +203,7 @@ export async function updateJobOnchainId(id: string, onchainId: string, txHash: 
     return;
   }
 
-  const headers = await walletAuthHeaders("update_job", walletClient ?? null);
+  const headers = await walletAuthHeaders("update_job", walletClient ?? null, id);
   const response = await fetch(`/api/jobs/${encodeURIComponent(id)}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...headers },

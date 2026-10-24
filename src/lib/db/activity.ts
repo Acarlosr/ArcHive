@@ -35,7 +35,7 @@ export async function recordActivityEvent(
   if (isDemoMode()) return;
 
   try {
-    const headers = await walletAuthHeaders("create_link", walletClient ?? null);
+    const headers = await walletAuthHeaders("log_event", walletClient ?? null);
     const response = await postToApi("/api/activity", event, headers);
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
