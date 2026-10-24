@@ -32,8 +32,8 @@ export function TestnetFundsCard({ compact = false }: { compact?: boolean }) {
           <p className="mt-1 text-sm leading-6 text-arc-muted">
             {isMainnet
               ? isPt
-                ? "Na mainnet não existe faucet: financie sua carteira comprando USDC via on-ramp (ex.: Circle, Coinbase, MoonPay) e transferindo para Arc via Circle Gateway/CCTP, ou usando o Onramp Kit."
-                : "There is no faucet on mainnet: fund your wallet by buying USDC through an on-ramp (e.g. Circle, Coinbase, MoonPay) and moving it to Arc via Circle Gateway/CCTP, or use the Onramp Kit."
+                ? "Na mainnet não existe faucet: use o portal oficial da Arc para depositar USDC na sua carteira, ou mova USDC de outra rede com a bridge da Circle. Se ainda não tiver USDC, compre em uma exchange (ex.: Circle, Coinbase, MoonPay) e transfira."
+                : "There is no faucet on mainnet: use the official Arc portal to deposit USDC into your wallet, or move USDC from another network with the Circle bridge. If you have no USDC yet, buy it on an exchange (e.g. Circle, Coinbase, MoonPay) and transfer it."
               : isPt
                 ? "Arc usa USDC para gas e escrow. USDC está ativo para pagamentos de jobs; EURC fica disponível para transferências de teste e fluxos futuros."
                 : "Arc uses USDC for gas and escrow. USDC is live for job payments; EURC is available for testnet transfers and future flows."}
@@ -59,20 +59,20 @@ export function TestnetFundsCard({ compact = false }: { compact?: boolean }) {
         {isMainnet ? (
           <>
             <a
-              href="https://www.arc.io"
+              href="https://portal.arc.io/deposit"
               target="_blank"
               rel="noreferrer"
               className="btn-primary flex-1 text-center"
             >
-              {isPt ? "Como obter USDC em Arc" : "How to get USDC on Arc"}
+              {isPt ? "Depositar USDC na Arc" : "Deposit USDC to Arc"}
             </a>
             <a
-              href="https://docs.arc.io/app-kit/onramp"
+              href="https://bridge.usdc.com/"
               target="_blank"
               rel="noreferrer"
               className="btn-secondary flex-1 text-center"
             >
-              {isPt ? "Onramp Kit" : "Onramp Kit"}
+              {isPt ? "Bridge USDC (Circle)" : "Bridge USDC (Circle)"}
             </a>
           </>
         ) : (
