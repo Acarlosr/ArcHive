@@ -50,3 +50,10 @@ _local/
 
 # python cache
 __pycache__/
+
+# auditoria interna e rascunhos (nunca vao pro GitHub)
+docs/security-audit/
+showcase-assets/mainnet-post/arc_forum_post.html
+showcase-assets/arc-projects-showcase.*
+showcase-assets/arcdex.png
+scripts/build-cpa-pdfs.js
