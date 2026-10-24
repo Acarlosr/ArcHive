@@ -8,6 +8,7 @@ import { agentPaidTools, getDemoSpendReceipts } from "@/lib/agentSpend";
 import { demoAgents, demoJobs } from "@/lib/demoData";
 import { useLanguage } from "@/lib/i18n";
 import { ARC_CHAIN_LABEL } from "@/lib/arc/network";
+import { AddArcNetworkButton } from "@/components/AddArcNetworkButton";
 
 const toolReceipts = getDemoSpendReceipts("job_8183_001");
 
@@ -174,9 +175,7 @@ export default function HomePage() {
             </div>
             <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-arc-muted">
               <span>{isPt ? `Precisa configurar a rede?` : `Need network setup?`}</span>
-              <Link href="/guide" className="font-medium text-arc-cyan transition-colors hover:text-white">
-                {isPt ? `Adicionar ${ARC_CHAIN_LABEL}` : `Add ${ARC_CHAIN_LABEL}`}
-              </Link>
+              <AddArcNetworkButton className="font-medium text-arc-cyan transition-colors hover:text-white" />
               <Link href="/tools" className="font-medium text-arc-gold transition-colors hover:text-white">
                 {isPt ? "Explorar tools medidas" : "Explore metered tools"}
               </Link>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n";
+import { AddArcNetworkButton } from "@/components/AddArcNetworkButton";
 import { ARC_RPC_URLS } from "@/lib/arc/rpc";
 import { ARC_CHAIN, ARC_CHAIN_ID, ARC_CHAIN_LABEL } from "@/lib/arc/network";
 
@@ -85,14 +86,7 @@ export function TestnetFundsCard({ compact = false }: { compact?: boolean }) {
             {isPt ? "Pegar USDC / EURC" : "Get USDC / EURC"}
           </a>
         )}
-        <a
-          href="https://docs.arc.io/arc/references/connect-to-arc"
-          target="_blank"
-          rel="noreferrer"
-          className="btn-secondary flex-1 text-center"
-        >
-          {isPt ? `Adicionar ${ARC_CHAIN_LABEL}` : `Add ${ARC_CHAIN_LABEL}`}
-        </a>
+        <AddArcNetworkButton className="btn-secondary w-full text-center" wrapperClassName="flex-1" />
       </div>
     </div>
   );
