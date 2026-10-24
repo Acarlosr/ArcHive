@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useLanguage } from "@/lib/i18n";
 import { ARC_CHAIN, ARC_CHAIN_ID, ARC_CHAIN_LABEL } from "@/lib/arc/network";
 import { ARC_RPC_URLS } from "@/lib/arc/rpc";
@@ -21,6 +22,8 @@ export function AddArcNetworkButton({ className = "", wrapperClassName = "" }: {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
   const [copied, setCopied] = useState<string | null>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [pos, setPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
 
   const rpcUrl = ARC_RPC_URLS[0];
   const rows: Array<[string, string]> = [
@@ -32,6 +35,12 @@ export function AddArcNetworkButton({ className = "", wrapperClassName = "" }: {
   ];
 
   async function addNetwork() {
+    const r = btnRef.current?.getBoundingClientRect();
+    if (r) {
+      const width = Math.min(340, window.innerWidth - 24);
+      const left = Math.max(12, Math.min(r.left + window.scrollX, window.scrollX + window.innerWidth - width - 12));
+      setPos({ top: r.bottom + window.scrollY + 8, left });
+    }
     setOpen(true);
     const provider = (typeof window !== "undefined"
       ? (window as unknown as { ethereum?: Eip1193Provider }).ethereum
@@ -84,15 +93,16 @@ export function AddArcNetworkButton({ className = "", wrapperClassName = "" }: {
 
   return (
     <span className={`relative inline-block ${wrapperClassName}`}>
-      <button type="button" onClick={addNetwork} className={className}>
+      <button ref={btnRef} type="button" onClick={addNetwork} className={className}>
         {isPt ? `Adicionar ${ARC_CHAIN_LABEL}` : `Add ${ARC_CHAIN_LABEL}`}
       </button>
 
-      {open && (
+      {open && typeof document !== "undefined" && createPortal(
         <div
           role="dialog"
           aria-label={isPt ? "Dados da rede" : "Network details"}
-          className="absolute left-0 top-full z-30 mt-2 w-[min(92vw,340px)] rounded-lg border border-arc-border bg-arc-card p-4 text-left shadow-xl"
+          style={{ position: "absolute", top: pos.top, left: pos.left }}
+          className="z-50 w-[min(92vw,340px)] rounded-lg border border-arc-border bg-arc-card p-4 text-left shadow-xl"
         >
           <div className="mb-2 flex items-center justify-between gap-3">
             <div className="text-sm font-semibold text-arc-text">
@@ -141,7 +151,8 @@ export function AddArcNetworkButton({ className = "", wrapperClassName = "" }: {
               {isPt ? "Tentar de novo" : "Try again"}
             </button>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </span>
   );
