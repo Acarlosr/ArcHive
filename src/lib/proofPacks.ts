@@ -163,5 +163,5 @@ export function buildProofPacks(jobs: DemoJob[], agents: DemoAgent[], events: De
 }
 
 export function getDemoProofPacks() {
-  return demoJobs.map(buildProofPack).sort((a, b) => b.completeness - a.completeness);
+  return demoJobs.map((job) => buildProofPack(job)).sort((a, b) => b.completeness - a.completeness);
 }
