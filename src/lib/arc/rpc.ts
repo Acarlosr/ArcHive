@@ -36,14 +36,16 @@ const PADROES_MAINNET = [
 ];
 
 const PADROES_TESTNET = [
-  "https://rpc.testnet.arc.network",
+  // `.io` primeiro pelo mesmo motivo da mainnet: `.arc.network` esta NXDOMAIN
+  // nas duas redes desde 12/10/2026 (mantido no fim caso volte).
   "https://rpc.testnet.arc.io",
-  "https://rpc.quicknode.testnet.arc.network",
   "https://rpc.quicknode.testnet.arc.io",
-  "https://rpc.drpc.testnet.arc.network",
   "https://rpc.drpc.testnet.arc.io",
-  "https://rpc.blockdaemon.testnet.arc.network",
   "https://rpc.blockdaemon.testnet.arc.io",
+  "https://rpc.testnet.arc.network",
+  "https://rpc.quicknode.testnet.arc.network",
+  "https://rpc.drpc.testnet.arc.network",
+  "https://rpc.blockdaemon.testnet.arc.network",
 ];
 
 export const ARC_RPC_URLS = [
