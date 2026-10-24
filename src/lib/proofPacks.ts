@@ -28,8 +28,17 @@ const fundedStatuses = new Set(["funded", "accepted", "submitted", "approved", "
 const approvedStatuses = new Set(["approved", "paid", "completed"]);
 const payoutStatuses = new Set(["paid", "completed"]);
 
-function findJobEvent(jobId: string, eventType: DemoActivityEvent["event_type"]) {
-  return demoActivityEvents.find((event) => event.related_job_id === jobId && event.event_type === eventType);
+export interface ProofContext {
+  agents: DemoAgent[];
+  events: DemoActivityEvent[];
+}
+
+function findJobEvent(
+  events: DemoActivityEvent[],
+  jobId: string,
+  eventType: DemoActivityEvent["event_type"],
+) {
+  return events.find((event) => event.related_job_id === jobId && event.event_type === eventType);
 }
 
 function makeCheck({
@@ -56,16 +65,22 @@ function makeCheck({
   };
 }
 
-export function buildProofPack(job: DemoJob): ProofPack {
-  const agent = demoAgents.find((item) => item.id === job.agent_id) ?? null;
-  const events = demoActivityEvents
+// Without `ctx` this builds a demo pack (demo data, demo receipts). With `ctx`
+// it builds a pack from real records: no demo receipts, and a transaction hash
+// is only attached to a check when an event or the job state actually backs it.
+export function buildProofPack(job: DemoJob, ctx?: ProofContext): ProofPack {
+  const real = Boolean(ctx);
+  const agentList = ctx?.agents ?? demoAgents;
+  const eventList = ctx?.events ?? demoActivityEvents;
+  const agent = agentList.find((item) => item.id === job.agent_id) ?? null;
+  const events = eventList
     .filter((event) => event.related_job_id === job.id || event.related_agent_id === job.agent_id)
     .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-  const receipts = getDemoSpendReceipts(job.id, job.agent_id);
+  const receipts = real ? [] : getDemoSpendReceipts(job.id, job.agent_id);
   const totalToolSpend = receipts.reduce((sum, receipt) => sum + Number(receipt.amountUsdc), 0);
-  const escrowEvent = findJobEvent(job.id, "escrow_funded");
-  const deliverableEvent = findJobEvent(job.id, "deliverable_submitted");
-  const payoutEvent = findJobEvent(job.id, "payout_released");
+  const escrowEvent = findJobEvent(eventList, job.id, "escrow_funded");
+  const deliverableEvent = findJobEvent(eventList, job.id, "deliverable_submitted");
+  const payoutEvent = findJobEvent(eventList, job.id, "payout_released");
 
   const checks: ProofCheck[] = [
     makeCheck({
@@ -83,7 +98,7 @@ export function buildProofPack(job: DemoJob): ProofPack {
       detail: fundedStatuses.has(job.status)
         ? `${job.budget_usdc} USDC reserved for this job.`
         : "Budget declared; escrow funding is still pending.",
-      txHash: escrowEvent?.tx_hash ?? job.tx_hash,
+      txHash: escrowEvent?.tx_hash ?? (real ? null : job.tx_hash),
     }),
     makeCheck({
       id: "tool-spend",
@@ -103,7 +118,7 @@ export function buildProofPack(job: DemoJob): ProofPack {
       detail: job.deliverable_hash
         ? `Hash-only proof: ${job.deliverable_hash}`
         : "Deliverable content stays private; only a hash/proof link is expected onchain.",
-      txHash: deliverableEvent?.tx_hash ?? job.tx_hash,
+      txHash: deliverableEvent?.tx_hash ?? (real ? null : job.tx_hash),
     }),
     makeCheck({
       id: "approval",
@@ -113,7 +128,7 @@ export function buildProofPack(job: DemoJob): ProofPack {
       detail: approvedStatuses.has(job.status)
         ? "Client approval is recorded for release."
         : "Client review is still pending.",
-      txHash: findJobEvent(job.id, "work_approved")?.tx_hash,
+      txHash: findJobEvent(eventList, job.id, "work_approved")?.tx_hash,
     }),
     makeCheck({
       id: "payout",
@@ -141,6 +156,10 @@ export function buildProofPack(job: DemoJob): ProofPack {
     totalToolSpendUsdc: totalToolSpend.toFixed(4),
     privacyMode: "hash-only",
   };
+}
+
+export function buildProofPacks(jobs: DemoJob[], agents: DemoAgent[], events: DemoActivityEvent[]) {
+  return jobs.map((job) => buildProofPack(job, { agents, events })).sort((a, b) => b.completeness - a.completeness);
 }
 
 export function getDemoProofPacks() {

@@ -1,11 +1,13 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { HeroWalletOnboarding } from "@/components/HeroWalletOnboarding";
 import { WalletConnectCTA } from "@/components/WalletConnectCTA";
 import { agentPaidTools, getDemoSpendReceipts } from "@/lib/agentSpend";
-import { demoAgents, demoJobs } from "@/lib/demoData";
+import { demoAgents, demoJobs, isDemoMode } from "@/lib/demoData";
+import { getJobs } from "@/lib/db/jobs";
+import { getAgents } from "@/lib/db/agents";
 import { useLanguage } from "@/lib/i18n";
 import { ARC_CHAIN_LABEL } from "@/lib/arc/network";
 import { AddArcNetworkButton } from "@/components/AddArcNetworkButton";
@@ -15,6 +17,25 @@ const toolReceipts = getDemoSpendReceipts("job_8183_001");
 export default function HomePage() {
   const { locale, t } = useLanguage();
   const isPt = locale === "pt-BR";
+  const demo = isDemoMode();
+  // Real counts from the database; demo numbers only when Supabase is not configured.
+  const [stats, setStats] = useState<{ jobs: number; settled: number; agents: number } | null>(null);
+  useEffect(() => {
+    if (demo) return;
+    let alive = true;
+    Promise.all([getJobs(), getAgents()])
+      .then(([jobs, agents]) => {
+        if (!alive) return;
+        const settled = jobs
+          .filter((job) => job.status === "completed" || job.status === "paid")
+          .reduce((sum, job) => sum + Number(job.budget_usdc), 0);
+        setStats({ jobs: jobs.length, settled, agents: agents.length });
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [demo]);
   const features = [
     {
       title: t("home.feature.agent"),
@@ -38,9 +59,16 @@ export default function HomePage() {
     },
   ];
   const metrics = [
-    { label: t("home.metrics.jobs"), value: demoJobs.length.toString() },
-    { label: t("home.metrics.settled"), value: `$${demoJobs.reduce((sum, job) => sum + Number(job.status === "completed" ? job.budget_usdc : 0), 0).toLocaleString()}` },
-    { label: t("home.metrics.agents"), value: demoAgents.length.toString() },
+    { label: t("home.metrics.jobs"), value: demo ? demoJobs.length.toString() : stats ? stats.jobs.toString() : "—" },
+    {
+      label: t("home.metrics.settled"),
+      value: demo
+        ? `$${demoJobs.reduce((sum, job) => sum + Number(job.status === "completed" ? job.budget_usdc : 0), 0).toLocaleString()}`
+        : stats
+          ? `$${stats.settled.toLocaleString("en-US", { maximumFractionDigits: 2 })}`
+          : "—",
+    },
+    { label: t("home.metrics.agents"), value: demo ? demoAgents.length.toString() : stats ? stats.agents.toString() : "—" },
     { label: t("home.metrics.receipts"), value: toolReceipts.length.toString() },
   ];
   const storySteps = [
@@ -188,7 +216,9 @@ export default function HomePage() {
                 <div className="label-field">{t("home.liveRoute")}</div>
                 <div className="mt-1 font-display text-xl font-semibold text-arc-text">{t("home.escrowFunded")}</div>
               </div>
-              <div className="rounded-full border border-arc-gold/30 bg-arc-gold/10 px-3 py-1 text-xs font-mono text-arc-gold">2,400 USDC</div>
+              {demo && (
+                <div className="rounded-full border border-arc-gold/30 bg-arc-gold/10 px-3 py-1 text-xs font-mono text-arc-gold">2,400 USDC</div>
+              )}
             </div>
 
             <div className="relative z-10 mt-6 rounded-lg border border-arc-border/80 bg-[#060b0a]/70 p-5">

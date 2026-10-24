@@ -1,14 +1,19 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AuditorAccessPanel } from "@/components/AuditorAccessPanel";
 import { ExplorerLink } from "@/components/ExplorerLink";
-import { getDemoProofPacks, type ProofCheck, type ProofCheckStatus, type ProofPack } from "@/lib/proofPacks";
-import { formatWallet } from "@/lib/demoData";
+import { buildProofPacks, getDemoProofPacks, type ProofCheck, type ProofCheckStatus, type ProofPack } from "@/lib/proofPacks";
+import { formatWallet, isDemoMode } from "@/lib/demoData";
+import { getJobs } from "@/lib/db/jobs";
+import { getAgents } from "@/lib/db/agents";
+import { getActivityEvents } from "@/lib/db/activity";
 import { useLanguage } from "@/lib/i18n";
 import { ARC_CHAIN_LABEL } from "@/lib/arc/network";
 
-const packs = getDemoProofPacks();
+// Demo packs are only used when Supabase is not configured (local/demo mode).
+const demoPacks = getDemoProofPacks();
 
 const integrationMap = [
   {
@@ -195,6 +200,28 @@ function checkDetail(check: ProofCheck, pack: ProofPack, isPt: boolean) {
 export default function ProofPage() {
   const { locale } = useLanguage();
   const isPt = locale === "pt-BR";
+  const demo = isDemoMode();
+  const [packs, setPacks] = useState<ProofPack[]>(demo ? demoPacks : []);
+  const [loading, setLoading] = useState(!demo);
+
+  useEffect(() => {
+    if (demo) return;
+    let alive = true;
+    Promise.all([getJobs(), getAgents(), getActivityEvents()])
+      .then(([jobs, agents, events]) => {
+        if (alive) setPacks(buildProofPacks(jobs, agents, events));
+      })
+      .catch(() => {
+        if (alive) setPacks([]);
+      })
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [demo]);
+
   const completedPacks = packs.filter((pack) => pack.completeness === 100).length;
   const totalReceipts = packs.reduce((sum, pack) => sum + pack.receipts.length, 0);
   const totalEvents = packs.reduce((sum, pack) => sum + pack.indexedEventCount, 0);
@@ -251,6 +278,15 @@ export default function ProofPage() {
               {isPt ? "Ver activity log" : "View activity log"}
             </Link>
           </div>
+
+          {!loading && packs.length === 0 && (
+            <p className="text-sm text-arc-muted">
+              {isPt ? "Nenhum job com prova ainda." : "No jobs with proof yet."}
+            </p>
+          )}
+          {loading && (
+            <p className="text-sm text-arc-muted">{isPt ? "Carregando provas…" : "Loading proofs…"}</p>
+          )}
 
           <div className="space-y-4">
             {packs.map((pack) => (
